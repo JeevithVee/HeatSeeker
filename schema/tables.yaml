@@ -1,7 +1,7 @@
 # HeatSeeker standard tables.
 #
-# STATUS: PROPOSED (Agent 1, 2026-11-14). Becomes FROZEN once all four agents
-# agree on the MessageBoard. After the freeze, changes need agreement of all four.
+# STATUS: FROZEN 2026-11-14. All four agents agreed on the MessageBoard.
+# Changes now need agreement of all four.
 #
 # Conventions that apply to every table:
 #   - country_code (ISO 3166-1 alpha-2) and city_id are on every table.
@@ -12,9 +12,9 @@
 #   - Unity Catalog names are <catalog>.<layer>.<table>; the catalog name is
 #     set per workspace (see `catalog` below), the layer and table are fixed.
 
-version: 0.1.0
-status: proposed
-catalog: heatseeker        # confirm in the workspace
+version: 1.0.0
+status: frozen
+catalog: heatseeker        # created in the workspace by Agent 3
 h3_resolution: 9           # ~0.105 km2 per cell, edge ~174 m
 country_codes: [US]
 city_ids:
@@ -149,9 +149,9 @@ tables:
       city_id:           {type: string, nullable: false}
       site_id:           {type: string, nullable: false}
       variant:           {type: string, nullable: false, description: "all | excl_batch_dated"}
-      treatment_year:    {type: int,    nullable: false, description: "First plant_year with trees_planted >= min_dose"}
+      treatment_year:    {type: int,    nullable: false, description: "First year the cumulative trees_planted (from 2015) reaches min_dose"}
       intervention_type: {type: string, nullable: false}
-      dose_trees:        {type: int,    nullable: false, description: "trees_planted summed over 2015-2019"}
+      dose_trees:        {type: int,    nullable: false, description: "trees_planted summed over the treatment window 2015-2019. Only cells reaching min_dose inside the window get a row"}
       n_pre_scenes:      {type: int,    nullable: false}
       n_post_scenes:     {type: int,    nullable: false}
       n_controls:        {type: int,    nullable: false}
@@ -168,8 +168,44 @@ tables:
       evaluated_at_utc:  {type: timestamp, nullable: false}
 
   gold.recommendations:
-    # Agent 4 owns this definition; to be posted on the MessageBoard.
+    # Agent 4 owns this definition (MessageBoard, Agent 4 msg 2).
     writer: agent-4
     readers: [app]
-    grain: one row per candidate site_id
-    columns: {}
+    grain: one row per site_id; only candidate cells appear
+    notes: >
+      User-facing, so predicted cooling is POSITIVE = cooling (sign flipped
+      from gold.site_effects.effect_k). Surface temperature, Kelvin.
+    columns:
+      country_code:                 {type: string, nullable: false}
+      city_id:                      {type: string, nullable: false}
+      site_id:                      {type: string, nullable: false}
+      rank:                         {type: int,    nullable: false, description: "1 = best"}
+      score:                        {type: double, nullable: false, description: "Predicted mature cooling x vulnerable residents / cost"}
+      predicted_cooling_k_5y:       {type: double, nullable: true}
+      predicted_cooling_k_5y_low:   {type: double, nullable: true}
+      predicted_cooling_k_5y_high:  {type: double, nullable: true}
+      predicted_cooling_k_15y:      {type: double, nullable: true}
+      predicted_cooling_k_15y_low:  {type: double, nullable: true}
+      predicted_cooling_k_15y_high: {type: double, nullable: true}
+      vulnerable_residents:         {type: double, nullable: true}
+      est_cost_usd:                 {type: double, nullable: true}
+      suggested_intervention:       {type: string, nullable: true, description: "street_trees | park_trees | cool_roof | cool_pavement (from country config)"}
+      holdout_control:              {type: boolean, nullable: false, description: "Ranked site deliberately left unplanted as a future control"}
+      model_version:                {type: string, nullable: false, description: "MLflow run"}
+      recommended_at_utc:           {type: timestamp, nullable: false}
+
+  gold.prediction_log:
+    # Agent 4 owns this definition (MessageBoard, Agent 4 msg 2). Also in MLflow.
+    writer: agent-4
+    readers: [agent-4, app]
+    grain: one row per site_id x model_version
+    notes: Scored against gold.site_effects once a logged site is evaluated.
+    columns:
+      country_code:       {type: string, nullable: false}
+      city_id:            {type: string, nullable: false}
+      site_id:            {type: string, nullable: false}
+      model_version:      {type: string, nullable: false}
+      pred_effect_k:      {type: double, nullable: true, description: "Same sign as effect_k: negative = cooling"}
+      pred_effect_k_low:  {type: double, nullable: true}
+      pred_effect_k_high: {type: double, nullable: true}
+      predicted_at_utc:   {type: timestamp, nullable: false}

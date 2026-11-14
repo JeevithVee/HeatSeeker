@@ -8,7 +8,10 @@ exists the column is null.
 """
 import argparse
 
+from pathlib import Path
+
 import pandas as pd
+import yaml
 
 from ingest.us import census, mrlc
 from pipelines import features, grid, interventions, io
@@ -16,6 +19,10 @@ from pipelines.run_interventions import ADAPTERS
 
 CANOPY_BASELINE_YEAR = 2014   # the last year before the first usable plantings
 LATEST_YEAR = 2024
+
+ROOT = Path(__file__).resolve().parents[1]
+STATIC_DIR = ROOT / "pipelines" / "panel" / "out"
+CONFIG_PATH = ROOT / "config" / "us" / "config.yaml"
 
 
 def raster_features(city_grid, raw_dir):
@@ -68,12 +75,20 @@ def existing_trees(city_id):
 
 
 def elevation(city_id):
-    """elevation_m per cell from Agent 2's static export, if it has landed."""
-    try:
-        static = io.read_table(f"bronze.{city_id}_static")
-    except Exception:
+    """elevation_m per cell from Agent 2's static Earth Engine export
+    (pipelines/panel/out/<city>_static.csv on their branch), if present."""
+    path = STATIC_DIR / f"{city_id}_static.csv"
+    if not path.exists():
         return None
-    return static.set_index("site_id")["elevation_m"]
+    return pd.read_csv(path).set_index("site_id")["elevation_m"]
+
+
+def vulnerability_formula():
+    """Weights from the country config when it exists (Agent 4's /config/us)."""
+    if CONFIG_PATH.exists():
+        weights = yaml.safe_load(CONFIG_PATH.read_text()).get("vulnerability_formula", {}).get("weights")
+        return features.weighted_vulnerability(weights)
+    return features.default_vulnerability
 
 
 def run(city_id):
@@ -92,6 +107,7 @@ def run(city_id):
         population=census_features(city_id, raw_root),
         elevation=elevation(city_id),
         existing_trees=existing_trees(city_id),
+        vulnerability_fn=vulnerability_formula(),
     )
     print("silver ->", io.write_table(silver, "silver.features", city_id=city_id))
     print(silver.describe(include="all").T[["count", "mean", "min", "max"]].to_string())

@@ -56,13 +56,27 @@ def population_by_cell(block_population, resolution=schema.H3_RESOLUTION):
     return out
 
 
-def default_vulnerability(features):
-    """Placeholder formula until the country config supplies one: the mean of
-    share aged 65+ and share on low income, each min-max scaled within the city."""
-    def scaled(s):
-        span = s.max() - s.min()
-        return (s - s.min()) / span if span > 0 else s * 0.0
-    return (scaled(features["share_age_65_plus"]) + scaled(features["share_low_income"])) / 2.0
+DEFAULT_VULNERABILITY_WEIGHTS = {"share_age_65_plus": 0.5, "share_low_income": 0.5}
+
+
+def weighted_vulnerability(weights=None):
+    """Formula builder: weighted mean of raw shares, each min-max scaled
+    within the city. `weights` comes from the country config
+    (vulnerability_formula.weights); equal weights when absent."""
+    weights = weights or DEFAULT_VULNERABILITY_WEIGHTS
+    total = sum(weights.values())
+
+    def formula(features):
+        index = 0.0
+        for column, weight in weights.items():
+            s = features[column]
+            span = s.max() - s.min()
+            index = index + (weight / total) * ((s - s.min()) / span if span > 0 else s * 0.0)
+        return index
+    return formula
+
+
+default_vulnerability = weighted_vulnerability()
 
 
 def build_features(grid, *, canopy_baseline=None, canopy_latest=None, impervious=None,
