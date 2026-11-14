@@ -1,0 +1,30 @@
+{
+  "name": "heatseeker-verify-silver-from-bronze",
+  "description": "Rebuilds a city's silver.interventions and silver.features from bronze inside the workspace and fails if they differ from the live tables. Writes nothing.",
+  "git_source": {
+    "git_url": "https://github.com/JeevithVee/HeatSeeker",
+    "git_provider": "gitHub",
+    "git_branch": "agent-1-data"
+  },
+  "tags": {"project": "heatseeker", "component": "silver_features_interventions"},
+  "environments": [
+    {
+      "environment_key": "default",
+      "spec": {"environment_version": "4", "dependencies": ["h3>=4", "pandas", "pyyaml", "numpy", "pyproj", "tifffile", "requests"]}
+    }
+  ],
+  "parameters": [{"name": "catalog", "default": "heatseeker"}, {"name": "city_id", "default": "nyc"}],
+  "max_concurrent_runs": 1,
+  "tasks": [
+    {
+      "task_key": "verify",
+      "environment_key": "default",
+      "spark_python_task": {
+        "python_file": "pipelines/verify_silver_from_bronze.py",
+        "source": "GIT",
+        "parameters": ["--catalog", "{{job.parameters.catalog}}", "--city-id", "{{job.parameters.city_id}}"]
+      },
+      "timeout_seconds": 3600
+    }
+  ]
+}
