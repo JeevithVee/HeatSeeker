@@ -8,10 +8,11 @@ class EvalConfig:
     # --- scene filtering (silver.panel) ---
     lst_col: str = "lst_median_k"            # main temperature measure per cell per scene
     summer_months: tuple = (6, 7, 8)
-    sensors: tuple = ("L8", "L9")            # Landsat only; never mixed with ECOSTRESS
-    max_scene_cloud_frac: float = 0.3
+    sensors: tuple = ("LANDSAT_8", "LANDSAT_9")   # Landsat only; never mixed with ECOSTRESS
+    max_scene_cloud_frac: float = 0.6        # whole-scene cloud; per-cell clear fraction does the real work
     min_valid_pixel_frac: float = 0.7
     min_cells_per_scene: int = 200           # drop scenes that cover too little of the city
+    min_city_clear_frac: float = 0.5         # if silver.panel has city_clear_frac: scene must cover half the city
     tmax_c_range: tuple | None = None        # optional (lo, hi) filter on per-scene tmax_c if present
 
     # --- treatment definition (silver.interventions) ---

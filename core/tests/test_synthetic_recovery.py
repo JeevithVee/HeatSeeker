@@ -29,16 +29,16 @@ def gold(city):
 
 def test_filtering_keeps_only_clean_summer_landsat(city):
     p = filter_scenes(city["panel"], CFG)
-    assert set(p["sensor"]) <= {"L8", "L9"}
+    assert set(p["sensor"]) <= {"LANDSAT_8", "LANDSAT_9"}
     months = pd.to_datetime(p["acquired_at_utc"]).dt.month
     assert months.isin([6, 7, 8]).all()
-    assert (p["scene_cloud_cover_frac"] <= 0.3).all()
-    assert (p["valid_pixel_frac"] >= 0.7).all()
+    assert (p["scene_cloud_cover_frac"] <= CFG.max_scene_cloud_frac).all()
+    assert (p["valid_pixel_frac"] >= CFG.min_valid_pixel_frac).all()
     raw = city["panel"].drop_duplicates("scene_id")
     expected = raw[
-        raw["sensor"].isin(["L8", "L9"])
+        raw["sensor"].isin(["LANDSAT_8", "LANDSAT_9"])
         & pd.to_datetime(raw["acquired_at_utc"]).dt.month.isin([6, 7, 8])
-        & (raw["scene_cloud_cover_frac"] <= 0.3)
+        & (raw["scene_cloud_cover_frac"] <= CFG.max_scene_cloud_frac)
     ]["scene_id"].nunique()
     assert p["scene_id"].nunique() == expected
     assert expected >= 60

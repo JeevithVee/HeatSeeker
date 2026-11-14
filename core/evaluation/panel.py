@@ -28,6 +28,8 @@ def filter_scenes(panel: pd.DataFrame, cfg: EvalConfig) -> pd.DataFrame:
         & (p["valid_pixel_frac"] >= cfg.min_valid_pixel_frac)
         & p[cfg.lst_col].notna()
     )
+    if "city_clear_frac" in p.columns:
+        keep &= p["city_clear_frac"].fillna(1.0) >= cfg.min_city_clear_frac
     if cfg.tmax_c_range is not None and "tmax_c" in p.columns:
         lo, hi = cfg.tmax_c_range
         keep &= p["tmax_c"].between(lo, hi) | p["tmax_c"].isna()

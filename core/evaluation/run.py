@@ -49,7 +49,7 @@ def evaluate_city(
         control_ids, treated["treatment_year"].to_numpy(), features, yearly, wide, scene_year, rng, cfg
     )
 
-    now = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    now = pd.Timestamp(datetime.now(timezone.utc)).floor("s")
     rows = []
     for t in treated.itertuples(index=False):
         ctrls = matches.get(t.site_id, [])
