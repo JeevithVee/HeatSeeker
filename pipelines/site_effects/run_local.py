@@ -48,6 +48,9 @@ def parse_args(argv=None):
     ap.add_argument("--panel", nargs="+", required=True, help="silver.panel file(s) or globs")
     ap.add_argument("--features", nargs="+", required=True)
     ap.add_argument("--interventions", nargs="+", required=True)
+    ap.add_argument("--static", nargs="*", default=None,
+                    help="optional per-cell static table(s) (e.g. Agent 2's nyc_static.csv) merged into features on "
+                         "site_id, filling columns that are missing or all-null there, such as elevation_m")
     ap.add_argument("--out-dir", required=True)
     ap.add_argument("--city-id", default=None, help="filter all three tables to this city_id")
     ap.add_argument("--panel-version", default=None, help="label for the panel snapshot, e.g. export date")
@@ -67,6 +70,14 @@ def main(argv=None):
         panel, features, interventions = (
             df[df["city_id"] == args.city_id].reset_index(drop=True) for df in (panel, features, interventions)
         )
+    if args.static:
+        static = read_any(args.static).drop_duplicates("site_id").set_index("site_id")
+        for col in static.columns:
+            if col in ("country_code", "city_id") or col.endswith("_source"):
+                continue
+            if col not in features.columns or features[col].isna().all():
+                features[col] = features["site_id"].map(static[col])
+                print(f"  filled features.{col} from static table ({features[col].notna().sum():,} cells)")
     city = str(panel["city_id"].iloc[0])
     extra = {"sensors": tuple(args.sensors)} if args.sensors else {}
     cfg = EvalConfig(n_bootstrap=args.n_bootstrap, n_placebo=args.n_placebo, min_dose=args.min_dose, **extra)
@@ -76,6 +87,7 @@ def main(argv=None):
     out.mkdir(parents=True, exist_ok=True)
     gold_path = out / f"{city}_gold_site_effects.csv"
     gold.to_csv(gold_path, index=False)
+    gold.to_parquet(out / f"{city}_gold_site_effects.parquet", index=False)   # same rows, for Agent 4's pipeline
     report_path = out / f"{city}_site_effects_report.json"
     with open(report_path, "w") as fh:
         json.dump({"city_id": city, "method_version": METHOD_VERSION, "panel_version": args.panel_version,

@@ -54,13 +54,30 @@ def placebo_distribution(
     scene_year: np.ndarray,
     rng: np.random.Generator,
     cfg: EvalConfig,
+    treated_ids: pd.Index | None = None,
 ) -> np.ndarray:
-    """DiD effects for n_placebo unplanted cells given fake treatment years."""
+    """DiD effects for n_placebo unplanted cells given fake treatment years.
+
+    Placebo cells are sampled so their land-cover mix matches the treated cells' (the control
+    pool is heavier in parks and barren land, which run noisier than streets); otherwise the
+    null distribution would be wider than the one the real sites face.
+    """
     pool = pd.Index(control_ids).intersection(wide.index)
     if len(pool) < cfg.n_controls + 1 or len(treatment_years) == 0:
         return np.array([])
     n = min(cfg.n_placebo, len(pool))
-    fake_ids = pool[rng.choice(len(pool), size=n, replace=False)]
+    weights = None
+    feats = features.set_index("site_id") if "site_id" in features.columns else features
+    col = cfg.exact_match_col
+    if treated_ids is not None and col and col in feats.columns:
+        t_cls = feats.loc[pd.Index(treated_ids).intersection(feats.index), col].value_counts(normalize=True)
+        pool_cls = feats.reindex(pool)[col]
+        n_in_cls = pool_cls.map(pool_cls.value_counts())
+        w = pool_cls.map(t_cls).fillna(0.0) / n_in_cls.replace(0, np.nan)
+        w = w.fillna(0.0).to_numpy(dtype=float)
+        if (w > 0).sum() >= n:
+            weights = w / w.sum()
+    fake_ids = pool[rng.choice(len(pool), size=n, replace=False, p=weights)]
     fake = pd.DataFrame({
         "site_id": fake_ids,
         "treatment_year": rng.choice(treatment_years, size=n, replace=True),

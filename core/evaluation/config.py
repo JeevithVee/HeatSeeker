@@ -15,12 +15,16 @@ class EvalConfig:
     # ~0.8 clear even on a cloudless day; a lower bar keeps those scenes when L5/L7 are enabled.
     sensor_min_valid_pixel_frac: dict = field(default_factory=lambda: {"LANDSAT_7": 0.5})
     min_cells_per_scene: int = 200           # drop scenes that cover too little of the city
-    # NYC straddles Landsat paths 13 and 14, so edge scenes cover part of the city. The per-site
-    # estimate differences a cell against its own matched controls, so partial scenes are usable;
-    # keep scenes with is_clear coverage >= 0.3 of the city, and per scene require at least half
-    # the site's controls to be present (min_control_frac_per_scene) for the scene to count.
-    min_city_clear_frac: float = 0.3
+    # NYC sits on Landsat path 13/row 32 and path 14/row 32 (each covers the whole city) plus
+    # path 14/row 31, which only clips the north (max city_clear_frac 0.34, Agent 2 checked).
+    # >= 0.5 removes that footprint entirely, so no date is counted twice. Do not lower below
+    # ~0.4 without de-duplicating by date. Per scene a site also needs at least half its
+    # matched controls present (min_control_frac_per_scene) for the scene to count.
+    min_city_clear_frac: float = 0.5
     min_control_frac_per_scene: float = 0.5
+    # Cloud the QA mask missed reads far colder than anything real. Per scene, drop cells whose
+    # rel_k is below median - cold_outlier_mads * MAD (one-sided; hot outliers are real roofs).
+    cold_outlier_mads: float = 6.0
     tmax_c_range: tuple | None = None        # optional (lo, hi) filter on per-scene tmax_c if present
 
     # --- treatment definition (silver.interventions) ---

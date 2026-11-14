@@ -39,8 +39,22 @@ silver tables and writes `gold.site_effects`.
 7. **Labels** (`labels.py`).
    - `detected`: CI excludes zero and `placebo_p < 0.05`.
    - `not_detectable`: no effect found, and `mde_k ≤ 1.0 K` (the site had the precision to see
-     a 1 K effect). `mde_k = 2.8 × SE` (80% power at 5%).
+     a 1 K effect).
    - `inconclusive`: too few scenes (< 5 pre or post) or controls (< 3), or `mde_k > 1.0 K`.
+   - `mde_k = max(2.8 × bootstrap SE, placebo q95 + 0.84 × placebo SD)`. On real NYC data the
+     bootstrap alone says ~0.7 K, but unplanted cells drift by 0.6 K SD on their own, so the
+     placebo-based floor (~1.6 K) is the honest one. The bootstrap CI alone would have called
+     286 of 1,111 NYC sites; the placebo gate calls 28, below the ~56 expected by chance.
+
+## First real NYC result (2026-11-14, panel agent2-8297d1c, Landsat 8/9, 99 scenes)
+
+1,111 planted cells, 3,872 controls. Pre-period −0.007 K, balance |SMD| 0.03, placebo centred.
+Per site: 28 detected (20 cooling, 8 warming) vs ~56 expected by chance, so individual cells
+are below Landsat's detection limit at 10–100 trees per 0.1 km². Pooled: −0.054 ± 0.015 K
+overall, −0.082 ± 0.017 K at 5+ years, with no dose gradient (15–19 trees −0.14 K, 30–49
+trees +0.05 K). Adding Landsat 5/7 (125 scenes, pre-period back to 2008) gives the same
+picture: −0.058 ± 0.016 K, −0.086 ± 0.018 K at 5+ years. Street-tree planting at NYC density
+cools surface temperature by about a tenth of a kelvin after five years, visible only pooled.
 
 ## Sanity report
 

@@ -61,7 +61,15 @@ def evaluate_city_with_report(
     matches = match_controls(treated, control_ids, features, yearly, cfg)
 
     placebo = placebo_distribution(
-        control_ids, treated["treatment_year"].to_numpy(), features, yearly, wide, scene_year, rng, cfg
+        control_ids, treated["treatment_year"].to_numpy(), features, yearly, wide, scene_year, rng, cfg,
+        treated_ids=pd.Index(treated["site_id"]),
+    )
+    # Honest detection floor. A site is called detected when |effect| beats the placebo 95th
+    # percentile, so 80% power against an effect delta needs delta ~ q95 + 0.84 * placebo SD.
+    # The bootstrap SE alone misses the drift unplanted cells show on their own.
+    placebo_floor = (
+        float(np.quantile(np.abs(placebo), 1 - cfg.alpha) + 0.84 * np.std(placebo, ddof=1))
+        if len(placebo) > 10 else 0.0
     )
 
     now = pd.Timestamp(datetime.now(timezone.utc)).floor("s")
@@ -72,7 +80,7 @@ def evaluate_city_with_report(
         Y_c = W[[row[c] for c in ctrls]] if ctrls else np.empty((0, W.shape[1]))
         est = site_did(y_t, Y_c, scene_year, int(t.treatment_year), cfg)
         se, lo, hi = bootstrap_effect(y_t, Y_c, est.pre_mask, est.post_mask, rng, cfg)
-        mde = cfg.power_z * se if not np.isnan(se) else float("nan")
+        mde = max(cfg.power_z * se, placebo_floor) if not np.isnan(se) else float("nan")
         pp = placebo_p_value(est.effect_k, placebo)
         label = quality_label(est.effect_k, lo, hi, pp, mde, est.n_pre, est.n_post, len(ctrls), cfg)
         rows.append({

@@ -45,10 +45,19 @@ def filter_scenes(panel: pd.DataFrame, cfg: EvalConfig) -> pd.DataFrame:
 
 
 def relative_temperature(panel: pd.DataFrame, cfg: EvalConfig) -> pd.DataFrame:
-    """Add rel_k: cell LST minus the scene's city-wide median LST (Kelvin)."""
+    """Add rel_k: cell LST minus the scene's city-wide median LST (Kelvin).
+
+    Then drop per-scene cold outliers (rel_k < -cold_outlier_mads * MAD): cloud that slipped
+    the QA mask reads tens of Kelvin colder than any real surface. One-sided on purpose; hot
+    outliers are real roofs and the point of the exercise.
+    """
     p = panel.copy()
     p["rel_k"] = p[cfg.lst_col] - p.groupby("scene_id")[cfg.lst_col].transform("median")
-    return p
+    if cfg.cold_outlier_mads:
+        mad = p.groupby("scene_id")["rel_k"].transform(lambda s: (s - s.median()).abs().median())
+        p = p.loc[p["rel_k"] >= -cfg.cold_outlier_mads * mad.clip(lower=0.5)]
+        p["rel_k"] = p[cfg.lst_col] - p.groupby("scene_id")[cfg.lst_col].transform("median")
+    return p.reset_index(drop=True)
 
 
 def to_wide(panel: pd.DataFrame) -> tuple[pd.DataFrame, np.ndarray]:

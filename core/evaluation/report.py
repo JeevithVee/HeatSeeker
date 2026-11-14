@@ -48,6 +48,42 @@ def pooled_event_study(gold: pd.DataFrame) -> pd.DataFrame:
             .reset_index().sort_values("years_since"))
 
 
+DOSE_BINS = [10, 15, 20, 30, 50, 10_000]
+
+
+def pooled_by_dose(gold: pd.DataFrame, min_years: int = 5) -> pd.DataFrame:
+    """Pooled effect by trees-in-cell bin: mean effect_k with SE across sites, and the mean
+    event-study effect at >= min_years since planting. Sites are treated as independent."""
+    if gold.empty:
+        return pd.DataFrame(columns=["dose_bin", "n_sites", "mean_effect_k", "se_k", "mean_effect_5yr_plus_k", "se_5yr_plus_k"])
+    g = gold.copy()
+    late = []
+    for s in g["event_study_json"].fillna("{}"):
+        vals = [v for k, v in json.loads(s).items() if int(k) >= min_years]
+        late.append(float(np.mean(vals)) if vals else np.nan)
+    g["late"] = late
+    g["dose_bin"] = pd.cut(g["dose_trees"], DOSE_BINS, right=False,
+                           labels=[f"{a}-{b - 1}" if b < 10_000 else f"{a}+" for a, b in zip(DOSE_BINS[:-1], DOSE_BINS[1:])])
+    rows = []
+    for b, s in g.groupby("dose_bin", observed=True):
+        e, l = s["effect_k"].dropna(), s["late"].dropna()
+        rows.append({
+            "dose_bin": str(b), "n_sites": int(len(s)),
+            "mean_effect_k": float(e.mean()) if len(e) else np.nan,
+            "se_k": float(e.std(ddof=1) / np.sqrt(len(e))) if len(e) > 1 else np.nan,
+            "mean_effect_5yr_plus_k": float(l.mean()) if len(l) else np.nan,
+            "se_5yr_plus_k": float(l.std(ddof=1) / np.sqrt(len(l))) if len(l) > 1 else np.nan,
+        })
+    all_e, all_l = g["effect_k"].dropna(), g["late"].dropna()
+    rows.append({
+        "dose_bin": "all", "n_sites": int(len(g)),
+        "mean_effect_k": float(all_e.mean()), "se_k": float(all_e.std(ddof=1) / np.sqrt(len(all_e))),
+        "mean_effect_5yr_plus_k": float(all_l.mean()) if len(all_l) else np.nan,
+        "se_5yr_plus_k": float(all_l.std(ddof=1) / np.sqrt(len(all_l))) if len(all_l) > 1 else np.nan,
+    })
+    return pd.DataFrame(rows)
+
+
 def build_report(
     gold: pd.DataFrame,
     filtered_panel: pd.DataFrame,
@@ -63,7 +99,14 @@ def build_report(
     pre = es.loc[es["years_since"] < 0]
     pre_mean = float(np.average(pre["mean_effect_k"], weights=pre["n_sites"])) if len(pre) else float("nan")
     balance = standardized_mean_differences(treated_ids, matches, features, cfg)
+    det = gold.loc[gold["quality_label"] == "detected", "effect_k"]
     return {
+        # Multiple testing: with n sites and a 5% placebo test, about alpha*n would be called
+        # detected under the null. Compare n_detected with this before celebrating.
+        "n_detected": int(len(det)),
+        "n_detected_cooling": int((det < 0).sum()),
+        "n_detected_warming": int((det > 0).sum()),
+        "expected_detected_under_null": float(cfg.alpha * len(gold)),
         "n_scenes": int(len(scenes)),
         "scenes_per_year": {int(k): int(v) for k, v in scenes_per_year.items()},
         "n_cells_in_panel": int(filtered_panel["site_id"].nunique()),
@@ -80,18 +123,32 @@ def build_report(
         "placebo_sd_k": float(np.std(placebo, ddof=1)) if len(placebo) > 1 else float("nan"),
         "placebo_q95_abs_k": float(np.quantile(np.abs(placebo), 0.95)) if len(placebo) else float("nan"),
         "event_study": es.round(4).to_dict("records"),
+        "pooled_by_dose": pooled_by_dose(gold).round(4).to_dict("records"),
     }
+
+
+def cfg_alpha(rep: dict) -> str:
+    n = max(rep.get("n_treated", 0), 1)
+    return f"{rep.get('expected_detected_under_null', 0.0) / n:.2f}"
 
 
 def format_report(rep: dict) -> str:
     lines = [
         f"scenes kept: {rep['n_scenes']} over {len(rep['scenes_per_year'])} years; cells: {rep['n_cells_in_panel']:,}",
         f"treated: {rep['n_treated']:,} (matched {rep['n_matched']:,}); labels: {rep['labels']}",
+        f"detected: {rep['n_detected']} ({rep['n_detected_cooling']} cooling, {rep['n_detected_warming']} warming) "
+        f"vs ~{rep['expected_detected_under_null']:.0f} expected by chance at alpha={cfg_alpha(rep)}",
         f"median MDE {rep['median_mde_k']:.2f} K; median detected effect {rep['median_effect_k_detected']:.2f} K",
         f"pre-period pooled effect {rep['pre_period_mean_effect_k']:+.3f} K (want ~0)",
         f"control balance: max |SMD| {rep['max_abs_smd']:.3f} (want < 0.1)",
         f"placebo: mean {rep['placebo_mean_k']:+.3f} K, sd {rep['placebo_sd_k']:.3f} K, 95% |q| {rep['placebo_q95_abs_k']:.3f} K",
         "event study (years since planting: mean K, n): "
         + ", ".join(f"{r['years_since']}: {r['mean_effect_k']:+.2f} ({r['n_sites']})" for r in rep["event_study"]),
+        "pooled by trees in cell (mean effect ± SE; at 5+ years ± SE; n):",
     ]
+    for r in rep.get("pooled_by_dose", []):
+        lines.append(
+            f"  {r['dose_bin']:>6}: {r['mean_effect_k']:+.3f} ± {r['se_k']:.3f} K; "
+            f"5yr+ {r['mean_effect_5yr_plus_k']:+.3f} ± {r['se_5yr_plus_k']:.3f} K; n={r['n_sites']}"
+        )
     return "\n".join(lines)

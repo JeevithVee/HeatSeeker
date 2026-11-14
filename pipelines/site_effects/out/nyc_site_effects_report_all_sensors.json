@@ -1,0 +1,532 @@
+{
+ "city_id": "nyc",
+ "method_version": "0.2.0",
+ "panel_version": "agent2-8297d1c",
+ "config": {
+  "lst_col": "lst_median_k",
+  "summer_months": [
+   6,
+   7,
+   8
+  ],
+  "sensors": [
+   "LANDSAT_8",
+   "LANDSAT_9",
+   "LANDSAT_7",
+   "LANDSAT_5"
+  ],
+  "max_scene_cloud_frac": 0.6,
+  "min_valid_pixel_frac": 0.7,
+  "sensor_min_valid_pixel_frac": {
+   "LANDSAT_7": 0.5
+  },
+  "min_cells_per_scene": 200,
+  "min_city_clear_frac": 0.5,
+  "min_control_frac_per_scene": 0.5,
+  "cold_outlier_mads": 6.0,
+  "tmax_c_range": null,
+  "min_dose": 10,
+  "treatment_window": [
+   2015,
+   2019
+  ],
+  "control_max_trees": 2,
+  "batch_frac_threshold": 0.5,
+  "intervention_type": "tree_planting",
+  "exclude_land_cover": [
+   "open_water",
+   "emergent_herbaceous_wetlands",
+   "woody_wetlands"
+  ],
+  "match_vars": [
+   "canopy_frac_baseline",
+   "impervious_frac",
+   "elevation_m"
+  ],
+  "exact_match_col": "land_cover_class",
+  "n_controls": 10,
+  "pretrend_weight": 1.0,
+  "post_start_offset": 1,
+  "min_pre_scenes": 5,
+  "min_post_scenes": 5,
+  "min_controls": 3,
+  "n_bootstrap": 500,
+  "n_placebo": 800,
+  "alpha": 0.05,
+  "power_z": 2.8,
+  "min_meaningful_effect_k": 1.0,
+  "seed": 0,
+  "required_panel_cols": [
+   "country_code",
+   "city_id",
+   "site_id",
+   "scene_id",
+   "acquired_at_utc",
+   "sensor",
+   "valid_pixel_frac",
+   "scene_cloud_cover_frac"
+  ]
+ },
+ "reports": {
+  "all": {
+   "n_detected": 14,
+   "n_detected_cooling": 10,
+   "n_detected_warming": 4,
+   "expected_detected_under_null": 55.550000000000004,
+   "n_scenes": 125,
+   "scenes_per_year": {
+    "2008": 6,
+    "2009": 6,
+    "2010": 6,
+    "2011": 6,
+    "2012": 2,
+    "2013": 5,
+    "2014": 6,
+    "2015": 4,
+    "2016": 10,
+    "2017": 5,
+    "2018": 2,
+    "2019": 6,
+    "2020": 4,
+    "2021": 4,
+    "2022": 10,
+    "2023": 9,
+    "2024": 10,
+    "2025": 12,
+    "2026": 12
+   },
+   "n_cells_in_panel": 7414,
+   "n_treated": 1111,
+   "n_matched": 1111,
+   "labels": {
+    "inconclusive": 1097,
+    "detected": 14
+   },
+   "median_mde_k": 1.7738309479133352,
+   "median_effect_k_detected": -1.5081571694865952,
+   "pre_period_mean_effect_k": 0.009851892196450369,
+   "max_abs_smd": 0.025699418116361242,
+   "balance": [
+    {
+     "variable": "canopy_frac_baseline",
+     "mean_treated": 0.0798,
+     "mean_controls": 0.0805,
+     "smd": -0.0071
+    },
+    {
+     "variable": "impervious_frac",
+     "mean_treated": 0.7222,
+     "mean_controls": 0.7201,
+     "smd": 0.0158
+    },
+    {
+     "variable": "elevation_m",
+     "mean_treated": 18.9774,
+     "mean_controls": 18.6138,
+     "smd": 0.0257
+    }
+   ],
+   "placebo_mean_k": 0.019764749843375215,
+   "placebo_sd_k": 0.6214112375517733,
+   "placebo_q95_abs_k": 1.2518455083698456,
+   "event_study": [
+    {
+     "years_since": -11,
+     "mean_effect_k": 0.0238,
+     "n_sites": 330
+    },
+    {
+     "years_since": -10,
+     "mean_effect_k": 0.0205,
+     "n_sites": 609
+    },
+    {
+     "years_since": -9,
+     "mean_effect_k": -0.0187,
+     "n_sites": 943
+    },
+    {
+     "years_since": -8,
+     "mean_effect_k": 0.0284,
+     "n_sites": 1053
+    },
+    {
+     "years_since": -7,
+     "mean_effect_k": 0.0619,
+     "n_sites": 1092
+    },
+    {
+     "years_since": -6,
+     "mean_effect_k": 0.0337,
+     "n_sites": 1098
+    },
+    {
+     "years_since": -5,
+     "mean_effect_k": 0.0018,
+     "n_sites": 1097
+    },
+    {
+     "years_since": -4,
+     "mean_effect_k": -0.0336,
+     "n_sites": 1100
+    },
+    {
+     "years_since": -3,
+     "mean_effect_k": 0.0203,
+     "n_sites": 1106
+    },
+    {
+     "years_since": -2,
+     "mean_effect_k": -0.009,
+     "n_sites": 1110
+    },
+    {
+     "years_since": -1,
+     "mean_effect_k": -0.0088,
+     "n_sites": 1111
+    },
+    {
+     "years_since": 0,
+     "mean_effect_k": 0.0095,
+     "n_sites": 1110
+    },
+    {
+     "years_since": 1,
+     "mean_effect_k": -0.0282,
+     "n_sites": 1110
+    },
+    {
+     "years_since": 2,
+     "mean_effect_k": -0.0002,
+     "n_sites": 1110
+    },
+    {
+     "years_since": 3,
+     "mean_effect_k": -0.0543,
+     "n_sites": 1110
+    },
+    {
+     "years_since": 4,
+     "mean_effect_k": 0.0034,
+     "n_sites": 1111
+    },
+    {
+     "years_since": 5,
+     "mean_effect_k": -0.0981,
+     "n_sites": 1110
+    },
+    {
+     "years_since": 6,
+     "mean_effect_k": -0.0729,
+     "n_sites": 1111
+    },
+    {
+     "years_since": 7,
+     "mean_effect_k": -0.0773,
+     "n_sites": 1111
+    },
+    {
+     "years_since": 8,
+     "mean_effect_k": -0.0639,
+     "n_sites": 781
+    },
+    {
+     "years_since": 9,
+     "mean_effect_k": -0.0587,
+     "n_sites": 502
+    },
+    {
+     "years_since": 10,
+     "mean_effect_k": -0.1531,
+     "n_sites": 166
+    },
+    {
+     "years_since": 11,
+     "mean_effect_k": -0.4504,
+     "n_sites": 57
+    }
+   ],
+   "pooled_by_dose": [
+    {
+     "dose_bin": "10-14",
+     "n_sites": 531,
+     "mean_effect_k": -0.0705,
+     "se_k": 0.0237,
+     "mean_effect_5yr_plus_k": -0.0996,
+     "se_5yr_plus_k": 0.028
+    },
+    {
+     "dose_bin": "15-19",
+     "n_sites": 253,
+     "mean_effect_k": -0.0837,
+     "se_k": 0.0324,
+     "mean_effect_5yr_plus_k": -0.1229,
+     "se_5yr_plus_k": 0.0375
+    },
+    {
+     "dose_bin": "20-29",
+     "n_sites": 203,
+     "mean_effect_k": -0.0225,
+     "se_k": 0.0334,
+     "mean_effect_5yr_plus_k": -0.0365,
+     "se_5yr_plus_k": 0.0404
+    },
+    {
+     "dose_bin": "30-49",
+     "n_sites": 95,
+     "mean_effect_k": 0.0207,
+     "se_k": 0.0494,
+     "mean_effect_5yr_plus_k": -0.0003,
+     "se_5yr_plus_k": 0.059
+    },
+    {
+     "dose_bin": "50+",
+     "n_sites": 29,
+     "mean_effect_k": -0.1105,
+     "se_k": 0.0733,
+     "mean_effect_5yr_plus_k": -0.1288,
+     "se_5yr_plus_k": 0.0891
+    },
+    {
+     "dose_bin": "all",
+     "n_sites": 1111,
+     "mean_effect_k": -0.058,
+     "se_k": 0.0156,
+     "mean_effect_5yr_plus_k": -0.0856,
+     "se_5yr_plus_k": 0.0184
+    }
+   ],
+   "variant": "all"
+  },
+  "excl_batch_dated": {
+   "n_detected": 14,
+   "n_detected_cooling": 10,
+   "n_detected_warming": 4,
+   "expected_detected_under_null": 55.550000000000004,
+   "n_scenes": 125,
+   "scenes_per_year": {
+    "2008": 6,
+    "2009": 6,
+    "2010": 6,
+    "2011": 6,
+    "2012": 2,
+    "2013": 5,
+    "2014": 6,
+    "2015": 4,
+    "2016": 10,
+    "2017": 5,
+    "2018": 2,
+    "2019": 6,
+    "2020": 4,
+    "2021": 4,
+    "2022": 10,
+    "2023": 9,
+    "2024": 10,
+    "2025": 12,
+    "2026": 12
+   },
+   "n_cells_in_panel": 7414,
+   "n_treated": 1111,
+   "n_matched": 1111,
+   "labels": {
+    "inconclusive": 1097,
+    "detected": 14
+   },
+   "median_mde_k": 1.7738309479133352,
+   "median_effect_k_detected": -1.5081571694865952,
+   "pre_period_mean_effect_k": 0.009851892196450369,
+   "max_abs_smd": 0.025699418116361242,
+   "balance": [
+    {
+     "variable": "canopy_frac_baseline",
+     "mean_treated": 0.0798,
+     "mean_controls": 0.0805,
+     "smd": -0.0071
+    },
+    {
+     "variable": "impervious_frac",
+     "mean_treated": 0.7222,
+     "mean_controls": 0.7201,
+     "smd": 0.0158
+    },
+    {
+     "variable": "elevation_m",
+     "mean_treated": 18.9774,
+     "mean_controls": 18.6138,
+     "smd": 0.0257
+    }
+   ],
+   "placebo_mean_k": 0.019764749843375215,
+   "placebo_sd_k": 0.6214112375517733,
+   "placebo_q95_abs_k": 1.2518455083698456,
+   "event_study": [
+    {
+     "years_since": -11,
+     "mean_effect_k": 0.0238,
+     "n_sites": 330
+    },
+    {
+     "years_since": -10,
+     "mean_effect_k": 0.0205,
+     "n_sites": 609
+    },
+    {
+     "years_since": -9,
+     "mean_effect_k": -0.0187,
+     "n_sites": 943
+    },
+    {
+     "years_since": -8,
+     "mean_effect_k": 0.0284,
+     "n_sites": 1053
+    },
+    {
+     "years_since": -7,
+     "mean_effect_k": 0.0619,
+     "n_sites": 1092
+    },
+    {
+     "years_since": -6,
+     "mean_effect_k": 0.0337,
+     "n_sites": 1098
+    },
+    {
+     "years_since": -5,
+     "mean_effect_k": 0.0018,
+     "n_sites": 1097
+    },
+    {
+     "years_since": -4,
+     "mean_effect_k": -0.0336,
+     "n_sites": 1100
+    },
+    {
+     "years_since": -3,
+     "mean_effect_k": 0.0203,
+     "n_sites": 1106
+    },
+    {
+     "years_since": -2,
+     "mean_effect_k": -0.009,
+     "n_sites": 1110
+    },
+    {
+     "years_since": -1,
+     "mean_effect_k": -0.0088,
+     "n_sites": 1111
+    },
+    {
+     "years_since": 0,
+     "mean_effect_k": 0.0095,
+     "n_sites": 1110
+    },
+    {
+     "years_since": 1,
+     "mean_effect_k": -0.0282,
+     "n_sites": 1110
+    },
+    {
+     "years_since": 2,
+     "mean_effect_k": -0.0002,
+     "n_sites": 1110
+    },
+    {
+     "years_since": 3,
+     "mean_effect_k": -0.0543,
+     "n_sites": 1110
+    },
+    {
+     "years_since": 4,
+     "mean_effect_k": 0.0034,
+     "n_sites": 1111
+    },
+    {
+     "years_since": 5,
+     "mean_effect_k": -0.0981,
+     "n_sites": 1110
+    },
+    {
+     "years_since": 6,
+     "mean_effect_k": -0.0729,
+     "n_sites": 1111
+    },
+    {
+     "years_since": 7,
+     "mean_effect_k": -0.0773,
+     "n_sites": 1111
+    },
+    {
+     "years_since": 8,
+     "mean_effect_k": -0.0639,
+     "n_sites": 781
+    },
+    {
+     "years_since": 9,
+     "mean_effect_k": -0.0587,
+     "n_sites": 502
+    },
+    {
+     "years_since": 10,
+     "mean_effect_k": -0.1531,
+     "n_sites": 166
+    },
+    {
+     "years_since": 11,
+     "mean_effect_k": -0.4504,
+     "n_sites": 57
+    }
+   ],
+   "pooled_by_dose": [
+    {
+     "dose_bin": "10-14",
+     "n_sites": 531,
+     "mean_effect_k": -0.0705,
+     "se_k": 0.0237,
+     "mean_effect_5yr_plus_k": -0.0996,
+     "se_5yr_plus_k": 0.028
+    },
+    {
+     "dose_bin": "15-19",
+     "n_sites": 253,
+     "mean_effect_k": -0.0837,
+     "se_k": 0.0324,
+     "mean_effect_5yr_plus_k": -0.1229,
+     "se_5yr_plus_k": 0.0375
+    },
+    {
+     "dose_bin": "20-29",
+     "n_sites": 203,
+     "mean_effect_k": -0.0225,
+     "se_k": 0.0334,
+     "mean_effect_5yr_plus_k": -0.0365,
+     "se_5yr_plus_k": 0.0404
+    },
+    {
+     "dose_bin": "30-49",
+     "n_sites": 95,
+     "mean_effect_k": 0.0207,
+     "se_k": 0.0494,
+     "mean_effect_5yr_plus_k": -0.0003,
+     "se_5yr_plus_k": 0.059
+    },
+    {
+     "dose_bin": "50+",
+     "n_sites": 29,
+     "mean_effect_k": -0.1105,
+     "se_k": 0.0733,
+     "mean_effect_5yr_plus_k": -0.1288,
+     "se_5yr_plus_k": 0.0891
+    },
+    {
+     "dose_bin": "all",
+     "n_sites": 1111,
+     "mean_effect_k": -0.058,
+     "se_k": 0.0156,
+     "mean_effect_5yr_plus_k": -0.0856,
+     "se_5yr_plus_k": 0.0184
+    }
+   ],
+   "variant": "excl_batch_dated"
+  }
+ }
+}
