@@ -3,6 +3,8 @@
 Agent 3's wrappers evaluate the standard silver inputs and publish the frozen
 `gold.site_effects` contract. All statistics live in `core/evaluation`.
 
+Start the next Agent 3 session with [CONTEXT.md](CONTEXT.md).
+
 ## Deploy and run on Databricks
 
 ```
