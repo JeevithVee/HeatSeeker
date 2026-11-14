@@ -28,8 +28,9 @@ def bootstrap_effect(
     c_draw = rng.integers(0, k, size=(B, k))                      # B x k control resamples
     Yb = Y_c[c_draw]                                              # B x k x scenes
     cnt = (~np.isnan(Yb)).sum(axis=1)
+    need = max(1, int(np.ceil(cfg.min_control_frac_per_scene * k)))
     with np.errstate(invalid="ignore", divide="ignore"):
-        ctrl_b = np.where(cnt > 0, np.nansum(Yb, axis=1) / cnt, np.nan)   # B x scenes
+        ctrl_b = np.where(cnt >= need, np.nansum(Yb, axis=1) / cnt, np.nan)   # B x scenes
     diff_b = y_t[None, :] - ctrl_b                                # B x scenes
 
     pre_draw = pre_idx[rng.integers(0, len(pre_idx), size=(B, len(pre_idx)))]

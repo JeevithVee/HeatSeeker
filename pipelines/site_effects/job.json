@@ -1,0 +1,42 @@
+{
+  "name": "heatseeker-site-effects-nyc",
+  "description": "silver.panel + silver.features + silver.interventions -> gold.site_effects for one city (Agent 3). Serverless, runs from the Git folder.",
+  "git_source": {
+    "git_url": "https://github.com/JeevithVee/HeatSeeker",
+    "git_provider": "gitHub",
+    "git_branch": "main"
+  },
+  "environments": [
+    {
+      "environment_key": "default",
+      "spec": {
+        "client": "1",
+        "dependencies": ["numpy>=1.26", "pandas>=2.1"]
+      }
+    }
+  ],
+  "tasks": [
+    {
+      "task_key": "site_effects",
+      "environment_key": "default",
+      "spark_python_task": {
+        "python_file": "pipelines/site_effects/run_site_effects.py",
+        "source": "GIT",
+        "parameters": [
+          "--catalog", "{{job.parameters.catalog}}",
+          "--city-id", "{{job.parameters.city_id}}",
+          "--n-bootstrap", "{{job.parameters.n_bootstrap}}",
+          "--n-placebo", "{{job.parameters.n_placebo}}"
+        ]
+      },
+      "timeout_seconds": 3600
+    }
+  ],
+  "parameters": [
+    {"name": "catalog", "default": "heatseeker"},
+    {"name": "city_id", "default": "nyc"},
+    {"name": "n_bootstrap", "default": "1000"},
+    {"name": "n_placebo", "default": "1000"}
+  ],
+  "max_concurrent_runs": 1
+}

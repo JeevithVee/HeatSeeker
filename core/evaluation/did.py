@@ -22,15 +22,22 @@ class SiteEstimate:
     diff: np.ndarray                  # per-scene treated-minus-controls difference
 
 
-def scene_differences(y_t: np.ndarray, Y_c: np.ndarray) -> np.ndarray:
-    """Treated minus mean of controls per scene; NaN where either side is missing."""
-    with np.errstate(invalid="ignore"):
-        ctrl = np.nanmean(Y_c, axis=0) if Y_c.shape[0] else np.full(y_t.shape, np.nan)
+def scene_differences(y_t: np.ndarray, Y_c: np.ndarray, min_control_frac: float = 0.0) -> np.ndarray:
+    """Treated minus mean of controls per scene; NaN where either side is missing or too few
+    controls are present in the scene (partial-coverage edge scenes)."""
+    k = Y_c.shape[0]
+    if k == 0:
+        return np.full(y_t.shape, np.nan)
+    present = (~np.isnan(Y_c)).sum(axis=0)
+    with np.errstate(invalid="ignore", divide="ignore"):
+        ctrl = np.where(present > 0, np.nansum(Y_c, axis=0) / present, np.nan)
+    need = max(1, int(np.ceil(min_control_frac * k)))
+    ctrl = np.where(present >= need, ctrl, np.nan)
     return y_t - ctrl
 
 
 def site_did(y_t: np.ndarray, Y_c: np.ndarray, scene_year: np.ndarray, ty: int, cfg: EvalConfig) -> SiteEstimate:
-    diff = scene_differences(y_t, Y_c)
+    diff = scene_differences(y_t, Y_c, cfg.min_control_frac_per_scene)
     valid = ~np.isnan(diff)
     pre = valid & (scene_year < ty)
     post = valid & (scene_year >= ty + cfg.post_start_offset)

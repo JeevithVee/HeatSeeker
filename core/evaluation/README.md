@@ -6,9 +6,13 @@ silver tables and writes `gold.site_effects`.
 
 ## Method
 
-1. **Scene filter** (`panel.py`). Keep clear-sky summer Landsat rows: June–August, sensor L8/L9,
-   scene cloud ≤ 30%, cell valid-pixel fraction ≥ 70%, at least 200 cells covered. ECOSTRESS
-   is never mixed in; if it is loaded later it is evaluated as its own panel.
+1. **Scene filter** (`panel.py`). Keep clear-sky summer Landsat rows: June–August, sensor
+   `LANDSAT_8`/`LANDSAT_9`, cell valid-pixel fraction ≥ 70%, scene covering ≥ 30% of the city's
+   cells clearly (`city_clear_frac`), at least 200 cells. Whole-scene cloud cover is only a
+   coarse guard (≤ 60%); the per-cell clear fraction does the real work. NYC sits on two Landsat
+   paths, so edge scenes cover part of the city; they are kept, and per site a scene counts only
+   if at least half of its matched controls are present in it. ECOSTRESS is never mixed in; if
+   it is loaded later it is evaluated as its own panel.
 2. **Relative temperature.** Each cell's LST minus the scene's city-wide median, in Kelvin.
    The city-wide scene effect (weather, time of year, calibration) cancels; what is left is how
    hot the cell runs relative to its city on that day.

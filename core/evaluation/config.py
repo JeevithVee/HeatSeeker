@@ -12,7 +12,12 @@ class EvalConfig:
     max_scene_cloud_frac: float = 0.6        # whole-scene cloud; per-cell clear fraction does the real work
     min_valid_pixel_frac: float = 0.7
     min_cells_per_scene: int = 200           # drop scenes that cover too little of the city
-    min_city_clear_frac: float = 0.5         # if silver.panel has city_clear_frac: scene must cover half the city
+    # NYC straddles Landsat paths 13 and 14, so edge scenes cover part of the city. The per-site
+    # estimate differences a cell against its own matched controls, so partial scenes are usable;
+    # keep scenes with is_clear coverage >= 0.3 of the city, and per scene require at least half
+    # the site's controls to be present (min_control_frac_per_scene) for the scene to count.
+    min_city_clear_frac: float = 0.3
+    min_control_frac_per_scene: float = 0.5
     tmax_c_range: tuple | None = None        # optional (lo, hi) filter on per-scene tmax_c if present
 
     # --- treatment definition (silver.interventions) ---
