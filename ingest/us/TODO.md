@@ -10,14 +10,25 @@
   CSVs in `ingest/us/samples/`. Those are the same files, by checksum, that
   `gold.site_effects` was computed from.
 
+## Done since the silver load
+- Cross-review of Agent 3's statistics: `pipelines/reviews/agent3_statistics_review.md`.
+- NYC bronze is in Databricks: `heatseeker.bronze.nyc_forestry_tree_points`
+  (1,125,266 rows), `bronze.census_2020_blocks_tigerweb` (37,984),
+  `bronze.cdc_svi_2022_tracts` (2,324), each with its license. As-received
+  files (tree CSV, boundary, four NLCD rasters, census CSVs, elevation) are in
+  `/Volumes/heatseeker/bronze/landing/us/nyc/`.
+- NYC silver is proven to follow from bronze inside the workspace: job
+  `heatseeker-verify-silver-from-bronze` (334451516814053) rebuilt both tables
+  from bronze with the real build code and found them identical to the live
+  tables (run 1107437999708243). It writes nothing.
+
 ## Left
-- (done) Cross-review of Agent 3's statistics: `pipelines/reviews/agent3_statistics_review.md`.
-- Bronze for Agent 1's sources (tree inventories, census, NLCD rasters) is not
-  in Databricks; the raw files exist only on the machines that built them.
-- The silver tables are published from files. Rebuilding them from source
-  inside Databricks (`run_interventions`, `run_features` under Spark) has not
-  been run; the city tree layers are live, so a rebuild would differ from the
-  tables the current gold results used.
+- Bronze for DC, Seattle and San Francisco. The raw files are on Agent 2's
+  machine (they built those cities). Once they are in
+  `/Volumes/heatseeker/bronze/landing/us/<city>/` in the NYC layout, create the
+  bronze tables and run the verify job with `city_id` set. The two census
+  bronze tables currently hold NYC only; append the other cities, do not
+  replace.
 - Delete the interim CSVs in `ingest/us/samples/` once Agents 3 and 4 read the
   Delta tables. The loader job reads them too, so it must change first.
 - `median_household_income` is null everywhere: needs a Census API key.
