@@ -90,8 +90,10 @@ def rank_candidates(
         * df["vulnerable_residents"]
         / df["est_cost_usd"]
     )
-    df = df.sort_values("score", ascending=False).reset_index(drop=True)
-    df["rank"] = df.index + 1
+    # Rank within each city: a DC cell competes with DC cells, not NYC's.
+    df = df.sort_values(["country_code", "city_id", "score"],
+                        ascending=[True, True, False]).reset_index(drop=True)
+    df["rank"] = df.groupby(["country_code", "city_id"]).cumcount() + 1
     df["holdout_control"] = (df["rank"] % holdout_every_n) == 0
     df["model_version"] = model_version
     df["recommended_at_utc"] = datetime.now(timezone.utc).isoformat()

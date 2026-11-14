@@ -31,17 +31,18 @@ def read_any(path: str) -> pd.DataFrame:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--panel", required=True)
-    ap.add_argument("--site-effects", required=True)
-    ap.add_argument("--interventions", required=True)
+    ap.add_argument("--panel", required=True, nargs="+")
+    ap.add_argument("--site-effects", required=True, nargs="+")
+    ap.add_argument("--interventions", required=True, nargs="+")
     ap.add_argument("--out", required=True)
     ap.add_argument("--max-control-trees", type=int, default=2)
     args = ap.parse_args()
 
-    panel = read_any(args.panel)
-    effects = read_any(args.site_effects)
+    panel = pd.concat([read_any(p) for p in args.panel], ignore_index=True)
+    effects = pd.concat([read_any(p) for p in args.site_effects], ignore_index=True)
     effects = effects[effects["variant"] == "all"]
-    interventions = read_any(args.interventions)
+    interventions = pd.concat(
+        [read_any(p) for p in args.interventions], ignore_index=True)
 
     usable = panel[
         panel["sensor"].str.startswith("LANDSAT")

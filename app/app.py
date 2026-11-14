@@ -22,6 +22,7 @@ import data
 st.set_page_config(page_title="HeatSeeker", page_icon="🌳", layout="wide")
 
 CONFIG = data.load_config()
+CITIES = {c["city_id"]: c for c in CONFIG["cities"]}
 FAHRENHEIT = CONFIG["display"]["temperature_unit"] == "fahrenheit"
 UNIT = "°F" if FAHRENHEIT else "°C"
 HEADLINE_VARIANT = "all"
@@ -60,11 +61,11 @@ def deck_map(df: pd.DataFrame, colors: np.ndarray, radius: int = 120,
     tip = None
     if tooltip_cols:
         tip = {"text": "\n".join(f"{c}: {{{c}}}" for c in tooltip_cols)}
-    city = CONFIG["cities"][0]["center"]
+    center = CITIES[st.session_state["city_id"]]["center"]
     st.pydeck_chart(pdk.Deck(
         map_style=None,
         initial_view_state=pdk.ViewState(
-            latitude=city["lat"], longitude=city["lon"], zoom=10.3),
+            latitude=center["lat"], longitude=center["lon"], zoom=10.3),
         layers=[pdk.Layer(
             "ScatterplotLayer", d,
             get_position=["centroid_lon", "centroid_lat"],
@@ -168,7 +169,8 @@ def view_track(t):
                                  int(CONFIG["costs_usd"]["street_trees"]))
         if st.form_submit_button("Log it"):
             data.log_planting({
-                "country_code": "US", "city_id": "nyc", "site_id": site,
+                "country_code": "US", "city_id": st.session_state["city_id"],
+                "site_id": site,
                 "intervention_type": kind, "trees_planted": int(n),
                 "planted_date": str(when), "cost_usd": float(cost),
                 "logged_at_utc": datetime.now(timezone.utc).isoformat(),
@@ -192,14 +194,21 @@ def view_results(t):
     st.subheader("Did past plantings cool anything?")
     counts = eff["quality_label"].value_counts()
     detected = eff[eff["quality_label"] == "detected"]
+    det_cooling = detected[detected["effect_k"] < 0]
 
     m = st.columns(4)
     m[0].metric("Sites evaluated", len(eff))
-    m[1].metric("Cooling detected", int(counts.get("detected", 0)))
-    m[2].metric("Not detectable", int(counts.get("not_detectable", 0)),
-                help="Honestly reported: no effect visible at 30 m resolution.")
-    med = dk(detected["effect_k"].median()) if len(detected) else float("nan")
-    m[3].metric(f"Median detected effect ({UNIT})", f"{med:.2f}")
+    m[1].metric("Detected (cooling / warming)",
+                f"{len(det_cooling)} / {len(detected) - len(det_cooling)}",
+                help="Unadjusted statistical label, not proof that planting "
+                     "caused the change.")
+    m[2].metric("Inconclusive or not detectable",
+                int(counts.get("inconclusive", 0))
+                + int(counts.get("not_detectable", 0)),
+                help="Honestly reported: effects too small to see at 30 m "
+                     "resolution are the norm, not a failure.")
+    med = dk(det_cooling["effect_k"].median()) if len(det_cooling) else float("nan")
+    m[3].metric(f"Median detected cooling ({UNIT})", f"{med:.2f}")
 
     labels = st.multiselect("Quality label", list(QUALITY_COLORS),
                             default=list(QUALITY_COLORS))
@@ -212,6 +221,7 @@ def view_results(t):
 
     # Portfolio: cooling per dollar, using config planting costs as estimates.
     cost_per_site = CONFIG["costs_usd"]["street_trees"]
+    detected = det_cooling
     if len(detected):
         total_cooling = dk(-detected["effect_k"].sum())
         st.caption(
@@ -264,13 +274,21 @@ def view_results(t):
 # -------------------------------------------------------------------- main
 
 st.title("🌳 HeatSeeker")
-st.caption("Plan, plant, prove: urban cooling for US cities · New York prototype")
+st.caption("Plan, plant, prove: urban cooling for US cities")
 
+t = tables()
+available = [c for c in CITIES
+             if c in set(t["features"].get("city_id", pd.Series()).unique())]
+city_id = st.sidebar.selectbox(
+    "City", available or list(CITIES),
+    format_func=lambda c: CITIES[c]["name"])
+st.session_state["city_id"] = city_id
 view = st.sidebar.radio("View", ["Recommend", "Track", "Results"])
 st.sidebar.divider()
 st.sidebar.info(CAVEAT)
 
-t = tables()
+t = {k: (v[v["city_id"] == city_id] if "city_id" in v.columns else v)
+     for k, v in t.items()}
 {"Recommend": view_recommend, "Track": view_track, "Results": view_results}[view](t)
 
 st.divider()

@@ -7,30 +7,29 @@ Precomputed results and replay data.
 ## Snapshots
 
 - `data/` — fully fake world (2,500 cells around NYC), self-contained:
-  `generate_fake_data.py` then `run_pipeline.py` rebuilds it.
-- `data_nyc/` — **real NYC grid** (7,414 H3 res-9 cells): Agent 1's real
-  `silver.features` and `silver.interventions`, Agent 2's real
-  `silver.panel` distilled into `panel_sample.parquet` (real Landsat scene
-  series per evaluated site), and recommendations from
-  `pipelines/recommendations/run_local.py`. **`gold_site_effects.parquet`
-  here is SYNTHETIC** (Agent 3's `make_panel_for` lays a known effect over
-  the real grid) until Agent 3 posts the real one — then rerun:
+  `generate_fake_data.py` then `run_pipeline.py` rebuilds it. Kept as the
+  no-dependencies test bed.
+- `data_real/` — **all real, all four cities** (NYC, DC, Seattle, SF):
+  Agent 1/2's silver features and interventions, Agent 3's corrected
+  gold.site_effects (method 0.3.0, panel Delta version 0), per-site Landsat
+  scene series distilled from Agent 2's panels, and recommendations +
+  prediction log from the pooled effect model (v2-real-gold-0.3.0). Rebuild:
 
   ```bash
   python pipelines/recommendations/run_local.py \
-      --site-effects <real gold_site_effects> \
-      --features demo/data_nyc/silver_features.parquet \
-      --interventions demo/data_nyc/silver_interventions.parquet \
-      --out-dir demo/data_nyc
+      --site-effects <per-city gold parquets> \
+      --features <per-city features CSVs> \
+      --interventions <per-city interventions CSVs> \
+      --out-dir demo/data_real
   python pipelines/recommendations/build_panel_sample.py \
-      --panel <nyc_silver_panel.parquet from agent-2-satellite> \
-      --site-effects <real gold_site_effects> \
-      --interventions demo/data_nyc/silver_interventions.parquet \
-      --out demo/data_nyc/panel_sample.parquet
+      --panel <per-city silver panel parquets> \
+      --site-effects <per-city gold parquets> \
+      --interventions <per-city interventions CSVs> \
+      --out demo/data_real/panel_sample.parquet
   ```
 
 Run the app on either snapshot:
 
 ```bash
-HEATSEEKER_DATA_DIR=demo/data_nyc streamlit run app/app.py
+HEATSEEKER_DATA_DIR=demo/data_real streamlit run app/app.py
 ```

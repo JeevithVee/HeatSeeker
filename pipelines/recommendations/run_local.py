@@ -40,9 +40,11 @@ def read_any(path: str) -> pd.DataFrame:
 
 def main() -> None:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--site-effects", required=True)
-    ap.add_argument("--features", required=True)
-    ap.add_argument("--interventions", required=True)
+    # Each input accepts several files (e.g. one per city); the model is
+    # trained pooled across all of them, ranking stays per city.
+    ap.add_argument("--site-effects", required=True, nargs="+")
+    ap.add_argument("--features", required=True, nargs="+")
+    ap.add_argument("--interventions", required=True, nargs="+")
     ap.add_argument("--out-dir", required=True)
     ap.add_argument("--config", default=str(REPO / "config" / "us" / "config.yaml"))
     ap.add_argument("--as-of-year", type=int,
@@ -56,9 +58,10 @@ def main() -> None:
     out = Path(args.out_dir)
     out.mkdir(parents=True, exist_ok=True)
 
-    effects = read_any(args.site_effects)
-    features = read_any(args.features)
-    interventions = read_any(args.interventions)
+    effects = pd.concat([read_any(p) for p in args.site_effects], ignore_index=True)
+    features = pd.concat([read_any(p) for p in args.features], ignore_index=True)
+    interventions = pd.concat(
+        [read_any(p) for p in args.interventions], ignore_index=True)
 
     model, train = train_effect_model(
         effects, features, as_of_year=args.as_of_year,
