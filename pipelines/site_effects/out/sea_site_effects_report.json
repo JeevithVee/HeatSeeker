@@ -1,0 +1,1631 @@
+{
+ "city_id": "sea",
+ "panel_version": "0",
+ "provenance": {
+  "mode": "delta_snapshots",
+  "inputs": {
+   "panel": {
+    "table": "heatseeker.silver.panel",
+    "delta_version": "0"
+   },
+   "features": {
+    "table": "heatseeker.silver.features",
+    "delta_version": "1"
+   },
+   "interventions": {
+    "table": "heatseeker.silver.interventions",
+    "delta_version": "1"
+   }
+  },
+  "code_snapshot": {
+   "source_sha256": "3ed3f2c83aa1a97583685f2eba6adf71d9be4162d1fe66546c41f51556fd0fb2"
+  },
+  "review_context": {
+   "independent_review_commit": "462e2b4",
+   "reviewed_snapshot": {
+    "panel": "0",
+    "features": "1",
+    "interventions": "1"
+   },
+   "caveats": [
+    "Surface temperature is not felt or air temperature.",
+    "All four cities are temperate.",
+    "No dated planting record is not proof of no planting.",
+    "Post-window plantings in treated cells can contribute to later contrasts.",
+    "Cross-sensor sensitivity is not independent confirmation.",
+    "Some static matching features may postdate planting; source-year columns must be considered before causal interpretation.",
+    "Excluded January-1 dates represent real trees with unknown planting dates; some controls may have been planted.",
+    "A negative association does not establish a causal effect."
+   ]
+  },
+  "runtime": {
+   "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+   "numpy": "2.1.3",
+   "pandas": "2.2.3"
+  },
+  "analysis_purpose": "headline_observational_comparison"
+ },
+ "config": {
+  "lst_col": "lst_median_k",
+  "summer_months": [
+   6,
+   7,
+   8
+  ],
+  "sensors": [
+   "LANDSAT_8",
+   "LANDSAT_9"
+  ],
+  "max_scene_cloud_frac": 0.6,
+  "min_valid_pixel_frac": 0.7,
+  "sensor_min_valid_pixel_frac": {
+   "LANDSAT_7": 0.5
+  },
+  "min_cells_per_scene": 200,
+  "min_city_clear_frac": 0.5,
+  "min_control_frac_per_scene": 0.5,
+  "cold_outlier_mads": 6.0,
+  "tmax_c_range": null,
+  "min_dose": 10,
+  "treatment_window": [
+   2015,
+   2019
+  ],
+  "control_max_trees": 2,
+  "batch_frac_threshold": 0.5,
+  "intervention_type": "tree_planting",
+  "exclude_land_cover": [
+   "open_water",
+   "emergent_herbaceous_wetlands",
+   "woody_wetlands"
+  ],
+  "match_vars": [
+   "canopy_frac_baseline",
+   "impervious_frac",
+   "elevation_m"
+  ],
+  "exact_match_col": "land_cover_class",
+  "n_controls": 10,
+  "pretrend_weight": 1.0,
+  "post_start_offset": 1,
+  "min_pre_scenes": 5,
+  "min_post_scenes": 5,
+  "min_controls": 3,
+  "n_bootstrap": 500,
+  "n_placebo": 800,
+  "alpha": 0.05,
+  "power_z": 2.8,
+  "min_meaningful_effect_k": 1.0,
+  "seed": 0,
+  "required_panel_cols": [
+   "country_code",
+   "city_id",
+   "site_id",
+   "scene_id",
+   "acquired_at_utc",
+   "sensor",
+   "valid_pixel_frac",
+   "scene_cloud_cover_frac"
+  ]
+ },
+ "reports": {
+  "all": {
+   "n_detected": 20,
+   "n_detected_cooling": 15,
+   "n_detected_warming": 5,
+   "expected_detected_under_null": 33.35,
+   "n_scenes": 117,
+   "scenes_per_year": {
+    "2013": 6,
+    "2014": 5,
+    "2015": 10,
+    "2016": 5,
+    "2017": 5,
+    "2018": 7,
+    "2019": 5,
+    "2020": 6,
+    "2021": 4,
+    "2022": 13,
+    "2023": 17,
+    "2024": 10,
+    "2025": 13,
+    "2026": 11
+   },
+   "n_cells_in_panel": 2339,
+   "n_treated": 667,
+   "n_matched": 667,
+   "n_controls_eligible": 400,
+   "control_reuse": {
+    "unique_matched_controls": 275,
+    "total_control_assignments": 6670,
+    "controls_reused_by_multiple_sites": 237,
+    "max_treated_sites_per_control": 250
+   },
+   "labels": {
+    "inconclusive": 647,
+    "detected": 20
+   },
+   "median_mde_k": 1.5641704652765567,
+   "median_effect_k_detected": -1.3166805728828153,
+   "pre_period_mean_effect_k": 0.01960788515972503,
+   "max_abs_smd": 0.3593036530287041,
+   "balance": [
+    {
+     "variable": "canopy_frac_baseline",
+     "mean_treated": 0.2241,
+     "mean_controls": 0.2237,
+     "smd": 0.0043
+    },
+    {
+     "variable": "impervious_frac",
+     "mean_treated": 0.6313,
+     "mean_controls": 0.5876,
+     "smd": 0.3593
+    },
+    {
+     "variable": "elevation_m",
+     "mean_treated": 68.3272,
+     "mean_controls": 66.0927,
+     "smd": 0.0607
+    }
+   ],
+   "placebo_mean_k": -0.023679425952407365,
+   "n_valid_placebo_estimates": 370,
+   "placebo_sd_k": 0.561707745252531,
+   "placebo_q95_abs_k": 1.0923359592644306,
+   "event_study": [
+    {
+     "years_since": -6,
+     "mean_effect_k": -0.0531,
+     "n_sites": 88
+    },
+    {
+     "years_since": -5,
+     "mean_effect_k": 0.115,
+     "n_sites": 197
+    },
+    {
+     "years_since": -4,
+     "mean_effect_k": 0.0372,
+     "n_sites": 332
+    },
+    {
+     "years_since": -3,
+     "mean_effect_k": 0.0331,
+     "n_sites": 523
+    },
+    {
+     "years_since": -2,
+     "mean_effect_k": 0.0425,
+     "n_sites": 666
+    },
+    {
+     "years_since": -1,
+     "mean_effect_k": -0.0412,
+     "n_sites": 667
+    },
+    {
+     "years_since": 0,
+     "mean_effect_k": -0.2162,
+     "n_sites": 666
+    },
+    {
+     "years_since": 1,
+     "mean_effect_k": -0.1674,
+     "n_sites": 667
+    },
+    {
+     "years_since": 2,
+     "mean_effect_k": -0.289,
+     "n_sites": 665
+    },
+    {
+     "years_since": 3,
+     "mean_effect_k": -0.2492,
+     "n_sites": 666
+    },
+    {
+     "years_since": 4,
+     "mean_effect_k": -0.2411,
+     "n_sites": 666
+    },
+    {
+     "years_since": 5,
+     "mean_effect_k": -0.1744,
+     "n_sites": 667
+    },
+    {
+     "years_since": 6,
+     "mean_effect_k": -0.1064,
+     "n_sites": 667
+    },
+    {
+     "years_since": 7,
+     "mean_effect_k": -0.1209,
+     "n_sites": 667
+    },
+    {
+     "years_since": 8,
+     "mean_effect_k": -0.168,
+     "n_sites": 579
+    },
+    {
+     "years_since": 9,
+     "mean_effect_k": -0.2221,
+     "n_sites": 470
+    },
+    {
+     "years_since": 10,
+     "mean_effect_k": -0.2452,
+     "n_sites": 334
+    },
+    {
+     "years_since": 11,
+     "mean_effect_k": -0.2921,
+     "n_sites": 143
+    }
+   ],
+   "pre_trend_diagnostics": {
+    "n_sites_with_three_pre_years": 523,
+    "mean_slope_k_per_year": -0.04047448238186288,
+    "median_slope_k_per_year": -0.02492,
+    "mean_last_minus_first_pre_year_k": -0.08221223709369024,
+    "limitations": "Descriptive only; matching uses these same pre-period data, so this is not an independent parallel-trends test."
+   },
+   "pooled_by_dose": [
+    {
+     "dose_bin": "10-14",
+     "n_sites": 226,
+     "mean_effect_k": -0.1108,
+     "se_k": 0.0235,
+     "mean_effect_5yr_plus_k": -0.0935,
+     "se_5yr_plus_k": 0.0254
+    },
+    {
+     "dose_bin": "15-19",
+     "n_sites": 143,
+     "mean_effect_k": -0.1649,
+     "se_k": 0.0316,
+     "mean_effect_5yr_plus_k": -0.1346,
+     "se_5yr_plus_k": 0.0341
+    },
+    {
+     "dose_bin": "20-29",
+     "n_sites": 172,
+     "mean_effect_k": -0.203,
+     "se_k": 0.0353,
+     "mean_effect_5yr_plus_k": -0.171,
+     "se_5yr_plus_k": 0.0379
+    },
+    {
+     "dose_bin": "30-49",
+     "n_sites": 96,
+     "mean_effect_k": -0.2034,
+     "se_k": 0.0679,
+     "mean_effect_5yr_plus_k": -0.1785,
+     "se_5yr_plus_k": 0.0727
+    },
+    {
+     "dose_bin": "50+",
+     "n_sites": 30,
+     "mean_effect_k": -0.6644,
+     "se_k": 0.2132,
+     "mean_effect_5yr_plus_k": -0.6278,
+     "se_5yr_plus_k": 0.2177
+    },
+    {
+     "dose_bin": "all",
+     "n_sites": 667,
+     "mean_effect_k": -0.1844,
+     "se_k": 0.0198,
+     "mean_effect_5yr_plus_k": -0.1585,
+     "se_5yr_plus_k": 0.021
+    }
+   ],
+   "pooled_iid_se_warning": "Across-site SEs assume independence; use source-block sensitivity and its limitations.",
+   "pre_period_mean_warning": "Pre-period centering makes the pooled pre mean approximately zero by construction; this is not a parallel-trends test.",
+   "pooled_block_sensitivity": {
+    "method": "joint_source_block_delete_one_jackknife",
+    "limitations": "Conditional on fixed matches and observed scenes. Deletes treated and control trajectories jointly; preserves reused-control dependence within each deletion. Spatial blocks at 2 km and 5 km with two origins are sensitivity choices, not validated independence boundaries. Intervals are normal approximations, not causal confidence intervals.",
+    "control_reuse": {
+     "unique_matched_controls": 275,
+     "total_control_assignments": 6670,
+     "controls_reused_by_multiple_sites": 237,
+     "max_treated_sites_per_control": 250
+    },
+    "grids": [
+     {
+      "block_size_m": 2000,
+      "origin_offset_fraction": 0.0,
+      "overall": {
+       "mean_effect_k": -0.185034752893038,
+       "n_sites": 666,
+       "n_blocks": 72,
+       "min_retained_fraction": 0.9564564564564565,
+       "status": "sensitivity_only",
+       "se_k": 0.06528304439441866,
+       "normal_interval_low_k": -0.3129895199060986,
+       "normal_interval_high_k": -0.057079985879977424
+      },
+      "five_year_plus": {
+       "mean_effect_k": -0.1590301170774047,
+       "n_sites": 666,
+       "n_blocks": 72,
+       "min_retained_fraction": 0.9564564564564565,
+       "status": "sensitivity_only",
+       "se_k": 0.07089319489948545,
+       "normal_interval_low_k": -0.29798077908039616,
+       "normal_interval_high_k": -0.02007945507441322
+      }
+     },
+     {
+      "block_size_m": 2000,
+      "origin_offset_fraction": 0.5,
+      "overall": {
+       "mean_effect_k": -0.185034752893038,
+       "n_sites": 666,
+       "n_blocks": 79,
+       "min_retained_fraction": 0.9519519519519519,
+       "status": "sensitivity_only",
+       "se_k": 0.061767390941681044,
+       "normal_interval_low_k": -0.3060988391387328,
+       "normal_interval_high_k": -0.06397066664734316
+      },
+      "five_year_plus": {
+       "mean_effect_k": -0.1590301170774047,
+       "n_sites": 666,
+       "n_blocks": 79,
+       "min_retained_fraction": 0.9519519519519519,
+       "status": "sensitivity_only",
+       "se_k": 0.0692420317286077,
+       "normal_interval_low_k": -0.29474449926547575,
+       "normal_interval_high_k": -0.02331573488933361
+      }
+     },
+     {
+      "block_size_m": 5000,
+      "origin_offset_fraction": 0.0,
+      "overall": {
+       "mean_effect_k": -0.185034752893038,
+       "n_sites": 666,
+       "n_blocks": 16,
+       "min_retained_fraction": 0.8033033033033034,
+       "status": "sensitivity_only",
+       "se_k": 0.06789165691017598,
+       "normal_interval_low_k": -0.3181024004369829,
+       "normal_interval_high_k": -0.05196710534909307
+      },
+      "five_year_plus": {
+       "mean_effect_k": -0.1590301170774047,
+       "n_sites": 666,
+       "n_blocks": 16,
+       "min_retained_fraction": 0.8033033033033034,
+       "status": "sensitivity_only",
+       "se_k": 0.0679752052462295,
+       "normal_interval_low_k": -0.29226151936001454,
+       "normal_interval_high_k": -0.02579871479479487
+      }
+     },
+     {
+      "block_size_m": 5000,
+      "origin_offset_fraction": 0.5,
+      "overall": {
+       "mean_effect_k": -0.185034752893038,
+       "n_sites": 666,
+       "n_blocks": 18,
+       "min_retained_fraction": 0.8183183183183184,
+       "status": "sensitivity_only",
+       "se_k": 0.057687316157427976,
+       "normal_interval_low_k": -0.2981018925615968,
+       "normal_interval_high_k": -0.07196761322447917
+      },
+      "five_year_plus": {
+       "mean_effect_k": -0.1590301170774047,
+       "n_sites": 666,
+       "n_blocks": 18,
+       "min_retained_fraction": 0.8183183183183184,
+       "status": "sensitivity_only",
+       "se_k": 0.05472526088422068,
+       "normal_interval_low_k": -0.2662916284104772,
+       "normal_interval_high_k": -0.05176860574433216
+      }
+     }
+    ],
+    "n_sites_with_minimum_support": 666,
+    "status": "sensitivity_only"
+   },
+   "variant": "all",
+   "review_diagnostics": {
+    "diagnostics_version": "1.0.0",
+    "variant": "all",
+    "specification_comparison": {
+     "headline": {
+      "overall": {
+       "n_sites": 666,
+       "mean_effect_k": -0.185034752893038
+      },
+      "five_year_plus": {
+       "n_sites": 666,
+       "mean_effect_k": -0.15903011707740472
+      }
+     },
+     "no_pre_outcome_matching": {
+      "overall": {
+       "n_sites": 666,
+       "mean_effect_k": -0.17687488960455203
+      },
+      "five_year_plus": {
+       "n_sites": 666,
+       "mean_effect_k": -0.15575714454569012
+      }
+     },
+     "interpretation": "Specification sensitivity, not a correction or a separately identified causal estimate.",
+     "common_cohort": {
+      "overall": {
+       "n_sites": 666,
+       "headline_mean_k": -0.185034752893038,
+       "static_only_mean_k": -0.17687488960455203
+      },
+      "five_year_plus": {
+       "n_sites": 666,
+       "headline_mean_k": -0.15903011707740472,
+       "static_only_mean_k": -0.15575714454569012
+      }
+     }
+    },
+    "year_block_sensitivity": {
+     "method": "delete_one_calendar_year_with_rematching",
+     "rematched": true,
+     "limitations": "Common-cohort normal-approximation sensitivity; few years and unmodelled dependence remain.",
+     "overall": {
+      "status": "sensitivity_only",
+      "n_baseline_sites": 666,
+      "n_common_sites": 649,
+      "common_retained_fraction": 0.9744744744744744,
+      "n_years": 14,
+      "mean_effect_k": -0.18341634447051147,
+      "se_k": 0.07696696183860714,
+      "normal_interval_low_k": -0.33427158967418147,
+      "normal_interval_high_k": -0.032561099266841476,
+      "delete_one_year": [
+       {
+        "year": 2013,
+        "n_supported_sites": 650,
+        "mean_common_cohort_k": -0.1347061743159239,
+        "mean_all_supported_k": -0.13402463497572914
+       },
+       {
+        "year": 2014,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.1475916696217521,
+        "mean_all_supported_k": -0.1397881605989056
+       },
+       {
+        "year": 2015,
+        "n_supported_sites": 665,
+        "mean_common_cohort_k": -0.22660005374216635,
+        "mean_all_supported_k": -0.22753288709633743
+       },
+       {
+        "year": 2016,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.18578845872021885,
+        "mean_all_supported_k": -0.18725794497559278
+       },
+       {
+        "year": 2017,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.18626360812341766,
+        "mean_all_supported_k": -0.18762301909014836
+       },
+       {
+        "year": 2018,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.1678557913449021,
+        "mean_all_supported_k": -0.1691443485230848
+       },
+       {
+        "year": 2019,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.17817185907743338,
+        "mean_all_supported_k": -0.17916871413810828
+       },
+       {
+        "year": 2020,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.17471908449675644,
+        "mean_all_supported_k": -0.17654100797682326
+       },
+       {
+        "year": 2021,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.18690470804068277,
+        "mean_all_supported_k": -0.18917259977660794
+       },
+       {
+        "year": 2022,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.18834819433482883,
+        "mean_all_supported_k": -0.18966483631082293
+       },
+       {
+        "year": 2023,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.1924117510000121,
+        "mean_all_supported_k": -0.19511237885843888
+       },
+       {
+        "year": 2024,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.19513974420574248,
+        "mean_all_supported_k": -0.19602304983053415
+       },
+       {
+        "year": 2025,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.19370174624521974,
+        "mean_all_supported_k": -0.1958249426654107
+       },
+       {
+        "year": 2026,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.16702555306757755,
+        "mean_all_supported_k": -0.16839564101952312
+       }
+      ]
+     },
+     "five_year_plus": {
+      "status": "sensitivity_only",
+      "n_baseline_sites": 666,
+      "n_common_sites": 649,
+      "common_retained_fraction": 0.9744744744744744,
+      "n_years": 14,
+      "mean_effect_k": -0.1591947689303257,
+      "se_k": 0.082974872068105,
+      "normal_interval_low_k": -0.3218255181838115,
+      "normal_interval_high_k": 0.003435980323160115,
+      "delete_one_year": [
+       {
+        "year": 2013,
+        "n_supported_sites": 650,
+        "mean_common_cohort_k": -0.1084128528444639,
+        "mean_all_supported_k": -0.10743055505941691
+       },
+       {
+        "year": 2014,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.12462890503968385,
+        "mean_all_supported_k": -0.11632831896731546
+       },
+       {
+        "year": 2015,
+        "n_supported_sites": 665,
+        "mean_common_cohort_k": -0.20506136747502282,
+        "mean_all_supported_k": -0.20429451435991952
+       },
+       {
+        "year": 2016,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.1608173108062465,
+        "mean_all_supported_k": -0.16016865497758315
+       },
+       {
+        "year": 2017,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.15887103604493266,
+        "mean_all_supported_k": -0.15871464764404125
+       },
+       {
+        "year": 2018,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.15544005392370844,
+        "mean_all_supported_k": -0.15537124314452996
+       },
+       {
+        "year": 2019,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.1591947689303257,
+        "mean_all_supported_k": -0.15903011707740472
+       },
+       {
+        "year": 2020,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.1532789787914602,
+        "mean_all_supported_k": -0.152975170310331
+       },
+       {
+        "year": 2021,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.16436814081524523,
+        "mean_all_supported_k": -0.16620590190053094
+       },
+       {
+        "year": 2022,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.16194534376710712,
+        "mean_all_supported_k": -0.16115300444072891
+       },
+       {
+        "year": 2023,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.1621068453535954,
+        "mean_all_supported_k": -0.16252965436951636
+       },
+       {
+        "year": 2024,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.1780358022464479,
+        "mean_all_supported_k": -0.1763611945703691
+       },
+       {
+        "year": 2025,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.1688870666982771,
+        "mean_all_supported_k": -0.16885291009065673
+       },
+       {
+        "year": 2026,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.1257412048401467,
+        "mean_all_supported_k": -0.12513298385969984
+       }
+      ]
+     }
+    },
+    "combined_space_year_sensitivity": {
+     "method": "sum_of_spatial_and_year_SE_sensitivity",
+     "metrics": {
+      "overall": {
+       "status": "sensitivity_only",
+       "grids": [
+        {
+         "block_size_m": 2000,
+         "origin_offset_fraction": 0.0,
+         "status": "sensitivity_only",
+         "n_sites": 649,
+         "mean_effect_k": -0.18341634447051147,
+         "spatial_se_k": 0.0662702731046739,
+         "year_se_k": 0.07696696183860714,
+         "se_sum_k": 0.14323723494328106,
+         "sensitivity_low_k": -0.4641613249593423,
+         "sensitivity_high_k": 0.09732863601831937
+        },
+        {
+         "block_size_m": 2000,
+         "origin_offset_fraction": 0.5,
+         "status": "sensitivity_only",
+         "n_sites": 649,
+         "mean_effect_k": -0.18341634447051147,
+         "spatial_se_k": 0.0626919430052678,
+         "year_se_k": 0.07696696183860714,
+         "se_sum_k": 0.13965890484387494,
+         "sensitivity_low_k": -0.45714779796450633,
+         "sensitivity_high_k": 0.09031510902348339
+        },
+        {
+         "block_size_m": 5000,
+         "origin_offset_fraction": 0.0,
+         "status": "sensitivity_only",
+         "n_sites": 649,
+         "mean_effect_k": -0.18341634447051147,
+         "spatial_se_k": 0.06935111282508777,
+         "year_se_k": 0.07696696183860714,
+         "se_sum_k": 0.1463180746636949,
+         "sensitivity_low_k": -0.47019977081135345,
+         "sensitivity_high_k": 0.1033670818703305
+        },
+        {
+         "block_size_m": 5000,
+         "origin_offset_fraction": 0.5,
+         "status": "sensitivity_only",
+         "n_sites": 649,
+         "mean_effect_k": -0.18341634447051147,
+         "spatial_se_k": 0.05872391309549022,
+         "year_se_k": 0.07696696183860714,
+         "se_sum_k": 0.13569087493409737,
+         "sensitivity_low_k": -0.44937045934134234,
+         "sensitivity_high_k": 0.0825377704003194
+        }
+       ]
+      },
+      "five_year_plus": {
+       "status": "sensitivity_only",
+       "grids": [
+        {
+         "block_size_m": 2000,
+         "origin_offset_fraction": 0.0,
+         "status": "sensitivity_only",
+         "n_sites": 649,
+         "mean_effect_k": -0.1591947689303257,
+         "spatial_se_k": 0.07170988018536997,
+         "year_se_k": 0.082974872068105,
+         "se_sum_k": 0.15468475225347497,
+         "sensitivity_low_k": -0.4623768833471366,
+         "sensitivity_high_k": 0.14398734548648523
+        },
+        {
+         "block_size_m": 2000,
+         "origin_offset_fraction": 0.5,
+         "status": "sensitivity_only",
+         "n_sites": 649,
+         "mean_effect_k": -0.1591947689303257,
+         "spatial_se_k": 0.069648368828382,
+         "year_se_k": 0.082974872068105,
+         "se_sum_k": 0.152623240896487,
+         "sensitivity_low_k": -0.4583363210874402,
+         "sensitivity_high_k": 0.13994678322678883
+        },
+        {
+         "block_size_m": 5000,
+         "origin_offset_fraction": 0.0,
+         "status": "sensitivity_only",
+         "n_sites": 649,
+         "mean_effect_k": -0.1591947689303257,
+         "spatial_se_k": 0.06886773801912821,
+         "year_se_k": 0.082974872068105,
+         "se_sum_k": 0.1518426100872332,
+         "sensitivity_low_k": -0.4568062847013028,
+         "sensitivity_high_k": 0.13841674684065142
+        },
+        {
+         "block_size_m": 5000,
+         "origin_offset_fraction": 0.5,
+         "status": "sensitivity_only",
+         "n_sites": 649,
+         "mean_effect_k": -0.1591947689303257,
+         "spatial_se_k": 0.055033517435864925,
+         "year_se_k": 0.082974872068105,
+         "se_sum_k": 0.13800838950396993,
+         "sensitivity_low_k": -0.42969121235810676,
+         "sensitivity_high_k": 0.11130167449745537
+        }
+       ]
+      }
+     },
+     "limitations": "Adds SEs rather than selecting the wider component. This permits positive covariance in an additive-component interpretation, but is not a calibrated multiway variance estimator. Components can overlap; source-block dependence and observational bias remain."
+    },
+    "pre_cohort_fake_date": {
+     "method": "same_sensor_pre_cohort_fake_date",
+     "sensor": "LANDSAT_5",
+     "years": [
+      2008,
+      2009,
+      2010,
+      2011
+     ],
+     "fake_treatment_year": 2010,
+     "n_pre_scenes": 10,
+     "n_post_scenes": 4,
+     "limitations": "Thin older-sensor window, one post year. Tests a period before the recorded cohort, not a treeless city. A nonzero contrast challenges causal attribution but does not measure headline bias.",
+     "status": "insufficient_same_sensor_scenes"
+    },
+    "sensor_family_support": {
+     "sensor_transition_sensitive": false,
+     "cohorts": [
+      {
+       "treatment_year": 2015,
+       "pre_scenes_by_family": {
+        "modern_8_9": 11
+       },
+       "post_scenes_by_family": {
+        "modern_8_9": 96
+       },
+       "families_present_only_pre": [],
+       "families_present_only_post": []
+      },
+      {
+       "treatment_year": 2016,
+       "pre_scenes_by_family": {
+        "modern_8_9": 21
+       },
+       "post_scenes_by_family": {
+        "modern_8_9": 91
+       },
+       "families_present_only_pre": [],
+       "families_present_only_post": []
+      },
+      {
+       "treatment_year": 2017,
+       "pre_scenes_by_family": {
+        "modern_8_9": 26
+       },
+       "post_scenes_by_family": {
+        "modern_8_9": 86
+       },
+       "families_present_only_pre": [],
+       "families_present_only_post": []
+      },
+      {
+       "treatment_year": 2018,
+       "pre_scenes_by_family": {
+        "modern_8_9": 31
+       },
+       "post_scenes_by_family": {
+        "modern_8_9": 79
+       },
+       "families_present_only_pre": [],
+       "families_present_only_post": []
+      },
+      {
+       "treatment_year": 2019,
+       "pre_scenes_by_family": {
+        "modern_8_9": 38
+       },
+       "post_scenes_by_family": {
+        "modern_8_9": 74
+       },
+       "families_present_only_pre": [],
+       "families_present_only_post": []
+      }
+     ],
+     "interpretation": "Cross-sensor sensitivity is not independent confirmation; scene differencing does not remove family-specific spatial contrast changes."
+    },
+    "later_planting_context": {
+     "treated_cells_with_post_window_plantings": 544,
+     "trees_after_window_in_treated_cells": 5098,
+     "interpretation": "Post-period differences can include later plantings; dose_trees only counts the treatment window."
+    },
+    "inference_status": "observational_association_not_established_causal_cooling"
+   }
+  },
+  "excl_batch_dated": {
+   "n_detected": 20,
+   "n_detected_cooling": 15,
+   "n_detected_warming": 5,
+   "expected_detected_under_null": 33.35,
+   "n_scenes": 117,
+   "scenes_per_year": {
+    "2013": 6,
+    "2014": 5,
+    "2015": 10,
+    "2016": 5,
+    "2017": 5,
+    "2018": 7,
+    "2019": 5,
+    "2020": 6,
+    "2021": 4,
+    "2022": 13,
+    "2023": 17,
+    "2024": 10,
+    "2025": 13,
+    "2026": 11
+   },
+   "n_cells_in_panel": 2339,
+   "n_treated": 667,
+   "n_matched": 667,
+   "n_controls_eligible": 400,
+   "control_reuse": {
+    "unique_matched_controls": 275,
+    "total_control_assignments": 6670,
+    "controls_reused_by_multiple_sites": 237,
+    "max_treated_sites_per_control": 250
+   },
+   "labels": {
+    "inconclusive": 647,
+    "detected": 20
+   },
+   "median_mde_k": 1.5641704652765567,
+   "median_effect_k_detected": -1.3166805728828153,
+   "pre_period_mean_effect_k": 0.01960788515972503,
+   "max_abs_smd": 0.3593036530287041,
+   "balance": [
+    {
+     "variable": "canopy_frac_baseline",
+     "mean_treated": 0.2241,
+     "mean_controls": 0.2237,
+     "smd": 0.0043
+    },
+    {
+     "variable": "impervious_frac",
+     "mean_treated": 0.6313,
+     "mean_controls": 0.5876,
+     "smd": 0.3593
+    },
+    {
+     "variable": "elevation_m",
+     "mean_treated": 68.3272,
+     "mean_controls": 66.0927,
+     "smd": 0.0607
+    }
+   ],
+   "placebo_mean_k": -0.023679425952407365,
+   "n_valid_placebo_estimates": 370,
+   "placebo_sd_k": 0.561707745252531,
+   "placebo_q95_abs_k": 1.0923359592644306,
+   "event_study": [
+    {
+     "years_since": -6,
+     "mean_effect_k": -0.0531,
+     "n_sites": 88
+    },
+    {
+     "years_since": -5,
+     "mean_effect_k": 0.115,
+     "n_sites": 197
+    },
+    {
+     "years_since": -4,
+     "mean_effect_k": 0.0372,
+     "n_sites": 332
+    },
+    {
+     "years_since": -3,
+     "mean_effect_k": 0.0331,
+     "n_sites": 523
+    },
+    {
+     "years_since": -2,
+     "mean_effect_k": 0.0425,
+     "n_sites": 666
+    },
+    {
+     "years_since": -1,
+     "mean_effect_k": -0.0412,
+     "n_sites": 667
+    },
+    {
+     "years_since": 0,
+     "mean_effect_k": -0.2162,
+     "n_sites": 666
+    },
+    {
+     "years_since": 1,
+     "mean_effect_k": -0.1674,
+     "n_sites": 667
+    },
+    {
+     "years_since": 2,
+     "mean_effect_k": -0.289,
+     "n_sites": 665
+    },
+    {
+     "years_since": 3,
+     "mean_effect_k": -0.2492,
+     "n_sites": 666
+    },
+    {
+     "years_since": 4,
+     "mean_effect_k": -0.2411,
+     "n_sites": 666
+    },
+    {
+     "years_since": 5,
+     "mean_effect_k": -0.1744,
+     "n_sites": 667
+    },
+    {
+     "years_since": 6,
+     "mean_effect_k": -0.1064,
+     "n_sites": 667
+    },
+    {
+     "years_since": 7,
+     "mean_effect_k": -0.1209,
+     "n_sites": 667
+    },
+    {
+     "years_since": 8,
+     "mean_effect_k": -0.168,
+     "n_sites": 579
+    },
+    {
+     "years_since": 9,
+     "mean_effect_k": -0.2221,
+     "n_sites": 470
+    },
+    {
+     "years_since": 10,
+     "mean_effect_k": -0.2452,
+     "n_sites": 334
+    },
+    {
+     "years_since": 11,
+     "mean_effect_k": -0.2921,
+     "n_sites": 143
+    }
+   ],
+   "pre_trend_diagnostics": {
+    "n_sites_with_three_pre_years": 523,
+    "mean_slope_k_per_year": -0.04047448238186288,
+    "median_slope_k_per_year": -0.02492,
+    "mean_last_minus_first_pre_year_k": -0.08221223709369024,
+    "limitations": "Descriptive only; matching uses these same pre-period data, so this is not an independent parallel-trends test."
+   },
+   "pooled_by_dose": [
+    {
+     "dose_bin": "10-14",
+     "n_sites": 226,
+     "mean_effect_k": -0.1108,
+     "se_k": 0.0235,
+     "mean_effect_5yr_plus_k": -0.0935,
+     "se_5yr_plus_k": 0.0254
+    },
+    {
+     "dose_bin": "15-19",
+     "n_sites": 143,
+     "mean_effect_k": -0.1649,
+     "se_k": 0.0316,
+     "mean_effect_5yr_plus_k": -0.1346,
+     "se_5yr_plus_k": 0.0341
+    },
+    {
+     "dose_bin": "20-29",
+     "n_sites": 172,
+     "mean_effect_k": -0.203,
+     "se_k": 0.0353,
+     "mean_effect_5yr_plus_k": -0.171,
+     "se_5yr_plus_k": 0.0379
+    },
+    {
+     "dose_bin": "30-49",
+     "n_sites": 96,
+     "mean_effect_k": -0.2034,
+     "se_k": 0.0679,
+     "mean_effect_5yr_plus_k": -0.1785,
+     "se_5yr_plus_k": 0.0727
+    },
+    {
+     "dose_bin": "50+",
+     "n_sites": 30,
+     "mean_effect_k": -0.6644,
+     "se_k": 0.2132,
+     "mean_effect_5yr_plus_k": -0.6278,
+     "se_5yr_plus_k": 0.2177
+    },
+    {
+     "dose_bin": "all",
+     "n_sites": 667,
+     "mean_effect_k": -0.1844,
+     "se_k": 0.0198,
+     "mean_effect_5yr_plus_k": -0.1585,
+     "se_5yr_plus_k": 0.021
+    }
+   ],
+   "pooled_iid_se_warning": "Across-site SEs assume independence; use source-block sensitivity and its limitations.",
+   "pre_period_mean_warning": "Pre-period centering makes the pooled pre mean approximately zero by construction; this is not a parallel-trends test.",
+   "pooled_block_sensitivity": {
+    "method": "joint_source_block_delete_one_jackknife",
+    "limitations": "Conditional on fixed matches and observed scenes. Deletes treated and control trajectories jointly; preserves reused-control dependence within each deletion. Spatial blocks at 2 km and 5 km with two origins are sensitivity choices, not validated independence boundaries. Intervals are normal approximations, not causal confidence intervals.",
+    "control_reuse": {
+     "unique_matched_controls": 275,
+     "total_control_assignments": 6670,
+     "controls_reused_by_multiple_sites": 237,
+     "max_treated_sites_per_control": 250
+    },
+    "grids": [
+     {
+      "block_size_m": 2000,
+      "origin_offset_fraction": 0.0,
+      "overall": {
+       "mean_effect_k": -0.185034752893038,
+       "n_sites": 666,
+       "n_blocks": 72,
+       "min_retained_fraction": 0.9564564564564565,
+       "status": "sensitivity_only",
+       "se_k": 0.06528304439441866,
+       "normal_interval_low_k": -0.3129895199060986,
+       "normal_interval_high_k": -0.057079985879977424
+      },
+      "five_year_plus": {
+       "mean_effect_k": -0.1590301170774047,
+       "n_sites": 666,
+       "n_blocks": 72,
+       "min_retained_fraction": 0.9564564564564565,
+       "status": "sensitivity_only",
+       "se_k": 0.07089319489948545,
+       "normal_interval_low_k": -0.29798077908039616,
+       "normal_interval_high_k": -0.02007945507441322
+      }
+     },
+     {
+      "block_size_m": 2000,
+      "origin_offset_fraction": 0.5,
+      "overall": {
+       "mean_effect_k": -0.185034752893038,
+       "n_sites": 666,
+       "n_blocks": 79,
+       "min_retained_fraction": 0.9519519519519519,
+       "status": "sensitivity_only",
+       "se_k": 0.061767390941681044,
+       "normal_interval_low_k": -0.3060988391387328,
+       "normal_interval_high_k": -0.06397066664734316
+      },
+      "five_year_plus": {
+       "mean_effect_k": -0.1590301170774047,
+       "n_sites": 666,
+       "n_blocks": 79,
+       "min_retained_fraction": 0.9519519519519519,
+       "status": "sensitivity_only",
+       "se_k": 0.0692420317286077,
+       "normal_interval_low_k": -0.29474449926547575,
+       "normal_interval_high_k": -0.02331573488933361
+      }
+     },
+     {
+      "block_size_m": 5000,
+      "origin_offset_fraction": 0.0,
+      "overall": {
+       "mean_effect_k": -0.185034752893038,
+       "n_sites": 666,
+       "n_blocks": 16,
+       "min_retained_fraction": 0.8033033033033034,
+       "status": "sensitivity_only",
+       "se_k": 0.06789165691017598,
+       "normal_interval_low_k": -0.3181024004369829,
+       "normal_interval_high_k": -0.05196710534909307
+      },
+      "five_year_plus": {
+       "mean_effect_k": -0.1590301170774047,
+       "n_sites": 666,
+       "n_blocks": 16,
+       "min_retained_fraction": 0.8033033033033034,
+       "status": "sensitivity_only",
+       "se_k": 0.0679752052462295,
+       "normal_interval_low_k": -0.29226151936001454,
+       "normal_interval_high_k": -0.02579871479479487
+      }
+     },
+     {
+      "block_size_m": 5000,
+      "origin_offset_fraction": 0.5,
+      "overall": {
+       "mean_effect_k": -0.185034752893038,
+       "n_sites": 666,
+       "n_blocks": 18,
+       "min_retained_fraction": 0.8183183183183184,
+       "status": "sensitivity_only",
+       "se_k": 0.057687316157427976,
+       "normal_interval_low_k": -0.2981018925615968,
+       "normal_interval_high_k": -0.07196761322447917
+      },
+      "five_year_plus": {
+       "mean_effect_k": -0.1590301170774047,
+       "n_sites": 666,
+       "n_blocks": 18,
+       "min_retained_fraction": 0.8183183183183184,
+       "status": "sensitivity_only",
+       "se_k": 0.05472526088422068,
+       "normal_interval_low_k": -0.2662916284104772,
+       "normal_interval_high_k": -0.05176860574433216
+      }
+     }
+    ],
+    "n_sites_with_minimum_support": 666,
+    "status": "sensitivity_only"
+   },
+   "variant": "excl_batch_dated",
+   "review_diagnostics": {
+    "diagnostics_version": "1.0.0",
+    "variant": "excl_batch_dated",
+    "specification_comparison": {
+     "headline": {
+      "overall": {
+       "n_sites": 666,
+       "mean_effect_k": -0.185034752893038
+      },
+      "five_year_plus": {
+       "n_sites": 666,
+       "mean_effect_k": -0.15903011707740472
+      }
+     },
+     "no_pre_outcome_matching": {
+      "overall": {
+       "n_sites": 666,
+       "mean_effect_k": -0.17687488960455203
+      },
+      "five_year_plus": {
+       "n_sites": 666,
+       "mean_effect_k": -0.15575714454569012
+      }
+     },
+     "interpretation": "Specification sensitivity, not a correction or a separately identified causal estimate.",
+     "common_cohort": {
+      "overall": {
+       "n_sites": 666,
+       "headline_mean_k": -0.185034752893038,
+       "static_only_mean_k": -0.17687488960455203
+      },
+      "five_year_plus": {
+       "n_sites": 666,
+       "headline_mean_k": -0.15903011707740472,
+       "static_only_mean_k": -0.15575714454569012
+      }
+     }
+    },
+    "year_block_sensitivity": {
+     "method": "delete_one_calendar_year_with_rematching",
+     "rematched": true,
+     "limitations": "Common-cohort normal-approximation sensitivity; few years and unmodelled dependence remain.",
+     "overall": {
+      "status": "sensitivity_only",
+      "n_baseline_sites": 666,
+      "n_common_sites": 649,
+      "common_retained_fraction": 0.9744744744744744,
+      "n_years": 14,
+      "mean_effect_k": -0.18341634447051147,
+      "se_k": 0.07696696183860714,
+      "normal_interval_low_k": -0.33427158967418147,
+      "normal_interval_high_k": -0.032561099266841476,
+      "delete_one_year": [
+       {
+        "year": 2013,
+        "n_supported_sites": 650,
+        "mean_common_cohort_k": -0.1347061743159239,
+        "mean_all_supported_k": -0.13402463497572914
+       },
+       {
+        "year": 2014,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.1475916696217521,
+        "mean_all_supported_k": -0.1397881605989056
+       },
+       {
+        "year": 2015,
+        "n_supported_sites": 665,
+        "mean_common_cohort_k": -0.22660005374216635,
+        "mean_all_supported_k": -0.22753288709633743
+       },
+       {
+        "year": 2016,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.18578845872021885,
+        "mean_all_supported_k": -0.18725794497559278
+       },
+       {
+        "year": 2017,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.18626360812341766,
+        "mean_all_supported_k": -0.18762301909014836
+       },
+       {
+        "year": 2018,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.1678557913449021,
+        "mean_all_supported_k": -0.1691443485230848
+       },
+       {
+        "year": 2019,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.17817185907743338,
+        "mean_all_supported_k": -0.17916871413810828
+       },
+       {
+        "year": 2020,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.17471908449675644,
+        "mean_all_supported_k": -0.17654100797682326
+       },
+       {
+        "year": 2021,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.18690470804068277,
+        "mean_all_supported_k": -0.18917259977660794
+       },
+       {
+        "year": 2022,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.18834819433482883,
+        "mean_all_supported_k": -0.18966483631082293
+       },
+       {
+        "year": 2023,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.1924117510000121,
+        "mean_all_supported_k": -0.19511237885843888
+       },
+       {
+        "year": 2024,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.19513974420574248,
+        "mean_all_supported_k": -0.19602304983053415
+       },
+       {
+        "year": 2025,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.19370174624521974,
+        "mean_all_supported_k": -0.1958249426654107
+       },
+       {
+        "year": 2026,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.16702555306757755,
+        "mean_all_supported_k": -0.16839564101952312
+       }
+      ]
+     },
+     "five_year_plus": {
+      "status": "sensitivity_only",
+      "n_baseline_sites": 666,
+      "n_common_sites": 649,
+      "common_retained_fraction": 0.9744744744744744,
+      "n_years": 14,
+      "mean_effect_k": -0.1591947689303257,
+      "se_k": 0.082974872068105,
+      "normal_interval_low_k": -0.3218255181838115,
+      "normal_interval_high_k": 0.003435980323160115,
+      "delete_one_year": [
+       {
+        "year": 2013,
+        "n_supported_sites": 650,
+        "mean_common_cohort_k": -0.1084128528444639,
+        "mean_all_supported_k": -0.10743055505941691
+       },
+       {
+        "year": 2014,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.12462890503968385,
+        "mean_all_supported_k": -0.11632831896731546
+       },
+       {
+        "year": 2015,
+        "n_supported_sites": 665,
+        "mean_common_cohort_k": -0.20506136747502282,
+        "mean_all_supported_k": -0.20429451435991952
+       },
+       {
+        "year": 2016,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.1608173108062465,
+        "mean_all_supported_k": -0.16016865497758315
+       },
+       {
+        "year": 2017,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.15887103604493266,
+        "mean_all_supported_k": -0.15871464764404125
+       },
+       {
+        "year": 2018,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.15544005392370844,
+        "mean_all_supported_k": -0.15537124314452996
+       },
+       {
+        "year": 2019,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.1591947689303257,
+        "mean_all_supported_k": -0.15903011707740472
+       },
+       {
+        "year": 2020,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.1532789787914602,
+        "mean_all_supported_k": -0.152975170310331
+       },
+       {
+        "year": 2021,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.16436814081524523,
+        "mean_all_supported_k": -0.16620590190053094
+       },
+       {
+        "year": 2022,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.16194534376710712,
+        "mean_all_supported_k": -0.16115300444072891
+       },
+       {
+        "year": 2023,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.1621068453535954,
+        "mean_all_supported_k": -0.16252965436951636
+       },
+       {
+        "year": 2024,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.1780358022464479,
+        "mean_all_supported_k": -0.1763611945703691
+       },
+       {
+        "year": 2025,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.1688870666982771,
+        "mean_all_supported_k": -0.16885291009065673
+       },
+       {
+        "year": 2026,
+        "n_supported_sites": 666,
+        "mean_common_cohort_k": -0.1257412048401467,
+        "mean_all_supported_k": -0.12513298385969984
+       }
+      ]
+     }
+    },
+    "combined_space_year_sensitivity": {
+     "method": "sum_of_spatial_and_year_SE_sensitivity",
+     "metrics": {
+      "overall": {
+       "status": "sensitivity_only",
+       "grids": [
+        {
+         "block_size_m": 2000,
+         "origin_offset_fraction": 0.0,
+         "status": "sensitivity_only",
+         "n_sites": 649,
+         "mean_effect_k": -0.18341634447051147,
+         "spatial_se_k": 0.0662702731046739,
+         "year_se_k": 0.07696696183860714,
+         "se_sum_k": 0.14323723494328106,
+         "sensitivity_low_k": -0.4641613249593423,
+         "sensitivity_high_k": 0.09732863601831937
+        },
+        {
+         "block_size_m": 2000,
+         "origin_offset_fraction": 0.5,
+         "status": "sensitivity_only",
+         "n_sites": 649,
+         "mean_effect_k": -0.18341634447051147,
+         "spatial_se_k": 0.0626919430052678,
+         "year_se_k": 0.07696696183860714,
+         "se_sum_k": 0.13965890484387494,
+         "sensitivity_low_k": -0.45714779796450633,
+         "sensitivity_high_k": 0.09031510902348339
+        },
+        {
+         "block_size_m": 5000,
+         "origin_offset_fraction": 0.0,
+         "status": "sensitivity_only",
+         "n_sites": 649,
+         "mean_effect_k": -0.18341634447051147,
+         "spatial_se_k": 0.06935111282508777,
+         "year_se_k": 0.07696696183860714,
+         "se_sum_k": 0.1463180746636949,
+         "sensitivity_low_k": -0.47019977081135345,
+         "sensitivity_high_k": 0.1033670818703305
+        },
+        {
+         "block_size_m": 5000,
+         "origin_offset_fraction": 0.5,
+         "status": "sensitivity_only",
+         "n_sites": 649,
+         "mean_effect_k": -0.18341634447051147,
+         "spatial_se_k": 0.05872391309549022,
+         "year_se_k": 0.07696696183860714,
+         "se_sum_k": 0.13569087493409737,
+         "sensitivity_low_k": -0.44937045934134234,
+         "sensitivity_high_k": 0.0825377704003194
+        }
+       ]
+      },
+      "five_year_plus": {
+       "status": "sensitivity_only",
+       "grids": [
+        {
+         "block_size_m": 2000,
+         "origin_offset_fraction": 0.0,
+         "status": "sensitivity_only",
+         "n_sites": 649,
+         "mean_effect_k": -0.1591947689303257,
+         "spatial_se_k": 0.07170988018536997,
+         "year_se_k": 0.082974872068105,
+         "se_sum_k": 0.15468475225347497,
+         "sensitivity_low_k": -0.4623768833471366,
+         "sensitivity_high_k": 0.14398734548648523
+        },
+        {
+         "block_size_m": 2000,
+         "origin_offset_fraction": 0.5,
+         "status": "sensitivity_only",
+         "n_sites": 649,
+         "mean_effect_k": -0.1591947689303257,
+         "spatial_se_k": 0.069648368828382,
+         "year_se_k": 0.082974872068105,
+         "se_sum_k": 0.152623240896487,
+         "sensitivity_low_k": -0.4583363210874402,
+         "sensitivity_high_k": 0.13994678322678883
+        },
+        {
+         "block_size_m": 5000,
+         "origin_offset_fraction": 0.0,
+         "status": "sensitivity_only",
+         "n_sites": 649,
+         "mean_effect_k": -0.1591947689303257,
+         "spatial_se_k": 0.06886773801912821,
+         "year_se_k": 0.082974872068105,
+         "se_sum_k": 0.1518426100872332,
+         "sensitivity_low_k": -0.4568062847013028,
+         "sensitivity_high_k": 0.13841674684065142
+        },
+        {
+         "block_size_m": 5000,
+         "origin_offset_fraction": 0.5,
+         "status": "sensitivity_only",
+         "n_sites": 649,
+         "mean_effect_k": -0.1591947689303257,
+         "spatial_se_k": 0.055033517435864925,
+         "year_se_k": 0.082974872068105,
+         "se_sum_k": 0.13800838950396993,
+         "sensitivity_low_k": -0.42969121235810676,
+         "sensitivity_high_k": 0.11130167449745537
+        }
+       ]
+      }
+     },
+     "limitations": "Adds SEs rather than selecting the wider component. This permits positive covariance in an additive-component interpretation, but is not a calibrated multiway variance estimator. Components can overlap; source-block dependence and observational bias remain."
+    },
+    "pre_cohort_fake_date": {
+     "method": "same_sensor_pre_cohort_fake_date",
+     "sensor": "LANDSAT_5",
+     "years": [
+      2008,
+      2009,
+      2010,
+      2011
+     ],
+     "fake_treatment_year": 2010,
+     "n_pre_scenes": 10,
+     "n_post_scenes": 4,
+     "limitations": "Thin older-sensor window, one post year. Tests a period before the recorded cohort, not a treeless city. A nonzero contrast challenges causal attribution but does not measure headline bias.",
+     "status": "insufficient_same_sensor_scenes"
+    },
+    "sensor_family_support": {
+     "sensor_transition_sensitive": false,
+     "cohorts": [
+      {
+       "treatment_year": 2015,
+       "pre_scenes_by_family": {
+        "modern_8_9": 11
+       },
+       "post_scenes_by_family": {
+        "modern_8_9": 96
+       },
+       "families_present_only_pre": [],
+       "families_present_only_post": []
+      },
+      {
+       "treatment_year": 2016,
+       "pre_scenes_by_family": {
+        "modern_8_9": 21
+       },
+       "post_scenes_by_family": {
+        "modern_8_9": 91
+       },
+       "families_present_only_pre": [],
+       "families_present_only_post": []
+      },
+      {
+       "treatment_year": 2017,
+       "pre_scenes_by_family": {
+        "modern_8_9": 26
+       },
+       "post_scenes_by_family": {
+        "modern_8_9": 86
+       },
+       "families_present_only_pre": [],
+       "families_present_only_post": []
+      },
+      {
+       "treatment_year": 2018,
+       "pre_scenes_by_family": {
+        "modern_8_9": 31
+       },
+       "post_scenes_by_family": {
+        "modern_8_9": 79
+       },
+       "families_present_only_pre": [],
+       "families_present_only_post": []
+      },
+      {
+       "treatment_year": 2019,
+       "pre_scenes_by_family": {
+        "modern_8_9": 38
+       },
+       "post_scenes_by_family": {
+        "modern_8_9": 74
+       },
+       "families_present_only_pre": [],
+       "families_present_only_post": []
+      }
+     ],
+     "interpretation": "Cross-sensor sensitivity is not independent confirmation; scene differencing does not remove family-specific spatial contrast changes."
+    },
+    "later_planting_context": {
+     "treated_cells_with_post_window_plantings": 544,
+     "trees_after_window_in_treated_cells": 5098,
+     "interpretation": "Post-period differences can include later plantings; dose_trees only counts the treatment window."
+    },
+    "inference_status": "observational_association_not_established_causal_cooling"
+   }
+  }
+ }
+}

@@ -1,0 +1,36 @@
+{
+  "independent_review_commit": "462e2b4",
+  "applies_to": "observational comparisons; not validated causal outcomes",
+  "all_cities": [
+    "Surface temperature is not felt or air temperature.",
+    "All four cities are temperate.",
+    "No dated planting record is not proof of no planting.",
+    "Post-window plantings in treated cells can contribute to later contrasts.",
+    "Cross-sensor sensitivity is not independent confirmation.",
+    "Some static matching features may postdate planting; source-year columns must be considered before causal interpretation."
+  ],
+  "city_notes": {
+    "nyc": [
+      "Dated inventory begins in 2015; earlier cohorts can mature unseen in both groups.",
+      "The 2008-2011 same-sensor pre-cohort fake-date check found a nonzero contrast.",
+      "Matching on noisy pre-outcomes can select regression to the mean."
+    ],
+    "dc": [
+      "Current tree-space records overwrite some past removals; survivorship/history bias is possible.",
+      "Thin pre-period and poor matching overlap limit identification."
+    ],
+    "sea": [
+      "Excluded January-1 dates represent real trees with unknown planting dates; some controls may have been planted.",
+      "A negative association does not establish a causal effect."
+    ],
+    "sf": [
+      "Standing-tree records omit historical removals; survivorship bias is possible.",
+      "Some dated records lack coordinates; fog limits summer observations."
+    ]
+  },
+  "reviewed_snapshot": {
+    "panel": "0",
+    "features": "1",
+    "interventions": "1"
+  }
+}

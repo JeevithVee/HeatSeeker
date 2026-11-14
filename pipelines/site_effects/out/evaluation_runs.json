@@ -1,0 +1,26 @@
+{
+  "job_id": 531402490679417,
+  "source_sha256": "3ed3f2c83aa1a97583685f2eba6adf71d9be4162d1fe66546c41f51556fd0fb2",
+  "workspace_source_root": "/Shared/heatseeker/agent3/3ed3f2c83aa1a975",
+  "input_dir": "",
+  "panel_source": "delta",
+  "job_name": "heatseeker-site-effects",
+  "headline_run_id": 606115661672539,
+  "cross_sensor_sensitivity_run_id": 598786481893891,
+  "cloud_tests_passed": 34,
+  "headline_job_success": true,
+  "cross_sensor_job_success": true,
+  "input_delta_versions": {
+    "panel": "0",
+    "features": "1",
+    "interventions": "1"
+  },
+  "full_silver_verified": true,
+  "diagnostics_version": "1.0.0",
+  "gold_delta_version": 18,
+  "prior_full_silver_parity_run": 383042876269446,
+  "previous_mixed_input_runs": {
+    "headline": 5222250658819,
+    "cross_sensor": 149976888548281
+  }
+}
