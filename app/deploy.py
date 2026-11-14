@@ -47,9 +47,11 @@ def main() -> None:
         f"{src_root}/app/data.py": REPO / "app" / "data.py",
         f"{src_root}/app/app.yaml": REPO / "app" / "app.yaml",
         f"{src_root}/app/requirements.txt": REPO / "app" / "requirements.txt",
+        f"{src_root}/app/.streamlit/config.toml":
+            REPO / "app" / ".streamlit" / "config.toml",
         f"{src_root}/config/us/config.yaml": REPO / "config" / "us" / "config.yaml",
     }
-    w.workspace.mkdirs(f"{src_root}/app")
+    w.workspace.mkdirs(f"{src_root}/app/.streamlit")
     w.workspace.mkdirs(f"{src_root}/config/us")
     for dest, src in uploads.items():
         w.workspace.upload(dest, io.BytesIO(src.read_bytes()),

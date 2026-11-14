@@ -20,8 +20,10 @@ NAME = "HeatSeeker Portfolio"
 CAVEAT = (
     "Surface temperature at the satellite overpass, not air or felt "
     "temperature. 'Detected' is an unadjusted statistical label, not proof of "
-    "causal cooling; pooled cooling remains provisional (sensitivity "
-    "intervals span zero). All four cities are temperate."
+    "causal cooling. Reliable cooling is not established: sensitivity "
+    "intervals span zero, NYC's pooled cooling is indistinguishable from zero "
+    "under alternative specifications, and Seattle shows a negative "
+    "association, not a causal estimate. All four cities are temperate."
 )
 
 
