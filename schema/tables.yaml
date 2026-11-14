@@ -91,28 +91,49 @@ tables:
       land_cover_year:      {type: int,    nullable: true}
       elevation_m:          {type: double, nullable: true}
       population:           {type: double, nullable: true, description: "Residents allocated to the cell"}
+      share_age_65_plus:    {type: double, nullable: true, description: "Raw vulnerability input: share of residents aged 65 or older, 0-1"}
+      share_low_income:     {type: double, nullable: true, description: "Raw vulnerability input: share of residents on low income (US: below 150% of the poverty line), 0-1"}
       vulnerable_residents: {type: double, nullable: true, description: "population x vulnerability_index"}
       vulnerability_index:  {type: double, nullable: true, description: "0-1, higher is more vulnerable. Formula comes from country config"}
       median_household_income: {type: double, nullable: true, description: "Local currency units per year"}
       existing_tree_count:  {type: int,    nullable: true, description: "Standing trees in the city inventory, dated or not"}
 
   silver.panel:
-    # Suggested minimum. Agent 2 owns this definition.
+    # Agent 2 owns this definition (MessageBoard, Agent 2 msg 1).
     writer: agent-2
     readers: [agent-3, agent-4]
-    grain: one row per site_id x scene, for every cell in the city grid
+    grain: one row per site_id x scene_id, for every cell in the city grid
+    notes: >
+      No averaging across scenes. Rows with zero clear pixels are dropped, so
+      a cell missing from a scene means "no clear view". A city can sit in two
+      Landsat paths, so a cell can appear twice within a week on different
+      scene_ids, and edge scenes cover only part of the city.
     columns:
       country_code:           {type: string, nullable: false}
       city_id:                {type: string, nullable: false}
       site_id:                {type: string, nullable: false}
-      scene_id:               {type: string, nullable: false}
+      scene_id:               {type: string, nullable: false, description: "Landsat product id"}
       acquired_at_utc:        {type: timestamp, nullable: false}
-      sensor:                 {type: string, nullable: false, description: "e.g. landsat8, landsat9, ecostress"}
+      acquired_date:          {type: date,   nullable: false}
+      year:                   {type: int,    nullable: false}
+      sensor:                 {type: string, nullable: false, description: "LANDSAT_8 | LANDSAT_9"}
       lst_mean_k:             {type: double, nullable: true}
       lst_median_k:           {type: double, nullable: true}
       lst_std_k:              {type: double, nullable: true}
-      valid_pixel_frac:       {type: double, nullable: false, description: "Share of the cell's pixels that passed the cloud mask"}
-      scene_cloud_cover_frac: {type: double, nullable: true}
+      valid_pixel_count:      {type: int,    nullable: false}
+      valid_pixel_frac:       {type: double, nullable: false, description: "Clear pixels / all pixels in the cell, 0-1"}
+      is_clear:               {type: boolean, nullable: false, description: "valid_pixel_frac >= 0.8"}
+      scene_cloud_cover_frac: {type: double, nullable: true, description: "Whole Landsat scene, 0-1"}
+      city_clear_frac:        {type: double, nullable: true, description: "Share of city cells with is_clear in this scene, 0-1"}
+      sun_elevation_deg:      {type: double, nullable: true}
+      wrs_path:               {type: int,    nullable: true}
+      wrs_row:                {type: int,    nullable: true}
+      tmax_c:                 {type: double, nullable: true, description: "City mean for the scene date"}
+      tmin_c:                 {type: double, nullable: true}
+      wind_speed_ms:          {type: double, nullable: true}
+      precip_mm:              {type: double, nullable: true}
+      source:                 {type: string, nullable: false}
+      license:                {type: string, nullable: false}
 
   gold.site_effects:
     # Agent 3 owns this definition (MessageBoard, Agent 3 msg 1).

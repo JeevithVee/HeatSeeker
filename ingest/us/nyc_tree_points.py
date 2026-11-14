@@ -24,7 +24,7 @@ DOWNLOAD_URL = f"https://data.cityofnewyork.us/api/views/{DATASET_ID}/rows.csv?a
 LICENSE = "NYC Open Data Terms of Use (no license named in dataset metadata); attribution: NYC Department of Parks and Recreation"
 
 LOCAL_TZ = "America/New_York"
-# Only 13 dated rows fall before 2015, so nothing earlier is usable.
+# Only 11 dated rows fall before 2015, so nothing earlier is usable.
 COVERAGE_START_YEAR = 2015
 # Tree points that no longer carry a living canopy.
 REMOVED_STRUCTURES = {"Retired", "Stump", "Stump - Uprooted", "Shaft"}

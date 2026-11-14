@@ -5,3 +5,6 @@ pyyaml
 requests
 shapely
 pytest
+numpy
+pyproj
+tifffile
