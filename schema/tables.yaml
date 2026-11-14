@@ -1,0 +1,154 @@
+# HeatSeeker standard tables.
+#
+# STATUS: PROPOSED (Agent 1, 2026-11-14). Becomes FROZEN once all four agents
+# agree on the MessageBoard. After the freeze, changes need agreement of all four.
+#
+# Conventions that apply to every table:
+#   - country_code (ISO 3166-1 alpha-2) and city_id are on every table.
+#   - site_id is an H3 cell index at `h3_resolution`, as a 15-character
+#     lowercase hex string. The same string is used in every table.
+#   - Metric units. Temperatures in Kelvin. Shares are fractions 0-1, not percent.
+#   - Timestamps are UTC. Dates are ISO 8601.
+#   - Unity Catalog names are <catalog>.<layer>.<table>; the catalog name is
+#     set per workspace (see `catalog` below), the layer and table are fixed.
+
+version: 0.1.0
+status: proposed
+catalog: heatseeker        # confirm in the workspace
+h3_resolution: 9           # ~0.105 km2 per cell, edge ~174 m
+country_codes: [US]
+city_ids:
+  nyc: New York
+  dc: Washington DC
+  sf: San Francisco
+  sea: Seattle
+
+# City grid rule: a cell belongs to a city when its centroid is inside the
+# city boundary polygon (land boundary, clipped to the shoreline).
+
+tables:
+
+  bronze:
+    # One physical table per source, named bronze.<source_id>. All share these
+    # columns. Raw data as received; nothing is dropped or corrected here.
+    writer: [agent-1, agent-2]
+    grain: one row per source record
+    columns:
+      country_code:  {type: string, nullable: false}
+      city_id:       {type: string, nullable: false}
+      role:          {type: string, nullable: false, description: "Country-neutral data role, see roles.yaml"}
+      value:         {type: double, nullable: true,  description: "Numeric value of the record in `units`"}
+      units:         {type: string, nullable: true}
+      date:          {type: string, nullable: true,  description: "Date or timestamp exactly as received from the source"}
+      geometry:      {type: string, nullable: true,  description: "WKT, EPSG:4326"}
+      source:        {type: string, nullable: false, description: "Source id, e.g. nyc_forestry_tree_points"}
+      license:       {type: string, nullable: false}
+      source_record_id: {type: string, nullable: true, description: "Record id in the source system"}
+      attributes:    {type: string, nullable: true,  description: "JSON object with the remaining source fields, unmodified"}
+      ingested_at:   {type: timestamp, nullable: false}
+
+  silver.interventions:
+    writer: agent-1
+    readers: [agent-3, agent-4]
+    grain: one row per site_id x plant_year x intervention_type
+    notes: >
+      Only cells with at least one dated planting appear. All years from 2015
+      on are included, not only the 2015-2019 evaluation window, so that
+      evaluation can exclude later-planted cells from the control pool.
+    columns:
+      country_code:       {type: string, nullable: false}
+      city_id:            {type: string, nullable: false}
+      site_id:            {type: string, nullable: false}
+      plant_year:         {type: int,    nullable: false, description: "Calendar year of the planting date"}
+      intervention_type:  {type: string, nullable: false, description: "tree_planting for now"}
+      trees_planted:      {type: int,    nullable: false, description: "Trees with a valid planting date in this cell and year"}
+      trees_removed:      {type: int,    nullable: false, description: "Of trees_planted, how many the source now records as removed or dead (stump, retired)"}
+      trees_surviving:    {type: int,    nullable: false, description: "trees_planted - trees_removed"}
+      removed_flag:       {type: boolean, nullable: false, description: "True only when trees_surviving = 0"}
+      removal_tracked:    {type: boolean, nullable: false, description: "False when the source lists only standing trees, so trees_removed is a lower bound of 0"}
+      trees_batch_dated:  {type: int,    nullable: false, description: "Of trees_planted, how many carry a date flagged as a likely batch entry. Flagged, not dropped"}
+      first_plant_date:   {type: date,   nullable: false}
+      last_plant_date:    {type: date,   nullable: false}
+      source:             {type: string, nullable: false}
+
+  silver.features:
+    writer: agent-1
+    readers: [agent-3, agent-4]
+    grain: one row per site_id, for every cell in the city grid
+    columns:
+      country_code:         {type: string, nullable: false}
+      city_id:              {type: string, nullable: false}
+      site_id:              {type: string, nullable: false}
+      centroid_lat:         {type: double, nullable: false}
+      centroid_lon:         {type: double, nullable: false}
+      area_km2:             {type: double, nullable: false}
+      canopy_frac_baseline: {type: double, nullable: true, description: "Tree canopy fraction in canopy_year_baseline"}
+      canopy_year_baseline: {type: int,    nullable: true}
+      canopy_frac_latest:   {type: double, nullable: true}
+      canopy_year_latest:   {type: int,    nullable: true}
+      impervious_frac:      {type: double, nullable: true}
+      land_cover_class:     {type: string, nullable: true, description: "Dominant land cover class in the cell"}
+      land_cover_year:      {type: int,    nullable: true}
+      elevation_m:          {type: double, nullable: true}
+      population:           {type: double, nullable: true, description: "Residents allocated to the cell"}
+      vulnerable_residents: {type: double, nullable: true, description: "population x vulnerability_index"}
+      vulnerability_index:  {type: double, nullable: true, description: "0-1, higher is more vulnerable. Formula comes from country config"}
+      median_household_income: {type: double, nullable: true, description: "Local currency units per year"}
+      existing_tree_count:  {type: int,    nullable: true, description: "Standing trees in the city inventory, dated or not"}
+
+  silver.panel:
+    # Suggested minimum. Agent 2 owns this definition.
+    writer: agent-2
+    readers: [agent-3, agent-4]
+    grain: one row per site_id x scene, for every cell in the city grid
+    columns:
+      country_code:           {type: string, nullable: false}
+      city_id:                {type: string, nullable: false}
+      site_id:                {type: string, nullable: false}
+      scene_id:               {type: string, nullable: false}
+      acquired_at_utc:        {type: timestamp, nullable: false}
+      sensor:                 {type: string, nullable: false, description: "e.g. landsat8, landsat9, ecostress"}
+      lst_mean_k:             {type: double, nullable: true}
+      lst_median_k:           {type: double, nullable: true}
+      lst_std_k:              {type: double, nullable: true}
+      valid_pixel_frac:       {type: double, nullable: false, description: "Share of the cell's pixels that passed the cloud mask"}
+      scene_cloud_cover_frac: {type: double, nullable: true}
+
+  gold.site_effects:
+    # Agent 3 owns this definition (MessageBoard, Agent 3 msg 1).
+    writer: agent-3
+    readers: [agent-4]
+    grain: one row per site_id x variant
+    notes: >
+      The 'all' variant is the headline; 'excl_batch_dated' is the robustness
+      check. Effects are Kelvin differences in surface temperature, not felt
+      temperature.
+    columns:
+      country_code:      {type: string, nullable: false}
+      city_id:           {type: string, nullable: false}
+      site_id:           {type: string, nullable: false}
+      variant:           {type: string, nullable: false, description: "all | excl_batch_dated"}
+      treatment_year:    {type: int,    nullable: false, description: "First plant_year with trees_planted >= min_dose"}
+      intervention_type: {type: string, nullable: false}
+      dose_trees:        {type: int,    nullable: false, description: "trees_planted summed over 2015-2019"}
+      n_pre_scenes:      {type: int,    nullable: false}
+      n_post_scenes:     {type: int,    nullable: false}
+      n_controls:        {type: int,    nullable: false}
+      effect_k:          {type: double, nullable: true, description: "Difference-in-differences estimate. Negative = cooling"}
+      effect_se_k:       {type: double, nullable: true}
+      ci_low_k:          {type: double, nullable: true}
+      ci_high_k:         {type: double, nullable: true}
+      placebo_p:         {type: double, nullable: true}
+      mde_k:             {type: double, nullable: true, description: "Minimum detectable effect at this site"}
+      quality_label:     {type: string, nullable: false, description: "detected | not_detectable | inconclusive"}
+      event_study_json:  {type: string, nullable: true, description: "JSON object {years_since_planting: effect_k}"}
+      panel_version:     {type: string, nullable: true, description: "Delta version of silver.panel that was read"}
+      method_version:    {type: string, nullable: false}
+      evaluated_at_utc:  {type: timestamp, nullable: false}
+
+  gold.recommendations:
+    # Agent 4 owns this definition; to be posted on the MessageBoard.
+    writer: agent-4
+    readers: [app]
+    grain: one row per candidate site_id
+    columns: {}

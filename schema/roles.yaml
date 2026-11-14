@@ -1,0 +1,15 @@
+# Country-neutral data roles. Core logic depends on the role, never on the source.
+# The `role` column in bronze takes one of these keys.
+
+roles:
+  surface_temperature: {units: K,        description: "Land surface temperature per cell per scene"}
+  canopy:              {units: fraction, description: "Tree canopy cover"}
+  land_cover:          {units: class,    description: "Land cover class and impervious fraction"}
+  elevation:           {units: m,        description: "Ground elevation"}
+  weather:             {units: varies,   description: "Air temperature, wind and similar for scene filtering"}
+  demographics:        {units: persons,  description: "Resident counts and census attributes"}
+  vulnerability:       {units: index,    description: "Inputs to the heat vulnerability index"}
+  intervention:        {units: trees,    description: "A cooling intervention record, e.g. one planted tree"}
+  boundary:            {units: none,     description: "City boundary polygon"}
+  feasibility:         {units: none,     description: "Right-of-way, parcels, utilities"}
+  ground_truth:        {units: K,        description: "Field temperature campaigns for validation"}
