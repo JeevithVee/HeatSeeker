@@ -1,12 +1,15 @@
-"""Data access for the app.
+"""Data access for the app: live Unity Catalog tables with snapshot fallback.
 
-On Databricks this module is the one place that switches to SQL against the
-gold/silver Unity Catalog tables (via databricks.sql or spark). Everywhere
-else - and whenever a live query fails - it reads the precomputed parquet
-snapshots, so the app always has something to show (shared brief: fall back
-to precomputed gold tables).
+Mode 1 - live: when DATABRICKS_WAREHOUSE_HTTP_PATH is set (app.yaml) and
+credentials exist (a Databricks App injects DATABRICKS_HOST / CLIENT_ID /
+CLIENT_SECRET for its service principal), each table is read from
+heatseeker.* through the SQL warehouse.
 
-Set HEATSEEKER_DATA_DIR to point at the snapshot directory; default is demo/data.
+Mode 2 - snapshot: everywhere else, and WHENEVER a live query fails (no
+grants yet, warehouse down, table missing), the precomputed parquet
+snapshot under HEATSEEKER_DATA_DIR serves instead - the brief's sanctioned
+fallback. The app keeps working either way; `source()` reports which mode
+each table came from.
 """
 
 from __future__ import annotations
@@ -30,8 +33,65 @@ TABLES = {
     "prediction_scores": "prediction_scores.parquet",
 }
 
-# Where the app logs plantings entered in the Track view.
+# Unity Catalog sources for live mode. panel_sample and prediction_scores
+# are derived files, snapshot-only.
+LIVE_TABLES = {
+    "features": "heatseeker.silver.features",
+    "interventions": "heatseeker.silver.interventions",
+    "site_effects": "heatseeker.gold.site_effects",
+    "recommendations": "heatseeker.gold.recommendations",
+    "prediction_log": "heatseeker.gold.prediction_log",
+}
+
+PLANTING_TABLE = "heatseeker.gold.app_planting_log"
 NEW_PLANTINGS_PATH = DATA_DIR / "new_plantings.parquet"
+
+_sources: dict[str, str] = {}
+_conn = None
+
+
+def source(name: str | None = None):
+    """'live' or 'snapshot' per table; overall summary when name is None."""
+    if name:
+        return _sources.get(name, "snapshot")
+    vals = set(_sources.values())
+    return "live" if vals == {"live"} else ("mixed" if "live" in vals else "snapshot")
+
+
+def _live_ready() -> bool:
+    return bool(os.environ.get("DATABRICKS_WAREHOUSE_HTTP_PATH")
+                and os.environ.get("DATABRICKS_HOST")
+                and os.environ.get("DATABRICKS_CLIENT_ID"))
+
+
+def _connect():
+    global _conn
+    if _conn is not None:
+        return _conn
+    from databricks import sql as dbsql
+    from databricks.sdk.core import Config, oauth_service_principal
+
+    host = os.environ["DATABRICKS_HOST"]
+    cfg = Config(host=f"https://{host}" if not host.startswith("http") else host,
+                 client_id=os.environ["DATABRICKS_CLIENT_ID"],
+                 client_secret=os.environ["DATABRICKS_CLIENT_SECRET"])
+    _conn = dbsql.connect(
+        server_hostname=cfg.host.replace("https://", ""),
+        http_path=os.environ["DATABRICKS_WAREHOUSE_HTTP_PATH"],
+        credentials_provider=lambda: oauth_service_principal(cfg),
+    )
+    return _conn
+
+
+def _live_query(query: str, params: dict | None = None) -> pd.DataFrame:
+    global _conn
+    try:
+        with _connect().cursor() as c:
+            c.execute(query, params)
+            return c.fetchall_arrow().to_pandas()
+    except Exception:
+        _conn = None  # stale connection: rebuild once on the next call
+        raise
 
 
 def load_config() -> dict:
@@ -39,27 +99,57 @@ def load_config() -> dict:
 
 
 def load_table(name: str) -> pd.DataFrame:
-    """Load a standard table; empty frame if the snapshot is missing."""
+    if name in LIVE_TABLES and _live_ready():
+        try:
+            df = _live_query(f"SELECT * FROM {LIVE_TABLES[name]}")
+            _sources[name] = "live"
+            return df
+        except Exception:
+            pass  # fall through to snapshot
+    _sources[name] = "snapshot"
     path = DATA_DIR / TABLES[name]
     if not path.exists():
         return pd.DataFrame()
     return pd.read_parquet(path)
 
 
-def log_planting(entry: dict) -> pd.DataFrame:
-    """Append one planting logged in the app (the 'Plant' step of the loop).
+def log_planting(entry: dict) -> str:
+    """Record one planting (the 'Plant' step). Returns where it landed.
 
-    On Databricks this becomes an INSERT into silver.interventions' staging
-    table; locally it appends to a parquet file next to the snapshots.
+    Live mode inserts into the app's own staging table (never Agent 1's
+    silver.interventions); otherwise appends to a local parquet file.
     """
+    if _live_ready():
+        try:
+            _live_query(
+                f"""INSERT INTO {PLANTING_TABLE}
+                (country_code, city_id, site_id, intervention_type,
+                 trees_planted, planted_date, cost_usd, logged_by,
+                 logged_at_utc)
+                VALUES (:country_code, :city_id, :site_id,
+                 :intervention_type, :trees_planted,
+                 CAST(:planted_date AS DATE), :cost_usd, :logged_by,
+                 CAST(:logged_at_utc AS TIMESTAMP))""",
+                entry)
+            return PLANTING_TABLE
+        except Exception:
+            pass
     row = pd.DataFrame([entry])
     if NEW_PLANTINGS_PATH.exists():
-        row = pd.concat([pd.read_parquet(NEW_PLANTINGS_PATH), row], ignore_index=True)
+        row = pd.concat([pd.read_parquet(NEW_PLANTINGS_PATH), row],
+                        ignore_index=True)
+    NEW_PLANTINGS_PATH.parent.mkdir(parents=True, exist_ok=True)
     row.to_parquet(NEW_PLANTINGS_PATH, index=False)
-    return row
+    return str(NEW_PLANTINGS_PATH.name)
 
 
 def load_new_plantings() -> pd.DataFrame:
+    if _live_ready():
+        try:
+            return _live_query(
+                f"SELECT * FROM {PLANTING_TABLE} ORDER BY logged_at_utc DESC")
+        except Exception:
+            pass
     if NEW_PLANTINGS_PATH.exists():
         return pd.read_parquet(NEW_PLANTINGS_PATH)
     return pd.DataFrame()

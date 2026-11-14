@@ -278,16 +278,21 @@ def view_track(t):
         cost = c[4].number_input("Cost (USD)", 0, 500000,
                                  int(CONFIG["costs_usd"]["street_trees"]))
         if st.form_submit_button("Log it"):
-            data.log_planting({
+            try:
+                logged_by = st.context.headers.get("X-Forwarded-Email") or "local"
+            except Exception:
+                logged_by = "local"
+            dest = data.log_planting({
                 "country_code": "US", "city_id": st.session_state["city_id"],
                 "site_id": site,
                 "intervention_type": kind, "trees_planted": int(n),
                 "planted_date": str(when), "cost_usd": float(cost),
+                "logged_by": logged_by,
                 "logged_at_utc": datetime.now(timezone.utc).isoformat(),
             })
-            st.success(f"Logged {n} × {kind} at {site}. It will be evaluated "
-                       "against matched controls once enough post-planting "
-                       "scenes arrive.")
+            st.success(f"Logged {n} × {kind} at {site} → {dest}. It will be "
+                       "evaluated against matched controls once enough "
+                       "post-planting scenes arrive.")
 
     new = data.load_new_plantings()
     if not new.empty:
@@ -408,6 +413,8 @@ city_id = st.sidebar.selectbox(
 st.session_state["city_id"] = city_id
 view = st.sidebar.radio("View", ["Recommend", "Track", "Results"])
 st.sidebar.divider()
+st.sidebar.caption(f"Data: {data.source()} "
+                   f"({'Unity Catalog tables' if data.source() == 'live' else 'verified snapshot of the tables'})")
 st.sidebar.info(CAVEAT)
 
 t = {k: (v[v["city_id"] == city_id] if "city_id" in v.columns else v)

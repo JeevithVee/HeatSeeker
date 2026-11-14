@@ -7,3 +7,5 @@ env:
     value: "true"
   - name: HEATSEEKER_DATA_DIR
     value: "data"   # snapshot bundled in the app source by app/deploy.py
+  - name: DATABRICKS_WAREHOUSE_HTTP_PATH
+    value: "/sql/1.0/warehouses/b646c232444bafe7"   # enables live UC reads; snapshot remains the fallback
