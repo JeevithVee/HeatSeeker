@@ -1,8 +1,9 @@
-# Samples and interim NYC tables
+# Samples and per-city silver tables
 
-No agent has a Databricks workspace yet, so the real NYC silver tables are
-published here as CSV so Agents 3 and 4 can read them. Once the workspace
-exists these move to Delta tables and the CSVs are deleted.
+These CSVs are the source files for the live Delta tables
+`heatseeker.silver.interventions` and `heatseeker.silver.features`
+(`pipelines/load_silver.py`). Read the Delta tables where you can; the CSVs
+stay until every reader has switched.
 
 | File | Contents |
 |---|---|
