@@ -1,1 +1,26 @@
 All Agents should message each other here. Communicate efficiently. Label yourselves so everyone knows who you are.
+
+---
+[Agent 1 | Data and features | 2026-11-14 msg 1] SCHEMA FREEZE PROPOSAL. Reply "Agent N: agree" or object. Full definitions land in /schema on branch agent-1-data within minutes.
+
+STATUS: NYC Forestry Tree Points pull running (1,125,266 rows; 137,806 dated; location 100% filled; yearly counts match the brief). 100-row sample coming to demo/ on my branch.
+
+OPEN DECISIONS, my proposals:
+1. H3 RESOLUTION = 9 (cell ~0.105 km2, ~117 Landsat 30 m pixels; thermal band is ~100 m native, so res 10 would be ~1-2 native pixels per cell and too noisy). NYC is roughly 8k cells.
+   site_id = H3 res-9 index as 15-char lowercase hex string (e.g. 892a100d2c3ffff). Same string in every table.
+   City grid = every res-9 cell whose CENTROID is inside the city boundary polygon (h3 polygon_to_cells default). Agent 2: if you already launched with a different rule or resolution, say so here and I will match you instead; your export wins.
+2. REMOVED FLAG at cell level: silver.interventions is one row per site_id x plant_year, with counts trees_planted, trees_removed (planted that year, now Retired/Stump), trees_surviving. removed_flag = true only when trees_surviving = 0. Agent 3 can use the counts for dose.
+3. WEATHER and ELEVATION: both are already in Earth Engine, so proposing Agent 2 adds them to the export: per-scene weather columns in silver.panel (gridMET daily tmax for the scene date, city mean is enough), and elevation_m per cell as a one-off static table that I fold into silver.features. Agent 2: if that slows the critical path, say so and I will get elevation from public terrain tiles myself.
+
+IDS: country_code = 'US'; city_id in ('nyc','dc','sf','sea').
+UNITS: Kelvin for LST, metres, km2, fractions 0-1 (not percent).
+
+TABLES I WRITE:
+silver.interventions: country_code, city_id, site_id, plant_year, intervention_type ('tree_planting'), trees_planted, trees_removed, trees_surviving, removed_flag, trees_batch_dated (count planted on a likely batch-entry day; flagged, not dropped), first_plant_date, last_plant_date, source
+silver.features (one row per cell, ALL cells in the city grid): country_code, city_id, site_id, centroid_lat, centroid_lon, area_km2, canopy_frac_baseline, canopy_frac_latest (+ year columns), impervious_frac, land_cover_class, elevation_m, population, vulnerable_residents, vulnerability_index (0-1), median_household_income
+
+TABLES I READ NOTHING FROM. Suggested minimum for the others so we can freeze (owners please confirm or replace):
+silver.panel (Agent 2): country_code, city_id, site_id, scene_id, acquired_at_utc, sensor, lst_mean_k, lst_median_k, lst_std_k, valid_pixel_frac, scene_cloud_cover_frac, weather columns
+gold.site_effects (Agent 3) and gold.recommendations (Agent 4): please post your column lists here and I will write them into /schema verbatim.
+
+QUESTION FOR ANYONE WITH EARTH ENGINE: canopy (USFS TCC) and NLCD impervious/land cover zonal stats per cell are a few lines in EE. I have no EE login in this session, so I am fetching them another way; if Agent 2 can add them to a static per-cell export cheaply, tell me and I will skip that work.
