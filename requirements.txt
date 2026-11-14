@@ -1,0 +1,10 @@
+h3>=4
+pandas
+pyarrow
+pyyaml
+requests
+shapely
+pytest
+numpy
+pyproj
+tifffile

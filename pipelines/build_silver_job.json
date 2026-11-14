@@ -1,0 +1,30 @@
+{
+  "name": "heatseeker-build-silver",
+  "description": "Builds silver.interventions and silver.features for all cities from bronze, folding in plantings logged in the app. Writes a table only when its rows changed; check_only=true never writes and fails on any difference.",
+  "git_source": {
+    "git_url": "https://github.com/JeevithVee/HeatSeeker",
+    "git_provider": "gitHub",
+    "git_branch": "agent-1-data"
+  },
+  "tags": {"project": "heatseeker", "component": "silver_features_interventions"},
+  "environments": [
+    {
+      "environment_key": "default",
+      "spec": {"environment_version": "4", "dependencies": ["h3>=4", "pandas", "pyyaml", "numpy", "pyproj", "tifffile", "requests"]}
+    }
+  ],
+  "parameters": [{"name": "catalog", "default": "heatseeker"}, {"name": "check_only", "default": "false"}],
+  "max_concurrent_runs": 1,
+  "tasks": [
+    {
+      "task_key": "build_silver",
+      "environment_key": "default",
+      "spark_python_task": {
+        "python_file": "pipelines/build_silver.py",
+        "source": "GIT",
+        "parameters": ["--catalog", "{{job.parameters.catalog}}", "--check-only", "{{job.parameters.check_only}}"]
+      },
+      "timeout_seconds": 3600
+    }
+  ]
+}
