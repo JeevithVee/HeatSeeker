@@ -103,6 +103,26 @@ def test_event_study_pre_period_is_flat(gold, city):
     assert np.mean(post_vals) < -1.0
 
 
+def test_report_sanity(city):
+    from core.evaluation import evaluate_city_with_report
+    from core.evaluation.report import format_report
+    gold, rep = evaluate_city_with_report(city["panel"], city["features"], city["interventions"], CFG)
+    assert rep["n_treated"] == len(gold) == rep["n_matched"]
+    assert abs(rep["pre_period_mean_effect_k"]) < 0.1          # pre-period flat
+    assert rep["max_abs_smd"] < 0.25                           # treated and controls balanced
+    assert abs(rep["placebo_mean_k"]) < 0.1                    # placebo centred on zero
+    assert 0.1 < rep["placebo_sd_k"] < 1.0
+    assert rep["n_scenes"] >= 60 and rep["n_cells_in_panel"] == SyntheticSpec().n_cells
+    text = format_report(rep)
+    assert "pre-period pooled effect" in text and "event study" in text
+
+
+def test_duplicate_panel_rows_are_tolerated(city):
+    dup = pd.concat([city["panel"], city["panel"].head(500)], ignore_index=True)
+    p = filter_scenes(dup, CFG)
+    assert not p.duplicated(["site_id", "scene_id"]).any()
+
+
 def test_core_has_no_country_imports():
     import pathlib
     root = pathlib.Path(__file__).resolve().parents[1]

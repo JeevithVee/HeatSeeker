@@ -35,6 +35,9 @@ def filter_scenes(panel: pd.DataFrame, cfg: EvalConfig) -> pd.DataFrame:
         keep &= p["tmax_c"].between(lo, hi) | p["tmax_c"].isna()
     p = p.loc[keep]
 
+    # one row per cell per scene; a duplicate would break the pivot, so keep the clearer row
+    p = p.sort_values("valid_pixel_frac", ascending=False).drop_duplicates(["site_id", "scene_id"])
+
     cells_per_scene = p.groupby("scene_id")["site_id"].transform("size")
     p = p.loc[cells_per_scene >= cfg.min_cells_per_scene]
     return p.reset_index(drop=True)

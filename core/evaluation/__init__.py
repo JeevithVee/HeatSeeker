@@ -6,8 +6,16 @@ country-specific code. Heavy runs happen in /pipelines on Databricks.
 """
 
 from core.evaluation.config import EvalConfig
-from core.evaluation.run import evaluate_city, evaluate_city_all_variants
+from core.evaluation.run import (
+    evaluate_city,
+    evaluate_city_all_variants,
+    evaluate_city_all_variants_with_reports,
+    evaluate_city_with_report,
+)
 
-METHOD_VERSION = "0.1.0"
+METHOD_VERSION = "0.2.0"   # 0.2: cumulative-dose treatment, water exclusion, city_clear_frac filter
 
-__all__ = ["EvalConfig", "evaluate_city", "evaluate_city_all_variants", "METHOD_VERSION"]
+__all__ = [
+    "EvalConfig", "evaluate_city", "evaluate_city_all_variants", "evaluate_city_with_report",
+    "evaluate_city_all_variants_with_reports", "METHOD_VERSION",
+]

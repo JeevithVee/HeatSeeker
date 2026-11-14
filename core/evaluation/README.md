@@ -38,6 +38,15 @@ silver tables and writes `gold.site_effects`.
      a 1 K effect). `mde_k = 2.8 × SE` (80% power at 5%).
    - `inconclusive`: too few scenes (< 5 pre or post) or controls (< 3), or `mde_k > 1.0 K`.
 
+## Sanity report
+
+`evaluate_city_with_report` returns the gold rows plus a report (`report.py`) that the job prints
+with every run: scenes kept per year, treated/matched counts, label counts, median MDE,
+**pre-period pooled effect** (should be ≈ 0; if not, matching is failing), **control balance**
+as standardized mean differences on the match variables (|SMD| < 0.1 good, < 0.25 acceptable),
+the placebo distribution's mean and spread, and the pooled event study by years since planting.
+Read it before believing the effects.
+
 ## Reading the output
 
 - `effect_k` is the **average over the whole post period**. Tree effects ramp in over years, so

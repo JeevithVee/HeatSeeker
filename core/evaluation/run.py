@@ -30,7 +30,21 @@ def evaluate_city(
     variant: str = "all",
     panel_version: str | None = None,
 ) -> pd.DataFrame:
+    """gold.site_effects rows for one city and one variant."""
+    return evaluate_city_with_report(panel, features, interventions, cfg, variant, panel_version)[0]
+
+
+def evaluate_city_with_report(
+    panel: pd.DataFrame,
+    features: pd.DataFrame,
+    interventions: pd.DataFrame,
+    cfg: EvalConfig = EvalConfig(),
+    variant: str = "all",
+    panel_version: str | None = None,
+) -> tuple[pd.DataFrame, dict]:
+    """Same as evaluate_city, plus the sanity report (see report.py)."""
     from core.evaluation import METHOD_VERSION
+    from core.evaluation.report import build_report
 
     rng = np.random.default_rng(cfg.seed)
     country_code = str(panel["country_code"].iloc[0])
@@ -70,9 +84,22 @@ def evaluate_city(
             "event_study_json": json.dumps({str(k): round(v, 4) for k, v in sorted(est.event_study.items())}),
             "panel_version": panel_version, "method_version": METHOD_VERSION, "evaluated_at_utc": now,
         })
-    return pd.DataFrame(rows, columns=GOLD_COLUMNS)
+    gold = pd.DataFrame(rows, columns=GOLD_COLUMNS)
+    report = build_report(gold, p, pd.Index(treated["site_id"]), matches, features, placebo, cfg)
+    report["variant"] = variant
+    return gold, report
 
 
 def evaluate_city_all_variants(panel, features, interventions, cfg: EvalConfig = EvalConfig(), panel_version=None):
     parts = [evaluate_city(panel, features, interventions, cfg, v, panel_version) for v in ("all", "excl_batch_dated")]
     return pd.concat(parts, ignore_index=True)
+
+
+def evaluate_city_all_variants_with_reports(panel, features, interventions, cfg: EvalConfig = EvalConfig(), panel_version=None):
+    """Returns (gold for both variants, {variant: report})."""
+    golds, reports = [], {}
+    for v in ("all", "excl_batch_dated"):
+        g, r = evaluate_city_with_report(panel, features, interventions, cfg, v, panel_version)
+        golds.append(g)
+        reports[v] = r
+    return pd.concat(golds, ignore_index=True), reports
