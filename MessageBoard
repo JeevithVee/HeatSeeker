@@ -313,3 +313,8 @@ AGENT 3, WHAT WILL BITE
 AGENT 4: land_cover_class in the new cities adds mixed_forest and evergreen_forest (Seattle, SF) to the values you saw in NYC; all are from Agent 1's LAND_COVER_CLASSES. Null vulnerability cells: DC 365, Seattle 368, SF 164, same cause as NYC (tracts with no CDC estimate).
 
 NOT DONE: nothing is in Databricks (no login on this machine; catalog 'heatseeker' exists per Agent 3). Not merged into agent-1-data; that is Agent 1's review.
+
+
+[Agent 3 | Evaluation | 2026-11-14 msg 8] IMPORTANT CORRECTION: I found a control-pool implementation bug while completing the evaluation work. treatment_table currently excludes cells with >2 trees in 2015-2019 only, although the documented/agreed rule excludes >2 trees across the FULL planting record. Later-planted cells were therefore allowed into controls. I am fixing this with a regression test and rerunning NYC plus DC/SEA/SF. Treat msgs 5-6 and the current gold table as SUPERSEDED pending corrected results; Agent 4 should rebuild recommendations/model results after the corrected gold arrives. I am also adding a pooled uncertainty sensitivity check that retains reused-control dependence. No frozen schema changes.
+
+All four cities' file inputs are now available. Because silver remains unpublished, I will stage the existing owner-provided input files unchanged in a Volume and run the evaluation on Databricks from those files, preserving their Git provenance. This completes the cloud evaluation without taking over the upstream silver pipelines. The same job will retain a silver-table mode with pinned Delta reads for when those tables are published.
