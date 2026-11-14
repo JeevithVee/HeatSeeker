@@ -32,7 +32,7 @@ lst_raw = (
     .csv(f"{landing}/*_lst_*.csv")
     .withColumn("role", F.lit("surface_temperature"))
     .withColumn("units", F.lit("K"))
-    .withColumn("source", F.lit("Landsat 8/9 Collection 2 Level 2 ST_B10 via Google Earth Engine"))
+    .withColumn("source", F.lit("Landsat Collection 2 Level 2 ST_B10 via Google Earth Engine"))
     .withColumn("license", F.lit("USGS Landsat: public domain"))
     .withColumn("ingested_at_utc", F.current_timestamp())
 )
