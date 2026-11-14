@@ -1,8 +1,16 @@
-"""Effect model: predict a site's cooling effect from its features.
+"""Effect model ("Learn"): predict a site's cooling effect from its features.
 
 Country-agnostic. Takes plain dataframes and parameters; never reads config
 files. Predictions are shrunk toward the training mean where similar past
 sites are few.
+
+Trains on gold.site_effects (frozen schema, Kelvin) joined to silver.features.
+All quality labels are pooled: sub-degree effects are individually
+'inconclusive' or 'not_detectable' at 30 m but inform the model in aggregate,
+and training only on 'detected' sites would select on significance and
+overstate effects. effect_k is an average over the whole post period, so
+years_since_treatment is a model feature; predictions are made at explicit
+ages (predict_at_age), which replaces any hand-set maturity curve.
 """
 
 from __future__ import annotations
@@ -13,11 +21,13 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.neighbors import NearestNeighbors
 
 FEATURE_COLUMNS = [
-    "canopy_pct",
-    "impervious_pct",
-    "trees_planted",
-    "baseline_temp_anomaly_c",
+    "canopy_frac_baseline",
+    "impervious_frac",
+    "dose_trees",
+    "years_since_treatment",
 ]
+
+HEADLINE_VARIANT = "all"
 
 # Shrinkage: weight on the model prediction is n_similar / (n_similar + K).
 SHRINKAGE_K = 5
@@ -38,9 +48,9 @@ class EffectModel:
         return (X[FEATURE_COLUMNS].to_numpy() - self._scale_mu) / self._scale_sd
 
     def fit(self, train: pd.DataFrame) -> "EffectModel":
-        """train: one row per evaluated site with FEATURE_COLUMNS + effect_c."""
+        """train: one row per evaluated site with FEATURE_COLUMNS + effect_k."""
         X = train[FEATURE_COLUMNS].to_numpy()
-        y = train["effect_c"].to_numpy()
+        y = train["effect_k"].to_numpy()
         self._scale_mu = X.mean(axis=0)
         self._scale_sd = np.where(X.std(axis=0) == 0, 1.0, X.std(axis=0))
         self.model.fit(X, y)
@@ -49,9 +59,9 @@ class EffectModel:
         return self
 
     def predict(self, sites: pd.DataFrame) -> pd.DataFrame:
-        """Returns effect_c prediction with uncertainty and shrinkage applied.
+        """Effect prediction (Kelvin) with uncertainty and shrinkage applied.
 
-        Output columns: pred_effect_c, pred_effect_c_low, pred_effect_c_high,
+        Output columns: pred_effect_k, pred_effect_k_low, pred_effect_k_high,
         n_similar, shrinkage_weight.
         """
         X = sites[FEATURE_COLUMNS].to_numpy()
@@ -68,34 +78,43 @@ class EffectModel:
         pred = w * raw + (1 - w) * self._train_mean
 
         out = sites[["site_id"]].copy()
-        out["pred_effect_c"] = pred
-        out["pred_effect_c_low"] = pred - 1.96 * sd
-        out["pred_effect_c_high"] = pred + 1.96 * sd
+        out["pred_effect_k"] = pred
+        out["pred_effect_k_low"] = pred - 1.96 * sd
+        out["pred_effect_k_high"] = pred + 1.96 * sd
         out["n_similar"] = n_similar
         out["shrinkage_weight"] = w
         return out
+
+    def predict_at_age(self, sites: pd.DataFrame, age_years: float) -> pd.DataFrame:
+        """Predict as if every site were age_years past planting."""
+        return self.predict(sites.assign(years_since_treatment=float(age_years)))
+
+
+def build_training_frame(
+    site_effects: pd.DataFrame,
+    features: pd.DataFrame,
+    as_of_year: int,
+    variant: str = HEADLINE_VARIANT,
+) -> pd.DataFrame:
+    """Join the headline-variant effects to features; derive treatment age."""
+    eff = site_effects[site_effects["variant"] == variant].copy()
+    eff["years_since_treatment"] = (as_of_year - eff["treatment_year"]).clip(lower=0)
+    return eff.merge(
+        features[["country_code", "city_id", "site_id",
+                  "canopy_frac_baseline", "impervious_frac"]],
+        on=["country_code", "city_id", "site_id"],
+    )
 
 
 def train_effect_model(
     site_effects: pd.DataFrame,
     features: pd.DataFrame,
-    interventions: pd.DataFrame,
+    as_of_year: int,
     mlflow_tracking_uri: str | None = None,
     model_version: str = "v0",
 ) -> tuple[EffectModel, pd.DataFrame]:
-    """Join measured effects to features, fit, optionally log to MLflow.
-
-    Only sites labeled `detected` or `inconclusive` train the model;
-    `not_detectable` sites carry no usable magnitude.
-    """
-    usable = site_effects[site_effects["quality_label"] != "not_detectable"]
-    train = (
-        usable.merge(features, on=["country_code", "city_id", "site_id"])
-        .merge(
-            interventions[["country_code", "city_id", "site_id", "trees_planted"]],
-            on=["country_code", "city_id", "site_id"],
-        )
-    )
+    """Build the training frame, fit, optionally log to MLflow."""
+    train = build_training_frame(site_effects, features, as_of_year)
     model = EffectModel().fit(train)
 
     if mlflow_tracking_uri:
@@ -106,11 +125,12 @@ def train_effect_model(
         with mlflow.start_run(run_name=model_version):
             mlflow.log_params(
                 {"n_train": len(train), "features": ",".join(FEATURE_COLUMNS),
-                 "shrinkage_k": SHRINKAGE_K, "model_version": model_version}
+                 "shrinkage_k": SHRINKAGE_K, "variant": HEADLINE_VARIANT,
+                 "model_version": model_version}
             )
             preds = model.predict(train)
             rmse = float(np.sqrt(np.mean(
-                (preds["pred_effect_c"] - train["effect_c"]) ** 2)))
-            mlflow.log_metric("train_rmse_c", rmse)
+                (preds["pred_effect_k"] - train["effect_k"]) ** 2)))
+            mlflow.log_metric("train_rmse_k", rmse)
 
     return model, train

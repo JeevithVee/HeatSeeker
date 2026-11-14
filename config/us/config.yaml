@@ -23,7 +23,7 @@ cities:
     name: Seattle
     center: {lat: 47.6062, lon: -122.3321}
 
-# Editable cost assumptions per intervention, USD per H3 cell treated.
+# Editable cost assumptions per intervention, USD per H3 res-9 cell treated.
 # Placeholder planning numbers for the prototype; a city can edit these.
 costs_usd:
   street_trees: 18000      # ~30 trees/cell at ~$600 planted
@@ -31,24 +31,28 @@ costs_usd:
   cool_roof: 25000
   cool_pavement: 40000
 
-# Weights for the vulnerability score computed per cell in /core.
-# score = sum(weight * normalized column). Columns come from silver.features.
+# Weights for vulnerability_index, computed per cell over the raw shares that
+# Agent 1 stores in silver.features (each min-max scaled within the city).
+# Agent 1's build_features takes this formula as an argument (board, msg 3);
+# equal weights match their placeholder. vulnerable_residents =
+# population * vulnerability_index.
 vulnerability_formula:
   weights:
-    heat_sensitive_share: 0.4   # share of residents 65+ or under 5
-    poverty_share: 0.4
-    no_ac_share: 0.2
-  # vulnerable_residents = population * vulnerability_score
+    share_age_65_plus: 0.5
+    share_low_income: 0.5
 
-# Growth curve: fraction of mature cooling effect reached by year N.
-cooling_maturity:
-  year_5: 0.4
-  year_15: 1.0
+# Horizons (years since planting) the recommendations show. The effect model
+# predicts at these ages directly; frozen column names carry them
+# (predicted_cooling_k_5y / _15y).
+horizons_years: [5, 15]
 
 candidate_rules:
-  max_canopy_pct: 20
-  max_impervious_pct: 85
-  allowed_land_cover: [developed_open, developed_low, developed_medium, grass, barren]
+  max_canopy_frac: 0.20
+  max_impervious_frac: 0.85
+  # Must match Agent 1's land_cover_class vocabulary character for character
+  # (Annual NLCD 2024). Placeholder until Agent 1 posts the distinct values.
+  allowed_land_cover_class:
+    [developed_open, developed_low, developed_medium, grass, barren]
 
 ranking:
   holdout_every_n: 5   # leave every Nth ranked site unplanted as a future control

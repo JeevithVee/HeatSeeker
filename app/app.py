@@ -2,8 +2,9 @@
 
 Streamlit app structured to run as a Databricks App. All numbers shown come
 from the gold/silver tables (shared rule 12); units and labels come from
-/config/us (shared rule 10). Storage is Celsius; display defaults to
-Fahrenheit per config.
+/config/us (shared rule 10). Storage is Kelvin per the frozen schema;
+display defaults to Fahrenheit per config (temperature differences:
+dF = dK x 1.8).
 """
 
 from __future__ import annotations
@@ -23,6 +24,7 @@ st.set_page_config(page_title="HeatSeeker", page_icon="🌳", layout="wide")
 CONFIG = data.load_config()
 FAHRENHEIT = CONFIG["display"]["temperature_unit"] == "fahrenheit"
 UNIT = "°F" if FAHRENHEIT else "°C"
+HEADLINE_VARIANT = "all"
 
 CAVEAT = (
     "**Surface temperature is not felt (air) temperature** - effects here are "
@@ -37,14 +39,18 @@ QUALITY_COLORS = {
 }
 
 
-def dc(celsius_delta):
-    """Convert a temperature *difference* to display units (ΔF = ΔC × 1.8)."""
-    return celsius_delta * 1.8 if FAHRENHEIT else celsius_delta
+def dk(kelvin_delta):
+    """Convert a temperature *difference* to display units (dF = dK x 1.8)."""
+    return kelvin_delta * 1.8 if FAHRENHEIT else kelvin_delta
 
 
 @st.cache_data(ttl=300)
 def tables():
-    return {name: data.load_table(name) for name in data.TABLES}
+    t = {name: data.load_table(name) for name in data.TABLES}
+    eff = t["site_effects"]
+    if not eff.empty and "variant" in eff.columns:
+        t["site_effects"] = eff[eff["variant"] == HEADLINE_VARIANT]
+    return t
 
 
 def deck_map(df: pd.DataFrame, colors: np.ndarray, radius: int = 120,
@@ -61,7 +67,8 @@ def deck_map(df: pd.DataFrame, colors: np.ndarray, radius: int = 120,
             latitude=city["lat"], longitude=city["lon"], zoom=10.3),
         layers=[pdk.Layer(
             "ScatterplotLayer", d,
-            get_position=["lon", "lat"], get_fill_color=["r", "g", "b", 170],
+            get_position=["centroid_lon", "centroid_lat"],
+            get_fill_color=["r", "g", "b", 170],
             get_radius=radius, pickable=bool(tip),
         )],
         tooltip=tip,
@@ -86,7 +93,10 @@ def view_recommend(t):
                            default=sorted(recs["suggested_intervention"].unique()))
     show_holdout = c3.checkbox("Include holdout controls", value=True)
 
-    d = recs[recs["suggested_intervention"].isin(kinds)]
+    d = recs.merge(feats[["site_id", "centroid_lat", "centroid_lon",
+                          "canopy_frac_baseline", "impervious_frac", "population"]],
+                   on="site_id")
+    d = d[d["suggested_intervention"].isin(kinds)]
     if not show_holdout:
         d = d[~d["holdout_control"]]
     d = d.nsmallest(top_n, "rank").copy()
@@ -94,28 +104,27 @@ def view_recommend(t):
     # color by score percentile: deep red = top priority
     q = d["score"].rank(pct=True).to_numpy()
     colors = np.stack([60 + 195 * q, 80 + 60 * (1 - q), 60 * (1 - q)], axis=1)
-    d["cooling_15y"] = dc(d["predicted_cooling_c_15y"]).round(2)
+    d["cooling_15y"] = dk(d["predicted_cooling_k_15y"]).round(2)
     deck_map(d, colors, tooltip_cols=["site_id", "rank", "cooling_15y",
                                       "suggested_intervention"])
 
     site = st.selectbox("Site detail", d.sort_values("rank")["site_id"])
     r = d[d["site_id"] == site].iloc[0]
-    f = feats[feats["site_id"] == site].iloc[0]
 
     m = st.columns(5)
     m[0].metric("Rank", int(r["rank"]))
     m[1].metric(f"Predicted cooling at 15y ({UNIT})",
-                f"{dc(r['predicted_cooling_c_15y']):.2f}",
-                f"range {dc(r['predicted_cooling_c_15y_low']):.2f} to "
-                f"{dc(r['predicted_cooling_c_15y_high']):.2f}", delta_color="off")
+                f"{dk(r['predicted_cooling_k_15y']):.2f}",
+                f"range {dk(r['predicted_cooling_k_15y_low']):.2f} to "
+                f"{dk(r['predicted_cooling_k_15y_high']):.2f}", delta_color="off")
     m[2].metric("Vulnerable residents", f"{r['vulnerable_residents']:,.0f}")
     m[3].metric("Est. cost", f"${r['est_cost_usd']:,.0f}")
     m[4].metric("Suggestion", r["suggested_intervention"].replace("_", " "))
     st.caption(
-        f"Why: canopy {f['canopy_pct']:.0f}%, impervious {f['impervious_pct']:.0f}%, "
-        f"population {f['population']:,.0f}. Cooling at 5y: "
-        f"{dc(r['predicted_cooling_c_5y']):.2f} {UNIT} "
-        f"(trees reach ~{CONFIG['cooling_maturity']['year_5']:.0%} of mature effect). "
+        f"Why: canopy {r['canopy_frac_baseline']:.0%}, impervious "
+        f"{r['impervious_frac']:.0%}, population {r['population']:,.0f}. "
+        f"Cooling at 5y: {dk(r['predicted_cooling_k_5y']):.2f} {UNIT} "
+        "(trees are still maturing). "
         + ("**Held out as a control - do not plant.**" if r["holdout_control"] else "")
     )
 
@@ -136,14 +145,16 @@ def view_track(t):
     st.caption("Logged plantings start the next Prove → Learn cycle.")
 
     if not inter.empty:
-        d = inter.merge(feats[["site_id", "lat", "lon"]], on="site_id")
+        d = inter.merge(feats[["site_id", "centroid_lat", "centroid_lon"]],
+                        on="site_id")
         q = (d["trees_planted"] / d["trees_planted"].max()).to_numpy()
         colors = np.stack([40 * (1 - q), 90 + 110 * q, 60 * (1 - q)], axis=1)
         deck_map(d, colors, tooltip_cols=["site_id", "trees_planted", "plant_year"])
-        c = st.columns(3)
-        c[0].metric("Sites planted", len(d))
+        c = st.columns(4)
+        c[0].metric("Cell-years planted", len(d))
         c[1].metric("Trees planted", f"{d['trees_planted'].sum():,.0f}")
-        c[2].metric("Years", f"{d['plant_year'].min()}-{d['plant_year'].max()}")
+        c[2].metric("Trees surviving", f"{d['trees_surviving'].sum():,.0f}")
+        c[3].metric("Years", f"{d['plant_year'].min()}-{d['plant_year'].max()}")
 
     st.divider()
     st.markdown("**Log a new planting**")
@@ -160,7 +171,7 @@ def view_track(t):
                 "country_code": "US", "city_id": "nyc", "site_id": site,
                 "intervention_type": kind, "trees_planted": int(n),
                 "planted_date": str(when), "cost_usd": float(cost),
-                "logged_at": datetime.now(timezone.utc).isoformat(),
+                "logged_at_utc": datetime.now(timezone.utc).isoformat(),
             })
             st.success(f"Logged {n} × {kind} at {site}. It will be evaluated "
                        "against matched controls once enough post-planting scenes arrive.")
@@ -187,14 +198,14 @@ def view_results(t):
     m[1].metric("Cooling detected", int(counts.get("detected", 0)))
     m[2].metric("Not detectable", int(counts.get("not_detectable", 0)),
                 help="Honestly reported: no effect visible at 30 m resolution.")
-    med = dc(detected["effect_c"].median()) if len(detected) else float("nan")
+    med = dk(detected["effect_k"].median()) if len(detected) else float("nan")
     m[3].metric(f"Median detected effect ({UNIT})", f"{med:.2f}")
 
     labels = st.multiselect("Quality label", list(QUALITY_COLORS),
                             default=list(QUALITY_COLORS))
     d = eff[eff["quality_label"].isin(labels)].merge(
-        feats[["site_id", "lat", "lon"]], on="site_id")
-    d["effect_display"] = dc(d["effect_c"]).round(2)
+        feats[["site_id", "centroid_lat", "centroid_lon"]], on="site_id")
+    d["effect_display"] = dk(d["effect_k"]).round(2)
     deck_map(d, np.array([QUALITY_COLORS[q] for q in d["quality_label"]]),
              tooltip_cols=["site_id", "effect_display", "quality_label"])
     st.caption("Green = cooling detected · amber = inconclusive · grey = not detectable")
@@ -202,7 +213,7 @@ def view_results(t):
     # Portfolio: cooling per dollar, using config planting costs as estimates.
     cost_per_site = CONFIG["costs_usd"]["street_trees"]
     if len(detected):
-        total_cooling = dc(-detected["effect_c"].sum())
+        total_cooling = dk(-detected["effect_k"].sum())
         st.caption(
             f"Portfolio: {total_cooling:.1f} {UNIT} of detected cooling across "
             f"{len(detected)} sites ≈ "
@@ -215,24 +226,27 @@ def view_results(t):
     site = st.selectbox("Evaluated site", d["site_id"])
     r = eff[eff["site_id"] == site].iloc[0]
 
-    m = st.columns(4)
-    m[0].metric(f"Measured effect ({UNIT})", f"{dc(r['effect_c']):.2f}",
-                f"CI {dc(r['effect_ci_low_c']):.2f} to {dc(r['effect_ci_high_c']):.2f}",
+    m = st.columns(5)
+    m[0].metric(f"Measured effect ({UNIT})", f"{dk(r['effect_k']):.2f}",
+                f"CI {dk(r['ci_low_k']):.2f} to {dk(r['ci_high_k']):.2f}",
                 delta_color="off")
-    m[1].metric("Confidence", r["quality_label"].replace("_", " "))
-    m[2].metric("Scenes pre / post", f"{r['n_scenes_pre']} / {r['n_scenes_post']}")
-    m[3].metric("Method", r["method"])
+    m[1].metric("Confidence", r["quality_label"].replace("_", " "),
+                help=f"Minimum detectable effect at this site: "
+                     f"{dk(r['mde_k']):.2f} {UNIT}; placebo p = {r['placebo_p']:.2f}")
+    m[2].metric("Planted", int(r["treatment_year"]))
+    m[3].metric("Scenes pre / post", f"{r['n_pre_scenes']} / {r['n_post_scenes']}")
+    m[4].metric("Matched controls", int(r["n_controls"]))
 
     p = panel[panel["site_id"] == site]
     if not p.empty:
         long = p.melt(
             id_vars=["scene_date", "post"],
-            value_vars=["site_temp_rel_c", "control_temp_rel_c"],
-            var_name="series", value_name="temp_rel_c",
+            value_vars=["site_temp_rel_k", "control_temp_rel_k"],
+            var_name="series", value_name="temp_rel_k",
         )
         long["series"] = long["series"].map(
-            {"site_temp_rel_c": "this site", "control_temp_rel_c": "matched controls"})
-        long["temp_rel"] = dc(long["temp_rel_c"])
+            {"site_temp_rel_k": "this site", "control_temp_rel_k": "matched controls"})
+        long["temp_rel"] = dk(long["temp_rel_k"])
         plant_date = p.loc[p["post"], "scene_date"].min()
         chart = alt.Chart(long).mark_line(point=True).encode(
             x=alt.X("scene_date:T", title="clear-sky summer scene"),
@@ -243,7 +257,7 @@ def view_results(t):
         rule = alt.Chart(pd.DataFrame({"d": [plant_date]})).mark_rule(
             strokeDash=[4, 4], color="#c62828").encode(x="d:T")
         st.altair_chart(chart + rule, width="stretch")
-        st.caption("Dashed red line: planting. If the green line drops below "
+        st.caption("Dashed red line: planting year. If the green line drops below "
                    "grey after it, the site cooled relative to its matched controls.")
 
 
