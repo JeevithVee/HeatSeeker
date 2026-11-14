@@ -32,7 +32,18 @@ FAHRENHEIT = CONFIG["display"]["temperature_unit"] == "fahrenheit"
 UNIT = "°F" if FAHRENHEIT else "°C"
 HEADLINE_VARIANT = "all"
 
-# ---- palette (validated reference instance; see dataviz skill) ----
+# ---- palette ----
+# Brand: HeatSeeker green-white-amber (validated: contrast + CVD separation;
+# spec page "HeatSeeker Palette"). Green acts, amber highlights as a fill
+# with ink text only (darkening amber merges with green for protanopia).
+BRAND = "#1a7d3a"        # green-600: primary / interactive
+BRAND_HOVER = "#1c6531"  # green-700
+BRAND_DEEP = "#18391f"   # green-900: headings
+WASH = "#f2f9f2"         # green-50
+ACCENT = "#f0a726"       # amber-400: highlight fills, always ink text
+ACCENT_SOFT = "#fad6a5"  # amber-200
+# Data-layer colors (validated reference instance; see dataviz skill) are a
+# separate system and stay as they are:
 INK = "#0b0b0b"
 INK_2 = "#52514e"
 MUTED = "#898781"
@@ -64,7 +75,10 @@ CSS = f"""
 <style>
 #MainMenu, footer {{visibility: hidden;}}
 .block-container {{padding-top: 2.2rem; max-width: 1200px;}}
-h1 {{font-size: 1.9rem; letter-spacing: -0.02em; margin-bottom: 0;}}
+h1 {{font-size: 1.9rem; letter-spacing: -0.02em; margin-bottom: 0;
+    color: {BRAND_DEEP};}}
+h3 {{color: {BRAND_DEEP};}}
+a {{color: {BRAND_HOVER};}}
 [data-testid="stMetric"] {{
   background: {SURFACE}; border: 1px solid rgba(11,11,11,0.10);
   border-radius: 12px; padding: 0.8rem 1rem;
@@ -85,8 +99,14 @@ h1 {{font-size: 1.9rem; letter-spacing: -0.02em; margin-bottom: 0;}}
   margin-right: 5px; vertical-align: baseline;
 }}
 .hs-note {{
-  border-left: 3px solid {HAIRLINE}; padding: 2px 12px; color: {INK_2};
+  border-left: 3px solid {ACCENT}; background: {WASH};
+  border-radius: 0 8px 8px 0; padding: 8px 12px; color: {INK_2};
   font-size: 0.86rem; margin: 6px 0 2px;
+}}
+.hs-badge {{
+  display: inline-block; background: {ACCENT}; color: {INK};
+  border-radius: 999px; padding: 1px 10px 2px; font-size: 0.8rem;
+  font-weight: 600;
 }}
 </style>
 """
@@ -212,7 +232,8 @@ def view_recommend(t):
         f'impervious {r["impervious_frac"]:.0%}, population '
         f'{r["population"]:,.0f}. Cooling at 5y: '
         f'{dk(r["predicted_cooling_k_5y"]):.2f} {UNIT} (trees still maturing).'
-        + (" <b>Held out as a control — do not plant.</b>"
+        + (f' <span class="hs-badge" style="background:{ACCENT_SOFT}">'
+           'Holdout control — do not plant</span>'
            if r["holdout_control"] else "") + "</div>",
         unsafe_allow_html=True)
 
