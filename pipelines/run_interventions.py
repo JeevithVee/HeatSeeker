@@ -6,11 +6,12 @@ Runs as a Databricks job or locally; see pipelines/io.py for where tables go.
 """
 import argparse
 
-from ingest.us import nyc_tree_points
+from ingest.us import dc_street_trees, nyc_tree_points
 from pipelines import grid, interventions, io
 
 ADAPTERS = {
     "nyc": nyc_tree_points,
+    "dc": dc_street_trees,
 }
 
 
