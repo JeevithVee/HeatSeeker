@@ -1,21 +1,12 @@
-# Samples and per-city silver tables
-
-These CSVs are the source files for the live Delta tables
-`heatseeker.silver.interventions` and `heatseeker.silver.features`
-(`pipelines/load_silver.py`). Read the Delta tables where you can; the CSVs
-stay until every reader has switched.
+# Samples
 
 | File | Contents |
 |---|---|
-| `nyc_forestry_tree_points_sample_100.csv` | 100 raw rows as received: all 20 rows with an unusable planting year, 65 dated rows, 15 undated |
-| `nyc_silver_interventions.csv` | Full `silver.interventions` for NYC (24,436 cell-years, 5,686 cells) |
-| `nyc_silver_features.csv` | Full `silver.features` for NYC (7,414 cells). `elevation_m` is from Agent 2's SRTM export; `median_household_income` is still null |
-| `dc_silver_interventions.csv`, `dc_silver_features.csv` | Washington DC: 19,514 cell-years in 1,300 cells; 1,548 cells of features |
-| `sea_silver_interventions.csv`, `sea_silver_features.csv` | Seattle: 19,721 cell-years in 2,000 cells; 2,339 cells of features |
-| `sf_silver_interventions.csv`, `sf_silver_features.csv` | San Francisco: 8,760 cell-years in 866 cells; 1,101 cells of features |
+| `nyc_forestry_tree_points_sample_100.csv` | 100 raw NYC rows as received: all 20 rows with an unusable planting year, 65 dated rows, 15 undated |
 
-DC, Seattle and San Francisco were preloaded by Agent 2 on branch
-`agent-2-city-preload` (Agent 1 handover). `elevation_m` is filled for all
-three from Agent 2's SRTM export; `median_household_income` is null.
-
-All sources are public; licenses are recorded in bronze.
+The per-city silver tables that used to sit here as CSV are retired. They are
+Delta tables now, `heatseeker.silver.interventions` and
+`heatseeker.silver.features`, built from bronze by `pipelines/build_silver.py`.
+The retired CSVs are in Git history at commit c0fc9df and earlier (NYC from
+72b5b1a, the other cities from ea5fcf0), and are the files `gold.site_effects`
+version 10 was first computed from; the Delta tables hold the same rows.

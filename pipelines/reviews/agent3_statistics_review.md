@@ -2,7 +2,7 @@
 
 Reviewed: `core/evaluation` at `agent-3-eval` 651b00d (method 0.3.0), on the
 panels at `agent-2-satellite` 3fd6870 and the silver CSVs in
-`ingest/us/samples`. Scripts are beside this file; each takes
+`ingest/us/samples` (since retired; check out commit 462e2b4 to rerun). Scripts are beside this file; each takes
 `<agent-3 checkout> <dir with <city>_panel.parquet> <this repo>`.
 Runs used 60 bootstrap and 300 placebo draws (10 and 40 for the year
 jackknife), which affects labels and intervals but not point estimates.

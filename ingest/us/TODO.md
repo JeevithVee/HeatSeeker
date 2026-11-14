@@ -30,10 +30,22 @@
   are identical to the live ones (runs 1107437999708243 nyc, 128201262853483 dc,
   614162988893915 sea, 352161324993762 sf).
 
+- One build job replaces the CSV loader: `heatseeker-build-silver`
+  (334451516814053, `pipelines/build_silver.py`) rebuilds all four cities from
+  bronze and writes a table only when its rows changed. First run
+  (637450357960656, check-only): both tables identical to live version 1.
+- The interim silver CSVs are deleted from the branch; the Delta tables are
+  the only copy in use. The old loader job (506579230445270) is retired.
+- Promotion of app-logged plantings is built and unit-tested
+  (`pipelines/promotion.py`) and runs inside the build job.
+
 ## Left
-- Delete the interim CSVs in `ingest/us/samples/` once nothing reads them:
-  Agent 4's app snapshot and `pipelines/load_silver.py` still do. With bronze
-  in place the loader could rebuild from bronze instead.
+- Promotion has not run on real rows: `gold.app_planting_log` is empty. The
+  build job's write path (it wrote nothing, because nothing changed) is the
+  same code the retired loader used for version 0, but has not written from
+  this job yet.
+- `gold.app_planting_log` goes into `schema/tables.yaml` as v1.1.0 once
+  Agents 2 and 3 agree (Agent 4 has).
 - `median_household_income` is null everywhere: needs a Census API key.
 - `CLAUDE.md` city notes are stale for DC (no 1970-01-01 rows in the live
   layer; one layer covers every year). Needs the human's approval to edit.
