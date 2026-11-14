@@ -22,13 +22,18 @@ import csv
 import ee
 import h3
 
+# sensor -> (collection, surface temperature band). Sensors are never mixed
+# silently: every row carries its sensor.
 LANDSAT = {
-    "LANDSAT_8": "LANDSAT/LC08/C02/T1_L2",
-    "LANDSAT_9": "LANDSAT/LC09/C02/T1_L2",
+    "LANDSAT_5": ("LANDSAT/LT05/C02/T1_L2", "ST_B6"),
+    "LANDSAT_7": ("LANDSAT/LE07/C02/T1_L2", "ST_B6"),
+    "LANDSAT_8": ("LANDSAT/LC08/C02/T1_L2", "ST_B10"),
+    "LANDSAT_9": ("LANDSAT/LC09/C02/T1_L2", "ST_B10"),
 }
 # Collection 2 Level 2 surface temperature scaling: Kelvin = DN * scale + offset
 ST_SCALE, ST_OFFSET = 0.00341802, 149.0
-# QA_PIXEL bits to reject: 0 fill, 1 dilated cloud, 2 cirrus, 3 cloud, 4 cloud shadow
+# QA_PIXEL bits to reject: 0 fill, 1 dilated cloud, 2 cirrus (Landsat 8/9 only,
+# unused and zero on 5/7), 3 cloud, 4 cloud shadow
 QA_REJECT = (1 << 0) | (1 << 1) | (1 << 2) | (1 << 3) | (1 << 4)
 
 LST_COLUMNS = [
@@ -57,15 +62,17 @@ def grid_to_fc(rows):
     return ee.FeatureCollection(feats)
 
 
-def scenes(region, year, months, max_cloud):
+def scenes(region, year, months, max_cloud, sensors):
     col = None
-    for coll_id in LANDSAT.values():
+    for sensor in sensors:
+        coll_id, st_band = LANDSAT[sensor]
         c = (
             ee.ImageCollection(coll_id)
             .filterBounds(region)
             .filter(ee.Filter.calendarRange(year, year, "year"))
             .filter(ee.Filter.calendarRange(months[0], months[1], "month"))
             .filter(ee.Filter.lt("CLOUD_COVER", max_cloud))
+            .select([st_band, "QA_PIXEL"], ["ST", "QA_PIXEL"])
         )
         col = c if col is None else col.merge(c)
     return col
@@ -80,8 +87,8 @@ def cell_stats(cells):
     )
 
     def per_image(img):
-        clear = img.select("QA_PIXEL").bitwiseAnd(QA_REJECT).eq(0).And(img.select("ST_B10").gt(0))
-        lst = img.select("ST_B10").multiply(ST_SCALE).add(ST_OFFSET).updateMask(clear).rename("lst")
+        clear = img.select("QA_PIXEL").bitwiseAnd(QA_REJECT).eq(0).And(img.select("ST").gt(0))
+        lst = img.select("ST").multiply(ST_SCALE).add(ST_OFFSET).updateMask(clear).rename("lst")
         valid = clear.unmask(0).rename("valid")
         stats = lst.addBands(valid).reduceRegions(collection=cells, reducer=reducer, scale=30, tileScale=4)
         props = {
@@ -189,6 +196,8 @@ def main():
     p.add_argument("--max-scene-cloud", type=float, default=60, help="scene-level CLOUD_COVER ceiling, percent")
     p.add_argument("--elevation-asset", default="USGS/SRTMGL1_003")
     p.add_argument("--elevation-band", default="elevation")
+    p.add_argument("--sensors", nargs="+", choices=list(LANDSAT), default=["LANDSAT_8", "LANDSAT_9"])
+    p.add_argument("--tag", default="", help="suffix for task and file names, e.g. _l57")
     p.add_argument("--only", choices=["lst", "weather", "static"], nargs="*", default=["lst", "weather", "static"])
     p.add_argument("--dry-run", action="store_true", help="print scene counts, start nothing")
     args = p.parse_args()
@@ -204,19 +213,19 @@ def main():
 
     if "lst" in args.only:
         for year in range(args.start_year, args.end_year + 1):
-            col = scenes(region, year, args.months, args.max_scene_cloud)
+            col = scenes(region, year, args.months, args.max_scene_cloud, args.sensors)
             n = col.size().getInfo()
             print(f"{year}: {n} scenes")
             if n == 0 or args.dry_run:
                 continue
             fc = ee.FeatureCollection(col.map(cell_stats(cells))).flatten()
-            export_table(fc, f"{city_id}_lst_{year}", LST_COLUMNS, args)
+            export_table(fc, f"{city_id}_lst_{year}{args.tag}", LST_COLUMNS, args)
     if args.dry_run:
         return
     if "weather" in args.only:
         export_table(
             weather_fc(region, city_id, country_code, args.start_year, args.end_year, args.months),
-            f"{city_id}_weather", WEATHER_COLUMNS, args,
+            f"{city_id}_weather{args.tag}", WEATHER_COLUMNS, args,
         )
     if "static" in args.only:
         export_table(static_fc(cells, args.elevation_asset, args.elevation_band), f"{city_id}_static", STATIC_COLUMNS, args)
