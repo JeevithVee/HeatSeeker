@@ -17,7 +17,6 @@ from datetime import date
 from pathlib import Path
 
 import pandas as pd
-import requests
 
 from . import common
 
@@ -36,48 +35,11 @@ DEAD_CONDITIONS = {"Dead"}
 # TBOX_STAT of a space that holds a tree. Everything else (Retired, Open,
 # Proposed, Conflict, Delete, ...) is a space without a standing tree.
 STANDING_STATUS = "Plant"
-# Not needed and large (a binary annotation column).
-SKIP_FIELDS = {"SE_ANNO_CAD_DATA", "SHAPE"}
-DATE_FIELDS = ("DATE_PLANT", "RETIREDDT", "CONDITIODT", "CREATED_DATE", "LAST_EDITED_DATE")
-PAGE_SIZE = 2000
 
 
 def fetch(dest_dir):
-    """Download every row of the layer as CSV. Returns the file path.
-
-    Date columns arrive as milliseconds since the Unix epoch and are written
-    as ISO UTC timestamps; nothing else is changed.
-    """
-    dest = Path(dest_dir) / "street_trees_raw.csv"
-    dest.parent.mkdir(parents=True, exist_ok=True)
-    meta = requests.get(LAYER_URL, params={"f": "json"}, timeout=120).json()
-    fields = [f["name"] for f in meta["fields"] if f["name"] not in SKIP_FIELDS]
-    rows, offset = [], 0
-    while True:
-        r = requests.get(f"{LAYER_URL}/query", timeout=300, params={
-            "where": "1=1", "outFields": ",".join(fields), "outSR": 4326,
-            "orderByFields": "OBJECTID", "resultOffset": offset,
-            "resultRecordCount": PAGE_SIZE, "f": "json",
-        })
-        r.raise_for_status()
-        body = r.json()
-        if "error" in body:
-            raise RuntimeError(f"{SOURCE_ID}: {body['error']}")
-        page = body["features"]
-        for f in page:
-            row = f["attributes"]
-            geom = f.get("geometry") or {}
-            row["LONGITUDE"], row["LATITUDE"] = geom.get("x"), geom.get("y")
-            rows.append(row)
-        if not page or not body.get("exceededTransferLimit"):
-            break
-        offset += len(page)
-    raw = pd.DataFrame(rows)
-    for col in DATE_FIELDS:
-        if col in raw:
-            raw[col] = pd.to_datetime(raw[col], unit="ms", utc=True).dt.strftime("%Y-%m-%dT%H:%M:%SZ")
-    raw.to_csv(dest, index=False)
-    return dest
+    """Download every row of the layer as CSV. Returns the file path."""
+    return common.fetch_arcgis_layer(LAYER_URL, Path(dest_dir) / "street_trees_raw.csv")
 
 
 def read_raw(path):

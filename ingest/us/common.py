@@ -72,6 +72,47 @@ def bronze_frame(raw, *, city_id, role, source, license, value, units, date,
     return schema.validate(out, "bronze")
 
 
+def fetch_arcgis_layer(layer_url, dest, *, skip_fields=(), page_size=2000, order_field="OBJECTID"):
+    """Download every row of an ArcGIS REST layer to a CSV at `dest`.
+
+    Point geometry is written as LONGITUDE and LATITUDE (EPSG:4326). Date
+    columns arrive as milliseconds since the Unix epoch and are written as ISO
+    UTC timestamps; nothing else is changed.
+    """
+    import requests
+
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    meta = requests.get(layer_url, params={"f": "json"}, timeout=120).json()
+    fields = [f["name"] for f in meta["fields"]
+              if f["name"] not in skip_fields and f["type"] not in ("esriFieldTypeGeometry", "esriFieldTypeBlob")]
+    date_fields = [f["name"] for f in meta["fields"] if f["type"] == "esriFieldTypeDate" and f["name"] in fields]
+    rows, offset = [], 0
+    while True:
+        r = requests.get(f"{layer_url}/query", timeout=300, params={
+            "where": "1=1", "outFields": ",".join(fields), "outSR": 4326,
+            "orderByFields": order_field, "resultOffset": offset,
+            "resultRecordCount": page_size, "f": "json",
+        })
+        r.raise_for_status()
+        body = r.json()
+        if "error" in body:
+            raise RuntimeError(f"{layer_url}: {body['error']}")
+        page = body["features"]
+        for f in page:
+            row = f["attributes"]
+            geom = f.get("geometry") or {}
+            row["LONGITUDE"], row["LATITUDE"] = geom.get("x"), geom.get("y")
+            rows.append(row)
+        if not page or not body.get("exceededTransferLimit"):
+            break
+        offset += len(page)
+    raw = pd.DataFrame(rows)
+    for col in date_fields:
+        raw[col] = pd.to_datetime(raw[col], unit="ms", utc=True).dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+    raw.to_csv(dest, index=False)
+    return dest
+
+
 def classify_dates(local_dates, raw_text, *, coverage_start_year, as_of,
                    placeholder_dates=()):
     """Label why a planting date is unusable, or None when it is fine.
