@@ -40,7 +40,7 @@ lst_raw.write.mode("overwrite").option("overwriteSchema", True).saveAsTable(f"{c
 
 weather_raw = (
     spark.read.option("header", True).option("inferSchema", True)  # noqa: F821
-    .csv(f"{landing}/*_weather.csv")
+    .csv(f"{landing}/*_weather*.csv")
     .withColumn("role", F.lit("weather"))
     .withColumn("units", F.lit("tmax_k,tmin_k: K; wind_speed_ms: m/s; rh_min_pct: %; precip_mm: mm"))
     .withColumn("source", F.lit("gridMET (IDAHO_EPSCOR/GRIDMET) via Google Earth Engine"))

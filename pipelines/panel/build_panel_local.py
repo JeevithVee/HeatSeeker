@@ -37,7 +37,8 @@ def build(in_dir, city_id):
     n_cells = lst["site_id"].nunique()
     lst["city_clear_frac"] = lst.groupby("scene_id")["is_clear"].transform("sum") / n_cells
 
-    w = pd.read_csv(f"{in_dir}/{city_id}_weather.csv")
+    w = pd.concat([pd.read_csv(f) for f in sorted(glob.glob(f"{in_dir}/{city_id}_weather*.csv"))], ignore_index=True)
+    w = w.drop_duplicates("date")
     w["acquired_date"] = pd.to_datetime(w["date"]).dt.date
     w["tmax_c"] = w["tmax_k"] - 273.15
     w["tmin_c"] = w["tmin_k"] - 273.15
