@@ -21,11 +21,12 @@ def filter_scenes(panel: pd.DataFrame, cfg: EvalConfig) -> pd.DataFrame:
     p["scene_year"] = t.dt.year.astype(int)
     month = t.dt.month
 
+    min_valid = p["sensor"].map(cfg.sensor_min_valid_pixel_frac).fillna(cfg.min_valid_pixel_frac)
     keep = (
         month.isin(cfg.summer_months)
         & p["sensor"].isin(cfg.sensors)
-        & (p["scene_cloud_cover_frac"] <= cfg.max_scene_cloud_frac)
-        & (p["valid_pixel_frac"] >= cfg.min_valid_pixel_frac)
+        & (p["scene_cloud_cover_frac"].fillna(0) <= cfg.max_scene_cloud_frac)
+        & (p["valid_pixel_frac"] >= min_valid)
         & p[cfg.lst_col].notna()
     )
     if "city_clear_frac" in p.columns:

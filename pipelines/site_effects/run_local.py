@@ -54,6 +54,8 @@ def parse_args(argv=None):
     ap.add_argument("--n-bootstrap", type=int, default=200)
     ap.add_argument("--n-placebo", type=int, default=200)
     ap.add_argument("--min-dose", type=int, default=10)
+    ap.add_argument("--sensors", nargs="+", default=None,
+                    help="sensors to keep, e.g. LANDSAT_8 LANDSAT_9 LANDSAT_7 LANDSAT_5 (default: L8 + L9)")
     return ap.parse_args(argv)
 
 
@@ -66,7 +68,8 @@ def main(argv=None):
             df[df["city_id"] == args.city_id].reset_index(drop=True) for df in (panel, features, interventions)
         )
     city = str(panel["city_id"].iloc[0])
-    cfg = EvalConfig(n_bootstrap=args.n_bootstrap, n_placebo=args.n_placebo, min_dose=args.min_dose)
+    extra = {"sensors": tuple(args.sensors)} if args.sensors else {}
+    cfg = EvalConfig(n_bootstrap=args.n_bootstrap, n_placebo=args.n_placebo, min_dose=args.min_dose, **extra)
     gold, reports = evaluate_city_all_variants_with_reports(panel, features, interventions, cfg, panel_version=args.panel_version)
 
     out = Path(args.out_dir)

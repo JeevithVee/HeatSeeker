@@ -11,6 +11,9 @@ class EvalConfig:
     sensors: tuple = ("LANDSAT_8", "LANDSAT_9")   # Landsat only; never mixed with ECOSTRESS
     max_scene_cloud_frac: float = 0.6        # whole-scene cloud; per-cell clear fraction does the real work
     min_valid_pixel_frac: float = 0.7
+    # Per-sensor overrides. Landsat 7 has SLC-off striping from 2003, so its cells rarely exceed
+    # ~0.8 clear even on a cloudless day; a lower bar keeps those scenes when L5/L7 are enabled.
+    sensor_min_valid_pixel_frac: dict = field(default_factory=lambda: {"LANDSAT_7": 0.5})
     min_cells_per_scene: int = 200           # drop scenes that cover too little of the city
     # NYC straddles Landsat paths 13 and 14, so edge scenes cover part of the city. The per-site
     # estimate differences a cell against its own matched controls, so partial scenes are usable;

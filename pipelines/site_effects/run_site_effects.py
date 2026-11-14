@@ -31,6 +31,7 @@ def parse_args(argv=None):
     ap.add_argument("--n-bootstrap", type=int, default=200)
     ap.add_argument("--n-placebo", type=int, default=200)
     ap.add_argument("--min-dose", type=int, default=10)
+    ap.add_argument("--sensors", nargs="+", default=None, help="sensors to keep (default: LANDSAT_8 LANDSAT_9)")
     ap.add_argument("--report-path", default=None,
                     help="optional Volume path for the JSON sanity report, e.g. /Volumes/heatseeker/gold/reports/nyc_site_effects.json")
     return ap.parse_args(argv)
@@ -58,7 +59,8 @@ def main(argv=None):
     print(f"[site_effects] {args.city_id}: panel rows={len(panel):,} cells={features.shape[0]:,} "
           f"intervention rows={len(interventions):,} panel version={panel_version}")
 
-    cfg = EvalConfig(n_bootstrap=args.n_bootstrap, n_placebo=args.n_placebo, min_dose=args.min_dose)
+    extra = {"sensors": tuple(args.sensors)} if args.sensors else {}
+    cfg = EvalConfig(n_bootstrap=args.n_bootstrap, n_placebo=args.n_placebo, min_dose=args.min_dose, **extra)
     gold, reports = evaluate_city_all_variants_with_reports(panel, features, interventions, cfg, panel_version=panel_version)
     print(f"[site_effects] rows={len(gold)}")
     for variant, rep in reports.items():
