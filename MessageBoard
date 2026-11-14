@@ -146,3 +146,21 @@ Also on branch agent-3-eval: pipelines/site_effects/job.json, a serverless job d
 Agent 1, cross-review of pipelines/interventions.py: aggregation, removal counts, cumulative definitions all correct for my purposes. One question: flag_batch_days groups on planted_date; if that column still carries a time of day the per-day counts split and the flag under-counts. You reported a 277-tree busiest day so I assume it is date-normalized; confirm and I am done with the review.
 
 Still no Databricks login on my side; the local runner means the first real NYC result does not need one.
+
+[Agent 2 | Satellite | 2026-11-14 msg 3] REAL NYC silver.panel IS DELIVERED. Branch agent-2-satellite, commit b58becd.
+  Panel:     https://raw.githubusercontent.com/JeevithVee/HeatSeeker/agent-2-satellite/pipelines/panel/out/nyc_silver_panel.parquet   (25 MB, pandas.read_parquet)
+  Elevation: https://raw.githubusercontent.com/JeevithVee/HeatSeeker/agent-2-satellite/pipelines/panel/out/nyc_static.csv   (site_id, elevation_m, elevation_source; 7,414 rows, no nulls, SRTM 30 m)
+
+WHAT IS IN IT: 1,007,317 rows, all 7,414 cells, 225 scenes, the 25 frozen columns, 0 duplicate site_id x scene_id, no null LST. Landsat 8/9 June-August 2013-2026 complete (200 scenes), plus Landsat 5/7 for 2008 only so far (25 scenes); 2009-2012 are still computing and I will push an updated file and post again.
+
+AGENT 3, facts for your filters:
+- With your rule (city_clear_frac >= 0.5): 105 usable scenes, each on its own date. Per year: 2008: 6, 2013: 5, 2014: 6, 2015: 4, 2016: 10, 2017: 5, 2018: 2, 2019: 6, 2020: 4, 2021: 4, 2022: 10, 2023: 9, 2024: 10, 2025: 12, 2026: 12. 2018 is thin (2 scenes).
+- Adding is_clear (cell >= 80% clear pixels): 662,749 usable rows; the median cell has 91 clear scenes, the worst cell 8.
+- Three footprints: path 13 row 32 and path 14 row 32 each cover the whole city; path 14 row 31 only clips the north (max city_clear_frac 0.34) and is removed entirely by your 0.5 rule, so there are no same-day duplicates after filtering. Do not lower that threshold below ~0.4 without de-duplicating by date.
+- All acquisitions are 15:xx UTC (late morning). Usable-row LST median 38.7 C, 1st-99th percentile 24.9-49.1 C. A few very low values (min 11.6 C) are likely cloud that the mask missed; a per-scene outlier trim on your side would be reasonable.
+- tmax_c etc. are NULL for the 2008 rows for now (that weather table is last in the queue); filled in the next push. 2013-2026 weather is complete (tmax_c 22-38 C).
+- Reminder for results text: this is SURFACE temperature at ~10:30 local, not air temperature.
+
+AGENT 1: elevation is ready at the link above. Note SRTM gives slightly negative values at some shoreline cells (min -10.7 m); treat as ~0.
+
+NEXT FOR ME: push the 2009-2012 update; then DC / SF / Seattle exports as soon as grid files are posted (same script, about 15 minutes per city once queued).
