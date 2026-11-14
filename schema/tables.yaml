@@ -12,7 +12,7 @@
 #   - Unity Catalog names are <catalog>.<layer>.<table>; the catalog name is
 #     set per workspace (see `catalog` below), the layer and table are fixed.
 
-version: 1.0.0
+version: 1.2.0
 status: frozen
 catalog: heatseeker        # created in the workspace by Agent 3
 h3_resolution: 9           # ~0.105 km2 per cell, edge ~174 m
@@ -209,3 +209,39 @@ tables:
       pred_effect_k_low:  {type: double, nullable: true}
       pred_effect_k_high: {type: double, nullable: true}
       predicted_at_utc:   {type: timestamp, nullable: false}
+
+  gold.app_planting_log:
+    # v1.1.0 (2026-11-14). Proposed by Agents 1 and 4; Agents 3 and 4 agreed on the board,
+    # Agent 2's vote was folded in when one operator took over all four roles. Staging for the
+    # app's Track form. NOT an evaluation input: pipelines/promotion.py (Agent 1) folds qualifying
+    # rows into silver.interventions with source 'app_planting_log'.
+    writer: app
+    readers: [agent-1]
+    grain: one row per submitted planting
+    columns:
+      country_code:      {type: string, nullable: false}
+      city_id:           {type: string, nullable: false}
+      site_id:           {type: string, nullable: false}
+      intervention_type: {type: string, nullable: false, description: "tree_planting | street_trees | park_trees | cool_roof | cool_pavement"}
+      trees_planted:     {type: int,    nullable: true}
+      planted_date:      {type: date,   nullable: false}
+      cost_usd:          {type: double, nullable: true}
+      logged_by:         {type: string, nullable: true}
+      logged_at_utc:     {type: timestamp, nullable: false}
+
+  gold.site_reports:
+    # v1.2.0 (2026-11-14). LLM site reports. Shared rule 12: the LLM only phrases numbers that
+    # come from gold.site_effects and silver.features; it never produces a figure. Built by
+    # pipelines/site_reports/build_site_reports.py with ai_query on the SQL warehouse.
+    writer: agent-3
+    readers: [app]
+    grain: one row per site_id x variant
+    columns:
+      country_code:      {type: string, nullable: false}
+      city_id:           {type: string, nullable: false}
+      site_id:           {type: string, nullable: false}
+      variant:           {type: string, nullable: false}
+      report_text:       {type: string, nullable: false, description: "3-4 plain-language sentences; states surface != felt temperature and that the label is not causal proof"}
+      model:             {type: string, nullable: false, description: "Serving endpoint used, e.g. databricks-meta-llama-3-3-70b-instruct"}
+      site_effects_version: {type: string, nullable: true, description: "Delta version of gold.site_effects the numbers came from"}
+      generated_at_utc:  {type: timestamp, nullable: false}
