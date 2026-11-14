@@ -20,8 +20,13 @@ from pathlib import Path
 import pandas as pd
 import yaml
 
-REPO = Path(__file__).resolve().parents[1]
-DATA_DIR = Path(os.environ.get("HEATSEEKER_DATA_DIR", REPO / "demo" / "data"))
+HERE = Path(__file__).resolve().parent
+REPO = HERE.parent
+
+_data_dir = Path(os.environ.get("HEATSEEKER_DATA_DIR", REPO / "demo" / "data"))
+# A relative HEATSEEKER_DATA_DIR (e.g. "data" in the deployed app) anchors to
+# this module's directory, not the process cwd.
+DATA_DIR = _data_dir if _data_dir.is_absolute() else HERE / _data_dir
 
 TABLES = {
     "features": "silver_features.parquet",
@@ -95,7 +100,16 @@ def _live_query(query: str, params: dict | None = None) -> pd.DataFrame:
 
 
 def load_config() -> dict:
-    return yaml.safe_load((REPO / "config" / "us" / "config.yaml").read_text())
+    """Find config.yaml: env override, repo layout, or bundled beside the app
+    (the Databricks App deployment copies only the app source directory)."""
+    candidates = [os.environ.get("HEATSEEKER_CONFIG"),
+                  REPO / "config" / "us" / "config.yaml",
+                  HERE / "config" / "us" / "config.yaml"]
+    for c in candidates:
+        if c and Path(c).exists():
+            return yaml.safe_load(Path(c).read_text())
+    raise FileNotFoundError("config/us/config.yaml not found; looked in: "
+                            + ", ".join(str(c) for c in candidates if c))
 
 
 def load_table(name: str) -> pd.DataFrame:
