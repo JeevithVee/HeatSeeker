@@ -18,8 +18,10 @@ def quality_label(
         return "inconclusive"
     if np.isnan(effect) or np.isnan(ci_low) or np.isnan(ci_high):
         return "inconclusive"
+    if not np.isfinite(placebo_p) or not np.isfinite(mde):
+        return "inconclusive"
     excludes_zero = ci_low > 0 or ci_high < 0
-    placebo_ok = np.isnan(placebo_p) or placebo_p < cfg.alpha
+    placebo_ok = placebo_p < cfg.alpha
     if excludes_zero and placebo_ok:
         return "detected"
     if not np.isnan(mde) and mde <= cfg.min_meaningful_effect_k:

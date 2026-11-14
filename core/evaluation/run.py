@@ -93,7 +93,8 @@ def evaluate_city_with_report(
             "panel_version": panel_version, "method_version": METHOD_VERSION, "evaluated_at_utc": now,
         })
     gold = pd.DataFrame(rows, columns=GOLD_COLUMNS)
-    report = build_report(gold, p, pd.Index(treated["site_id"]), matches, features, placebo, cfg)
+    report = build_report(gold, p, pd.Index(treated["site_id"]), matches, features, placebo, cfg,
+                          wide=wide, scene_year=scene_year, control_ids=control_ids)
     report["variant"] = variant
     return gold, report
 

@@ -1,0 +1,19 @@
+{
+  "job_id": 531402490679417,
+  "source_sha256": "a5405c5ae6f07b7954476c72720fb771ed133e3142a078323259eb120e6b0648",
+  "workspace_source_root": "/Shared/heatseeker/agent3/a5405c5ae6f07b79",
+  "input_dir": "/Volumes/heatseeker/gold/files/site_effects/inputs/git-3fd6870-ea5fcf0-72b5b1a",
+  "panel_source": "delta",
+  "job_name": "heatseeker-site-effects",
+  "headline_run_id": 5222250658819,
+  "robustness_run_id": 149976888548281,
+  "cloud_tests_passed": 27,
+  "headline_job_success": true,
+  "robustness_job_success": true,
+  "panel_delta_version": "0",
+  "gold_delta_version": 10,
+  "prior_file_input_runs": {
+    "headline": 1044546343814209,
+    "robustness": 1100247180142541
+  }
+}

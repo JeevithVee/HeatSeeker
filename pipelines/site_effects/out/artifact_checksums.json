@@ -1,0 +1,22 @@
+{
+  "dc_gold_site_effects.csv": "6ee66245f9fc38bde47b7d5b07214cde5104b15c1dc7392125e968624b9d9208",
+  "dc_gold_site_effects.parquet": "262531e5fd6d17f8abc24d1767546788e5cc7202160ef7f9611d32d127cc7ef2",
+  "dc_site_effects_report.json": "1595bfe97c1ab8a285253730e36d3b2675ea0fd99f8c2e36c4276189ef1e7bad",
+  "dc_site_effects_report_all_sensors.json": "d6cb0e0381cab179db7347a3dc06202bf0fdc6e91d1a0a2b41998df41b39546d",
+  "evaluation_runs.json": "2e50ac078363dac2aae1b654290ab471c954e686a92b9d60c226bd9da312cb71",
+  "headline_verification.json": "aeb8c4c586473f3a472bb01fab3037b969a830fa75ab59a9a4291f3df4a95ecf",
+  "input_manifest.json": "88ca4accc3c5624c29436a7136f242dd7aa7c13cea4a5e9d1589c492ac14c8ed",
+  "nyc_gold_site_effects.csv": "caeb24a116253a5ba372a92bb0aa0e5119ded6c7c6a10cb0d181099a521cc663",
+  "nyc_gold_site_effects.parquet": "4610d56f64c690e2f7b6e0139566a35137cf6eb70cee023e8b442acaaf590d2e",
+  "nyc_site_effects_report.json": "fb0e03a54a8ea7c3f41aaa3ceb9313aee6c38840b58d483e156a3c53edca1f42",
+  "nyc_site_effects_report_all_sensors.json": "e844944a9eeb5374e1885869f4d41ef5fc4f640bb74da1bdd2c057dda7e45ca2",
+  "robustness_verification.json": "6097766e8122df8f4509347ae675f1fff62c04cd0fbaa7e8b8a0911e23652402",
+  "sea_gold_site_effects.csv": "80631093316822d79641dfb0f34312f27022617b6dead5648ed7a2cac4114878",
+  "sea_gold_site_effects.parquet": "0f3007c33c8aa26ab7a0965a04aca8a23a25663cf339d4bb6152d611ddd8d3c9",
+  "sea_site_effects_report.json": "fe3523b75f4b9ccfa6f53f332488ab55e49e7842a8c7cd6e2c2135a0ce4d315e",
+  "sea_site_effects_report_all_sensors.json": "c51aa9faa775d69090f4d5fdd0a033bded34eca04c1a821c68c991c5d5865546",
+  "sf_gold_site_effects.csv": "24b5cf23cfd12f507103a1ec5d72d209f53b0ac2df6705097916ea00de2eeac8",
+  "sf_gold_site_effects.parquet": "d8d28700ae197a43c1370358f3e76aa82fd5e269eacde14e7320a93fd8b7ad8a",
+  "sf_site_effects_report.json": "cc746ca500e69b88afd92ae4844ee560dd382ee8fd480e50361973f0ef3522c2",
+  "sf_site_effects_report_all_sensors.json": "a5970b929908781b3cd50ebc5b80051446690f0d3838474629c7a61cad57a61a"
+}

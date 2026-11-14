@@ -1,62 +1,124 @@
-# /pipelines/site_effects
+# Site effects pipeline
 
-Writes `gold.site_effects` for one city. Thin wrappers around `/core/evaluation`; all the
-statistics live there. Every run prints the sanity report (pre-trend, control balance, placebo
-spread, pooled event study) alongside the labels.
+Agent 3's wrappers evaluate the standard silver inputs and publish the frozen
+`gold.site_effects` contract. All statistics live in `core/evaluation`.
 
-**Owner:** Agent 3
+## Deploy and run on Databricks
 
-## Without a workspace (files)
+```
+python pipelines/site_effects/deploy.py --profile heatseeker \
+  --input-dir /Volumes/heatseeker/gold/files/site_effects/inputs/<input-snapshot> \
+  --panel-source delta
+databricks jobs run-now <job-id> --no-wait -p heatseeker -o json
+```
 
-Agents 1 and 2 deliver silver tables as files on their branches until Databricks exists.
+The deployer packages only the evaluation code, its tests and required wrappers. It uploads
+an immutable, content-hashed source snapshot under `/Shared/heatseeker/agent3/<hash>` and
+creates or updates only this component's tagged `heatseeker-site-effects` job. The deployed
+job uses workspace files, so it needs no separate GitHub login. The checked-in `job.json`
+also supports a Git-backed deployment from `agent-3-eval`.
+
+The first task runs the permanent tests in the same pinned serverless environment as the
+analysis: environment version 4, numpy 2.1.3, pandas 2.2.3 and pyarrow 19.0.1. Only a passing
+test task enables the four city tasks. NYC, DC, Seattle and San Francisco run sequentially
+to avoid concurrent replacements of the same gold table. Defaults are 500 bootstrap draws
+and up to 800 control-cell placebo estimates.
+
+`deploy.py` writes its local deployment receipt to a temporary path by default. Authentication
+uses the existing CLI profile; credentials are never part of the source snapshot.
+
+## Input modes and provenance
+
+- **Silver tables:** leave `input_dir` empty. The runner records the versions of
+  `<catalog>.silver.panel`, `.features` and `.interventions` before reading each table and
+  reads those exact snapshots with `versionAsOf`. It records all three versions in the report;
+  `gold.site_effects.panel_version` contains the panel's Delta version.
+- **Owner-provided files:** set `input_dir` to a Volume containing the published per-city
+  Parquet panel, feature/intervention CSVs and `manifest.json`. Each manifest entry names the
+  file, upstream Git commit, source path and SHA256. The runner verifies every checksum before
+  evaluation. Gold's panel version is `git:<panel-commit>`; it must not be described as a
+  silver Delta version. This mode does not create or modify the upstream silver tables.
+
+- **Pinned Delta panel plus files:** set `input_dir` and `panel_source=delta`. The panel is
+  read from a frozen `silver.panel` version, while feature/intervention files remain
+  checksum-verified upstream deliveries. Gold records the real panel Delta version; the
+  report explicitly identifies the mixed input mode and the two file commits. This mode
+  completes cloud evaluation while those upstream silver tables are awaiting publication.
+
+Reports also carry the immutable code hash, runtime versions, configuration and source-data
+caveats. The deployed snapshot is reproducible even if an agent branch changes later.
+
+Once all upstream silver tables are available, switch modes without changing the code:
+
+```
+databricks jobs run-now --no-wait -p heatseeker \
+  --json '{"job_id":<job-id>,"job_parameters":{"input_dir":""}}'
+```
+
+## Outputs and robustness
+
+Each successful city task writes CSV, Parquet and a JSON report under
+`<output_dir>/<job-run-id>/<city>/`, then atomically replaces that city's rows in
+`<catalog>.gold.site_effects`. The default output root is
+`/Volumes/heatseeker/gold/files/site_effects/runs`.
+
+The report includes actual control counts, balance, placebo support, event studies,
+descriptive pre-trends and pooled source-block jackknife sensitivity. Surface temperature is
+not felt temperature. The pooled intervals are conditional sensitivity diagnostics, not
+causal confidence intervals; all four cities are temperate.
+
+Run the all-sensor check without overwriting headline gold:
+
+```
+databricks jobs run-now --no-wait -p heatseeker \
+  --json '{"job_id":<job-id>,"job_parameters":{"sensors":"LANDSAT_5 LANDSAT_7 LANDSAT_8 LANDSAT_9","publish_gold":"false"}}'
+```
+
+Its output files live under its own run ID. Strict June–August filtering applies to SF too;
+its September scenes are not silently included.
+
+## Local smoke runs and CSV publication
 
 ```
 python pipelines/site_effects/run_local.py \
-    --panel pipelines/panel/out/nyc_silver_panel.parquet \        # Agent 2 (branch agent-2-satellite)
-    --features ingest/us/samples/nyc_silver_features.csv \        # Agent 1 (branch agent-1-data)
-    --interventions ingest/us/samples/nyc_silver_interventions.csv \
-    --out-dir out/nyc --panel-version <export date>
+  --panel <city-panel.parquet> --features <city-features.csv> \
+  --interventions <city-interventions.csv> --out-dir <output-dir> \
+  --panel-version git:<panel-commit>
 ```
 
-Writes `out/nyc/nyc_gold_site_effects.csv` (both variants) and `nyc_site_effects_report.json`.
-~3 s for NYC. Add `--sensors LANDSAT_8 LANDSAT_9 LANDSAT_7 LANDSAT_5` once the second export lands.
+Heavy inference runs belong on Databricks. The local runner is for samples, integration
+checks and situations without a workspace.
 
-## On Databricks
-
-`run_site_effects.py` reads `<catalog>.silver.{panel,features,interventions}` for the city,
-records the panel's Delta version (time travel), and overwrites that city's rows in
-`<catalog>.gold.site_effects` with `replaceWhere`. `job.json` is a serverless job definition that
-runs it from the Git folder:
+To publish an already-produced CSV through the SQL warehouse:
 
 ```
-databricks jobs create -p heatseeker --json @pipelines/site_effects/job.json
-databricks jobs run-now <job_id> -p heatseeker --json '{"job_parameters": {"city_id": "nyc"}}'
+bash pipelines/site_effects/load_gold.sh <city-gold.csv> <city-id> heatseeker heatseeker
 ```
 
-The job reads from `agent-3-eval`; change that source after the evaluation code is merged.
-It pins `silver.panel` to the Delta version recorded before the read. Defaults are 500
-bootstrap and 800 placebo draws. Status: authentication works; the evaluation job has not
-run in the workspace because the three upstream silver tables are not loaded yet.
+The stdlib-only loader validates locally and remotely, explicitly requests JSON CLI output,
+handles doubled quotes inside event-study JSON, and uses atomic `INSERT ... REPLACE WHERE`.
+It checks counts, unique keys and exact typed-CSV parity in both directions after loading.
+This loader publishes an artifact; it does not claim the evaluation ran in Databricks.
 
-## Load existing results into Databricks
+## Version correction
 
-The real NYC file results are already available in `heatseeker.gold.site_effects`:
-2,222 rows, 1,111 cells in each variant. Their `panel_version` is the file provenance label
-`agent2-8297d1c`, not a Delta version. The app can read this table while silver is being loaded.
+Method 0.2.0's NYC outputs are superseded: its control selector checked only 2015–2019,
+allowing later-planted controls. Method 0.3.0 checks the full available record. Do not mix
+older gold files or synthetic dry-run expectations into current results. Read `RESULTS.md`
+for the completed runs and current output locations.
+
+## Audit a completed run
 
 ```
-bash pipelines/site_effects/load_gold.sh \
-    pipelines/site_effects/out/nyc_gold_site_effects.csv nyc heatseeker heatseeker
+python pipelines/site_effects/verify_run.py --run-id <run-id> \
+  --receipt <verification.json>
 ```
 
-The wrapper uses `load_gold.py` (Python standard library only). It finds the Databricks CLI
-on PATH or in `~/.local/bin`, requests JSON output explicitly, and uses a serverless warehouse
-(or `DATABRICKS_WAREHOUSE_ID`). It validates the CSV and uploaded event-study JSON, then
-replaces the city's rows atomically with `INSERT ... REPLACE WHERE`. After loading it checks
-row counts, unique site/variant keys, and exact equality with the typed CSV in both directions.
-The NYC load and repeat-load verification both passed on 2026-11-14.
+The audit verifies keys, method version and detection gates, then compares the typed cloud
+CSV with the gold table using `EXCEPT ALL` in both directions. CSV/Parquet value equality is
+also checked locally. Use the CSV for SQL/Spark file ingestion: pandas' Parquet timestamp
+encoding can be nanoseconds, which this SQL warehouse does not support directly.
 
-The saved report's pooled SEs assume independent sites. Shared controls and spatial
-correlation are not accounted for, so the pooled values are descriptive estimates, not
-spatially adjusted causal confidence intervals. Surface temperature is not felt temperature;
-current observations are NYC only and the planned cities are all temperate.
+For a robustness run, pass `--robustness --expected-gold-version <headline-version>` to
+verify that the headline table version was preserved. The robustness outputs are audited
+independently; they are intentionally not equal to the headline table.

@@ -13,7 +13,7 @@ from core.evaluation.run import (
     evaluate_city_with_report,
 )
 
-METHOD_VERSION = "0.2.0"   # 0.2: cumulative-dose treatment, water exclusion, city_clear_frac filter
+METHOD_VERSION = "0.3.0"   # 0.3: controls exclude planting across the full record, not only 2015-2019
 
 __all__ = [
     "EvalConfig", "evaluate_city", "evaluate_city_all_variants", "evaluate_city_with_report",

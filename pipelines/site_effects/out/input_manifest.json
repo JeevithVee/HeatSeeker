@@ -1,0 +1,113 @@
+{
+  "cities": {
+    "nyc": {
+      "panel": {
+        "file": "nyc_silver_panel.parquet",
+        "git_commit": "3fd6870fefb613445462a5741b949870203c4c4d",
+        "source_path": "pipelines/panel/out/nyc_silver_panel.parquet",
+        "sha256": "a839f36e227d9e9794d62f82b639ca34b81e1ed07ef8f7920cc455828625c149",
+        "bytes": 34476055
+      },
+      "features": {
+        "file": "nyc_silver_features.csv",
+        "git_commit": "72b5b1a794d1e89abb8ff8e441fa5fb533655c57",
+        "source_path": "ingest/us/samples/nyc_silver_features.csv",
+        "sha256": "24ea1d08dd9c92ee19a77fa6066068822ac19ed5b1e5e271f4f2d8efb8c7ad5a",
+        "bytes": 1233401
+      },
+      "interventions": {
+        "file": "nyc_silver_interventions.csv",
+        "git_commit": "72b5b1a794d1e89abb8ff8e441fa5fb533655c57",
+        "source_path": "ingest/us/samples/nyc_silver_interventions.csv",
+        "sha256": "c4a80759c09aae1c8713c7cbd81cbfb3e91c7b8738b107408e40acd8edbf680b",
+        "bytes": 2645631
+      }
+    },
+    "dc": {
+      "panel": {
+        "file": "dc_silver_panel.parquet",
+        "git_commit": "3fd6870fefb613445462a5741b949870203c4c4d",
+        "source_path": "pipelines/panel/out/dc_silver_panel.parquet",
+        "sha256": "a2680ad8b2313c7f5bd0ff476e9fe8756b3937388cb0258a609b3436021074be",
+        "bytes": 3586620
+      },
+      "features": {
+        "file": "dc_silver_features.csv",
+        "git_commit": "ea5fcf0b9dcbbcd0f6c28919bf66d270405d4206",
+        "source_path": "ingest/us/samples/dc_silver_features.csv",
+        "sha256": "7da3b1ece159f08b2ba269773c2cdbbdec0206c913032d0ed3ec76d29019edd9",
+        "bytes": 352658
+      },
+      "interventions": {
+        "file": "dc_silver_interventions.csv",
+        "git_commit": "ea5fcf0b9dcbbcd0f6c28919bf66d270405d4206",
+        "source_path": "ingest/us/samples/dc_silver_interventions.csv",
+        "sha256": "99c57dd4449bf816065229753b56fde6962e59894b327c06a7ee1b64a744fd32",
+        "bytes": 2229695
+      }
+    },
+    "sea": {
+      "panel": {
+        "file": "sea_silver_panel.parquet",
+        "git_commit": "3fd6870fefb613445462a5741b949870203c4c4d",
+        "source_path": "pipelines/panel/out/sea_silver_panel.parquet",
+        "sha256": "d307b6d8ff6fe36901ea58553d306afae074dd6612f17506e420ede060e4839a",
+        "bytes": 8970256
+      },
+      "features": {
+        "file": "sea_silver_features.csv",
+        "git_commit": "ea5fcf0b9dcbbcd0f6c28919bf66d270405d4206",
+        "source_path": "ingest/us/samples/sea_silver_features.csv",
+        "sha256": "de105fe1cb5883d4328149e045662c12790ba91dc84276a81f20c1499c389e2d",
+        "bytes": 545505
+      },
+      "interventions": {
+        "file": "sea_silver_interventions.csv",
+        "git_commit": "ea5fcf0b9dcbbcd0f6c28919bf66d270405d4206",
+        "source_path": "ingest/us/samples/sea_silver_interventions.csv",
+        "sha256": "227a8aec33d474defb1692ba1859c95b490ea0154dc32fda272e372f5ea4938a",
+        "bytes": 1938027
+      }
+    },
+    "sf": {
+      "panel": {
+        "file": "sf_silver_panel.parquet",
+        "git_commit": "3fd6870fefb613445462a5741b949870203c4c4d",
+        "source_path": "pipelines/panel/out/sf_silver_panel.parquet",
+        "sha256": "470f89bd6a855f4f1167cd618ebf3c02539a289bfed36f187ba474093f86260e",
+        "bytes": 3697855
+      },
+      "features": {
+        "file": "sf_silver_features.csv",
+        "git_commit": "ea5fcf0b9dcbbcd0f6c28919bf66d270405d4206",
+        "source_path": "ingest/us/samples/sf_silver_features.csv",
+        "sha256": "425797fd4b54d2b11452339907ef4c34e2e203afb762c4fa0ff799b3fdea0372",
+        "bytes": 258594
+      },
+      "interventions": {
+        "file": "sf_silver_interventions.csv",
+        "git_commit": "ea5fcf0b9dcbbcd0f6c28919bf66d270405d4206",
+        "source_path": "ingest/us/samples/sf_silver_interventions.csv",
+        "sha256": "0113d6c1f228046197e06ecae8bef004493575ab8b7bee951c1242459eceee0d",
+        "bytes": 903493
+      }
+    }
+  },
+  "city_notes": {
+    "nyc": [
+      "Incomplete dated planting history: absence of a dated record is not proof of no planting."
+    ],
+    "dc": [
+      "Current tree-space inventory overwrites earlier removals when replanted; survivorship/record-history bias possible.",
+      "Small control pool and thin Landsat 8/9 pre-period; review balance and scene support."
+    ],
+    "sea": [
+      "January 1 dates were excluded as unknown dates; some apparent controls may have real undocumented-date plantings."
+    ],
+    "sf": [
+      "Standing-tree inventory misses removed plantings; survivorship bias possible.",
+      "Dated trees have mildly uneven geographic coverage; 4,880 dated records lacked coordinates.",
+      "Strict June-August filtering excludes September scenes; fog limits observations."
+    ]
+  }
+}

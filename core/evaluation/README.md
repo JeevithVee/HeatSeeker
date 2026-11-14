@@ -1,116 +1,96 @@
-# /core/evaluation — "Prove"
+# Evaluation engine — Prove
 
-Did a planted H3 cell cool, relative to matched unplanted cells? Pure pandas/numpy; no Spark,
-no H3, nothing country-specific. The Databricks job in `/pipelines/site_effects` feeds it the
-silver tables and writes `gold.site_effects`.
+`core.evaluation` estimates H3-cell surface-temperature differences against matched controls.
+It is country-neutral pandas/numpy code. The wrappers in `pipelines/site_effects` supply the
+standard tables and publish the frozen `gold.site_effects` columns.
 
-## Method
+## Method 0.3.0
 
-1. **Scene filter** (`panel.py`). Keep clear-sky summer Landsat rows: June–August, sensor
-   `LANDSAT_8`/`LANDSAT_9`, cell valid-pixel fraction ≥ 70%, scene covering ≥ 50% of the city's
-   cells clearly (`city_clear_frac`), at least 200 cells. Whole-scene cloud cover is only a
-   coarse guard (≤ 60%); the per-cell clear fraction does the real work. NYC sits on two Landsat
-   paths, so the north-clipping footprint is excluded, and per site a scene counts only
-   if at least half of its matched controls are present in it. ECOSTRESS is never mixed in; if
-   it is loaded later it is evaluated as its own panel.
-2. **Relative temperature.** Each cell's LST minus the scene's city-wide median, in Kelvin.
-   The city-wide scene effect (weather, time of year, calibration) cancels; what is left is how
-   hot the cell runs relative to its city on that day.
-3. **Treatment** (`treatment.py`). A cell is planted in the first year its cumulative count
-   (from 2015) reaches `min_dose` trees (default 10); NYC plants a median of 5 trees per cell
-   per year, so a single-year bar would miss steady planters. Only cells reaching the dose
-   inside `treatment_window` (2015–2019) are evaluated; `dose_trees` is the window total. Cells
-   with ≤ 2 trees over the whole record (all years to date) are the control pool, so cells
-   planted after 2019 are excluded from it. Water- and wetland-dominated cells are excluded from
-   both sides. Variant `excl_batch_dated` drops planted cells where more than half the trees
-   were batch-dated entries (for NYC 2015–2019 nothing is flagged, so both variants agree).
-4. **Matching** (`matching.py`). For each planted cell, the 10 nearest controls by standardized
-   distance over canopy, impervious fraction, elevation, and the cell's pre-period relative
-   temperature level and trend, with an exact match on land-cover class when enough candidates
-   exist. Pre-period = scene years before the planting year.
-5. **Difference-in-differences** (`did.py`). Per scene, `d = treated − mean(controls)`.
-   `effect_k = mean(d | post) − mean(d | pre)`. Post starts the year after planting (the
-   planting year itself is excluded: trees go in through the season and do nothing yet).
-   The **event study** is the same difference grouped by years since planting.
-6. **Uncertainty** (`inference.py`). Bootstrap over pre scenes, post scenes and the control set
-   (200 draws) gives the standard error and 95% CI. **Placebo**: 200 unplanted cells get a fake
-   planting year drawn from the real ones and are evaluated identically; `placebo_p` is the share
-   of placebo effects at least as large as the site's.
-7. **Labels** (`labels.py`).
-   - `detected`: CI excludes zero and `placebo_p < 0.05`.
-   - `not_detectable`: no effect found, and `mde_k ≤ 1.0 K` (the site had the precision to see
-     a 1 K effect).
-   - `inconclusive`: too few scenes (< 5 pre or post) or controls (< 3), or `mde_k > 1.0 K`.
-   - `mde_k = max(2.8 × bootstrap SE, placebo q95 + 0.84 × placebo SD)`. On real NYC data the
-     bootstrap alone says ~0.7 K, but unplanted cells drift by 0.6 K SD on their own, so the
-     placebo-based floor (~1.6 K) is the honest one. The bootstrap CI alone would have called
-     286 of 1,111 NYC sites; the placebo gate calls 28, below the ~56 expected by chance.
+1. Keep June–August Landsat 8/9 observations with cell valid-pixel fraction >= 0.7,
+   whole-scene cloud fraction <= 0.6, city clear fraction >= 0.5 and at least 200 observed
+   cells. Landsat 5/7 are a separate robustness run; Landsat 7's per-cell threshold is 0.5
+   because of striping gaps. ECOSTRESS is never mixed into this estimate.
+2. Subtract the city median within each scene. Trim cold outliers below six scene MADs;
+   retain hot roofs. Per-site contrasts use only scenes with at least half the matched
+   controls observed, so partial coverage is handled on both sides.
+3. Treatment year is the first year cumulative 2015–2019 plantings reach ten trees.
+   Dose is the total in that window. Controls have at most two dated trees across the
+   **entire available planting record**, including before 2015 and after 2019.
+   Water/wetland-dominated cells are excluded from both groups. The robustness variant
+   excludes treated cells with more than half their window dose batch-flagged.
+4. Match ten controls by standardized canopy, impervious fraction, elevation, pre-period
+   temperature level and slope. Match land-cover class exactly when at least ten same-class
+   controls exist; otherwise use the broader eligible pool. There is no distance caliper:
+   inspect balance rather than assuming every nearest match is substantively comparable.
+5. Compute treated minus control mean within each scene, then post minus pre. The treatment
+   year is excluded. The event study groups those contrasts by years since treatment.
+6. Bootstrap pre scenes, post scenes and matched controls for the per-site standard error
+   and 95% interval. Fake treatment dates on controls provide a second, empirical null.
+   Minimum detectable effect is the maximum of `2.8 * bootstrap SE` and
+   `placebo abs-q95 + 0.84 * placebo SD`.
+7. `detected` requires enough observations/controls, an interval excluding zero and a finite
+   placebo p-value < 0.05. Missing placebo evidence cannot produce a detection.
+   `not_detectable` means no detection despite an MDE <= 1 K; otherwise the result is
+   `inconclusive`. These site labels are not adjusted for multiple testing.
 
-## First real NYC result (2026-11-14, panel agent2-8297d1c, Landsat 8/9, 99 scenes)
+**Version correction:** 0.2.0 accidentally defined controls using only 2015–2019 plantings.
+Its NYC findings and synthetic expectations are superseded. Version 0.3.0 fixes that bug;
+regression tests explicitly exclude early, late and cumulatively planted controls. A
+batch-excluded treated site is never reintroduced as a control.
 
-1,111 planted cells, 3,872 controls. Pre-period −0.007 K, balance |SMD| 0.03, placebo centred.
-Per site: 28 detected (20 cooling, 8 warming) vs ~56 expected by chance, so individual cells
-are below Landsat's detection limit at 10–100 trees per 0.1 km². Pooled: −0.054 ± 0.015 K
-overall, −0.082 ± 0.017 K at 5+ years, with no dose gradient (15–19 trees −0.14 K, 30–49
-trees +0.05 K). Adding Landsat 5/7 (125 scenes, pre-period back to 2008) gives the same
-picture: −0.058 ± 0.016 K, −0.086 ± 0.018 K at 5+ years. These pooled differences are
-descriptive: the reported SEs assume independent cells, while matched controls are reused
-and nearby cells can covary. They do not establish a causal cooling effect or a spatially
-adjusted confidence interval. Surface temperature is not felt temperature. Observations
-currently cover NYC only; all four planned cities are temperate, limiting generalization.
+## Pooled uncertainty and diagnostics
 
-## Sanity report
+`pooled_by_dose` retains descriptive across-site means and independence-assuming SEs for
+compatibility. Do not present those SEs as spatially adjusted confidence intervals.
 
-`evaluate_city_with_report` returns the gold rows plus a report (`report.py`) that the job prints
-with every run: scenes kept per year, treated/matched counts, label counts, median MDE,
-**pre-period pooled effect** (should be ≈ 0; if not, matching is failing), **control balance**
-as standardized mean differences on the match variables (|SMD| < 0.1 good, < 0.25 acceptable),
-the placebo distribution's mean and spread, and the pooled event study by years since planting.
-Read it before believing the effects.
+`pooled_block_sensitivity` deletes geographic source blocks at prespecified 2 km and 5 km
+sizes, each with zero and half-block shifted origins. Each deletion removes complete
+trajectories of both treated and control cells, and removes a reused control from every
+matched set at once. It then recomputes the fixed-match contrasts and coverage checks.
+This differs from resampling treated effect rows alone, which misses reused-control effects.
 
-## Reading the output
+For G blocks, the delete-one variance is `(G-1)/G * sum((theta_minus_g - mean(theta_minus_g))**2)`.
+The report supplies conditional normal-approximation sensitivity intervals. A grid needs at
+least ten blocks, finite deletion estimates, and at least 80% retention of the original
+supported sites in every deletion. Unsupported grids return no interval. The pooled set
+requires the same minimum scenes and controls as the per-site labels. Five-year-plus effects
+first average eligible event-year effects within each site, then average sites equally.
 
-- `effect_k` is the **average over the whole post period**. Tree effects ramp in over years, so
-  a 2019 planting observed to 2024 shows a smaller `effect_k` than a 2015 one with the same
-  trees. For the effect at a given age, use `event_study_json` (`{"years_since": effect_k}`).
-- Negative = cooling. Units are Kelvin differences in **surface** temperature, not air or felt
-  temperature (shared rule 14).
-- Real NYC's median per-site MDE is 1.62 K after applying the placebo floor. Sub-degree
-  differences cannot be confirmed site by site at 30 m. The pooled model should carry this
-  uncertainty and the shared-control/spatial caveat rather than presenting small differences
-  as proven cooling.
+These are **sensitivity diagnostics**, conditional on fixed matches and the observed scenes.
+They do not account for rematching uncertainty, every possible correlation across block
+boundaries, observational confounding, unknown planting dates or survivorship bias. Block
+sizes are not chosen after looking for significance. No causal claim follows from the interval.
 
-## Permanent test
+The report also records actual eligible-control counts, reused-control counts, matching
+balance, valid placebo counts and descriptive pre-period slopes. The old pooled pre-period
+mean is centred near zero by construction; it is not a parallel-trends test. Slopes use the
+same pre-data used for matching, so they are descriptive rather than an independent test.
+Likewise, alpha times the number of sites is a reference, not a calibrated expected false
+positive count for the combined bootstrap/placebo gate.
 
-`core/tests/test_synthetic_recovery.py` builds a synthetic city (`synthetic.py`) with a known
-ramping effect, zero-effect planted cells, batch-dated artifacts and rows that must be
-filtered, then checks the engine recovers the effect (bias < 0.15 K, correlation > 0.7), does
-not call null sites detected, and handles both variants.
+References for the variance construction and spatial block-size limitations:
+- [Efron and Stein, The Jackknife Estimate of Variance](https://statistics.stanford.edu/technical-reports/jackknife-estimate-variance)
+- [Nordman and Lahiri, On optimal spatial subsample size for variance estimation](https://arxiv.org/abs/math/0503671)
 
-```
-python -m pytest core/tests -q
-```
+## Reading results
 
-## Dry run on the real NYC grid
+Negative `effect_k` means cooling in Kelvin differences of **surface temperature**. Surface
+temperature is not felt or air temperature. `effect_k` averages the whole post period;
+`event_study_json` describes age-specific differences. A non-detection is not proof of no
+cooling. Thirty-metre Landsat cannot reliably resolve individual street trees.
 
-`synthetic.make_panel_for(features, interventions)` lays a synthetic panel (1 K noise, 6 scenes
-per summer, 2013–2025, 1.5 K long-run effect per 40 trees) over Agent 1's real NYC features and
-interventions. With `min_dose=10`: 1,111 treated cells, 3,872 controls, bias −0.01 K,
-correlation 0.75, 1.7 s for both variants. Detection rate by dose, for a true effect of about
-−0.3 K at 10 trees to −1.8 K at 50+:
+All four cities are temperate. Seattle controls may contain real plantings with unknown
+January-1 dates. DC and San Francisco inventories miss some historical removals and can
+select survivors. A cell without a dated record is not necessarily a genuinely unplanted
+cell. Preserve these limitations alongside model outputs and recommendations.
 
-| trees in cell | cells | detected |
-|---|---|---|
-| 10–15 | 581 | 15% |
-| 15–20 | 227 | 28% |
-| 20–30 | 189 | 55% |
-| 30–50 | 87 | 95% |
-| 50+ | 27 | 100% |
+## Validation
 
-So per-site "detected" calls will concentrate in the ~300 cells with 20+ trees; the rest are
-honestly `not_detectable` at the single-site level and feed the pooled model.
+`../.venv-agent3/bin/python -m pytest core/tests -q`
 
-## Config
-
-All thresholds live in `EvalConfig` (`config.py`). Prototype defaults: 200 bootstrap and 200
-placebo draws. Raise both for the final run on Databricks.
+The permanent synthetic recovery test checks bias, correlation and false detections against
+known truth. Additional tests cover full-record controls, missing placebo evidence, source
+checksums, pinned Delta reads, atomic gold loading and spatial/source-block support. The
+block jackknife is tested against an analytically known independent-block mean SE and a
+shared-control example whose support disappears when the common control block is deleted.
+The same suite runs as the first task of the Databricks job.

@@ -1,0 +1,97 @@
+{
+  "run_id": 149976888548281,
+  "mode": "robustness",
+  "cloud_rows": 5884,
+  "unique_keys": 5884,
+  "method_version": "0.3.0",
+  "gold_table": "heatseeker.gold.site_effects",
+  "gold_delta_version": 10,
+  "exact_gold_csv_parity": false,
+  "headline_version_preserved": true,
+  "labels": [
+    [
+      "dc",
+      "all",
+      "detected",
+      "59"
+    ],
+    [
+      "dc",
+      "all",
+      "inconclusive",
+      "952"
+    ],
+    [
+      "dc",
+      "excl_batch_dated",
+      "detected",
+      "59"
+    ],
+    [
+      "dc",
+      "excl_batch_dated",
+      "inconclusive",
+      "952"
+    ],
+    [
+      "nyc",
+      "all",
+      "detected",
+      "13"
+    ],
+    [
+      "nyc",
+      "all",
+      "inconclusive",
+      "1098"
+    ],
+    [
+      "nyc",
+      "excl_batch_dated",
+      "detected",
+      "13"
+    ],
+    [
+      "nyc",
+      "excl_batch_dated",
+      "inconclusive",
+      "1098"
+    ],
+    [
+      "sea",
+      "all",
+      "detected",
+      "18"
+    ],
+    [
+      "sea",
+      "all",
+      "inconclusive",
+      "649"
+    ],
+    [
+      "sea",
+      "excl_batch_dated",
+      "detected",
+      "18"
+    ],
+    [
+      "sea",
+      "excl_batch_dated",
+      "inconclusive",
+      "649"
+    ],
+    [
+      "sf",
+      "all",
+      "inconclusive",
+      "153"
+    ],
+    [
+      "sf",
+      "excl_batch_dated",
+      "inconclusive",
+      "153"
+    ]
+  ]
+}

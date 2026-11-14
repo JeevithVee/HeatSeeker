@@ -1,0 +1,825 @@
+{
+ "city_id": "dc",
+ "panel_version": "0",
+ "provenance": {
+  "mode": "delta_panel_with_owner_feature_intervention_files",
+  "inputs": {
+   "panel": {
+    "table": "heatseeker.silver.panel",
+    "delta_version": "0",
+    "owner_file_reference": {
+     "file": "dc_silver_panel.parquet",
+     "git_commit": "3fd6870fefb613445462a5741b949870203c4c4d",
+     "source_path": "pipelines/panel/out/dc_silver_panel.parquet",
+     "sha256": "a2680ad8b2313c7f5bd0ff476e9fe8756b3937388cb0258a609b3436021074be",
+     "bytes": 3586620
+    }
+   },
+   "features": {
+    "file": "dc_silver_features.csv",
+    "git_commit": "ea5fcf0b9dcbbcd0f6c28919bf66d270405d4206",
+    "source_path": "ingest/us/samples/dc_silver_features.csv",
+    "sha256": "7da3b1ece159f08b2ba269773c2cdbbdec0206c913032d0ed3ec76d29019edd9",
+    "bytes": 352658
+   },
+   "interventions": {
+    "file": "dc_silver_interventions.csv",
+    "git_commit": "ea5fcf0b9dcbbcd0f6c28919bf66d270405d4206",
+    "source_path": "ingest/us/samples/dc_silver_interventions.csv",
+    "sha256": "99c57dd4449bf816065229753b56fde6962e59894b327c06a7ee1b64a744fd32",
+    "bytes": 2229695
+   }
+  },
+  "source_caveats": [
+   "Current tree-space inventory overwrites earlier removals when replanted; survivorship/record-history bias possible.",
+   "Small control pool and thin Landsat 8/9 pre-period; review balance and scene support."
+  ],
+  "code_snapshot": {
+   "source_sha256": "a5405c5ae6f07b7954476c72720fb771ed133e3142a078323259eb120e6b0648"
+  },
+  "runtime": {
+   "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+   "numpy": "2.1.3",
+   "pandas": "2.2.3"
+  }
+ },
+ "config": {
+  "lst_col": "lst_median_k",
+  "summer_months": [
+   6,
+   7,
+   8
+  ],
+  "sensors": [
+   "LANDSAT_5",
+   "LANDSAT_7",
+   "LANDSAT_8",
+   "LANDSAT_9"
+  ],
+  "max_scene_cloud_frac": 0.6,
+  "min_valid_pixel_frac": 0.7,
+  "sensor_min_valid_pixel_frac": {
+   "LANDSAT_7": 0.5
+  },
+  "min_cells_per_scene": 200,
+  "min_city_clear_frac": 0.5,
+  "min_control_frac_per_scene": 0.5,
+  "cold_outlier_mads": 6.0,
+  "tmax_c_range": null,
+  "min_dose": 10,
+  "treatment_window": [
+   2015,
+   2019
+  ],
+  "control_max_trees": 2,
+  "batch_frac_threshold": 0.5,
+  "intervention_type": "tree_planting",
+  "exclude_land_cover": [
+   "open_water",
+   "emergent_herbaceous_wetlands",
+   "woody_wetlands"
+  ],
+  "match_vars": [
+   "canopy_frac_baseline",
+   "impervious_frac",
+   "elevation_m"
+  ],
+  "exact_match_col": "land_cover_class",
+  "n_controls": 10,
+  "pretrend_weight": 1.0,
+  "post_start_offset": 1,
+  "min_pre_scenes": 5,
+  "min_post_scenes": 5,
+  "min_controls": 3,
+  "n_bootstrap": 500,
+  "n_placebo": 800,
+  "alpha": 0.05,
+  "power_z": 2.8,
+  "min_meaningful_effect_k": 1.0,
+  "seed": 0,
+  "required_panel_cols": [
+   "country_code",
+   "city_id",
+   "site_id",
+   "scene_id",
+   "acquired_at_utc",
+   "sensor",
+   "valid_pixel_frac",
+   "scene_cloud_cover_frac"
+  ]
+ },
+ "reports": {
+  "all": {
+   "n_detected": 59,
+   "n_detected_cooling": 13,
+   "n_detected_warming": 46,
+   "expected_detected_under_null": 50.550000000000004,
+   "n_scenes": 71,
+   "scenes_per_year": {
+    "2008": 5,
+    "2009": 5,
+    "2010": 5,
+    "2011": 5,
+    "2012": 1,
+    "2014": 3,
+    "2015": 4,
+    "2016": 3,
+    "2017": 2,
+    "2018": 1,
+    "2019": 2,
+    "2020": 3,
+    "2021": 3,
+    "2022": 7,
+    "2023": 4,
+    "2024": 5,
+    "2025": 6,
+    "2026": 7
+   },
+   "n_cells_in_panel": 1548,
+   "n_treated": 1011,
+   "n_matched": 1011,
+   "n_controls_eligible": 237,
+   "control_reuse": {
+    "unique_matched_controls": 194,
+    "total_control_assignments": 10110,
+    "controls_reused_by_multiple_sites": 174,
+    "max_treated_sites_per_control": 346
+   },
+   "labels": {
+    "inconclusive": 952,
+    "detected": 59
+   },
+   "median_mde_k": 1.45448854487335,
+   "median_effect_k_detected": 1.2146104976472125,
+   "pre_period_mean_effect_k": -0.021535838150289015,
+   "max_abs_smd": 0.8455314082122327,
+   "balance": [
+    {
+     "variable": "canopy_frac_baseline",
+     "mean_treated": 0.2212,
+     "mean_controls": 0.1836,
+     "smd": 0.2328
+    },
+    {
+     "variable": "impervious_frac",
+     "mean_treated": 0.5252,
+     "mean_controls": 0.5019,
+     "smd": 0.1228
+    },
+    {
+     "variable": "elevation_m",
+     "mean_treated": 53.418,
+     "mean_controls": 28.8207,
+     "smd": 0.8455
+    }
+   ],
+   "placebo_mean_k": -0.012426639707000805,
+   "n_valid_placebo_estimates": 237,
+   "placebo_sd_k": 0.4968792771679198,
+   "placebo_q95_abs_k": 1.0371099520522975,
+   "event_study": [
+    {
+     "years_since": -11,
+     "mean_effect_k": 0.0791,
+     "n_sites": 100
+    },
+    {
+     "years_since": -10,
+     "mean_effect_k": 0.039,
+     "n_sites": 257
+    },
+    {
+     "years_since": -9,
+     "mean_effect_k": 0.0611,
+     "n_sites": 560
+    },
+    {
+     "years_since": -8,
+     "mean_effect_k": 0.0276,
+     "n_sites": 980
+    },
+    {
+     "years_since": -7,
+     "mean_effect_k": -0.1092,
+     "n_sites": 1011
+    },
+    {
+     "years_since": -6,
+     "mean_effect_k": -0.0655,
+     "n_sites": 910
+    },
+    {
+     "years_since": -5,
+     "mean_effect_k": -0.14,
+     "n_sites": 853
+    },
+    {
+     "years_since": -4,
+     "mean_effect_k": -0.1277,
+     "n_sites": 708
+    },
+    {
+     "years_since": -3,
+     "mean_effect_k": -0.0065,
+     "n_sites": 590
+    },
+    {
+     "years_since": -2,
+     "mean_effect_k": 0.0584,
+     "n_sites": 979
+    },
+    {
+     "years_since": -1,
+     "mean_effect_k": 0.0752,
+     "n_sites": 1010
+    },
+    {
+     "years_since": 0,
+     "mean_effect_k": -0.1822,
+     "n_sites": 1010
+    },
+    {
+     "years_since": 1,
+     "mean_effect_k": -0.1373,
+     "n_sites": 1010
+    },
+    {
+     "years_since": 2,
+     "mean_effect_k": -0.0042,
+     "n_sites": 1010
+    },
+    {
+     "years_since": 3,
+     "mean_effect_k": 0.1543,
+     "n_sites": 1010
+    },
+    {
+     "years_since": 4,
+     "mean_effect_k": 0.3469,
+     "n_sites": 1009
+    },
+    {
+     "years_since": 5,
+     "mean_effect_k": 0.4892,
+     "n_sites": 1008
+    },
+    {
+     "years_since": 6,
+     "mean_effect_k": 0.3584,
+     "n_sites": 1010
+    },
+    {
+     "years_since": 7,
+     "mean_effect_k": 0.1478,
+     "n_sites": 1010
+    },
+    {
+     "years_since": 8,
+     "mean_effect_k": 0.0504,
+     "n_sites": 910
+    },
+    {
+     "years_since": 9,
+     "mean_effect_k": 0.0007,
+     "n_sites": 753
+    },
+    {
+     "years_since": 10,
+     "mean_effect_k": 0.0631,
+     "n_sites": 451
+    },
+    {
+     "years_since": 11,
+     "mean_effect_k": 0.1435,
+     "n_sites": 31
+    }
+   ],
+   "pre_trend_diagnostics": {
+    "n_sites_with_three_pre_years": 1011,
+    "mean_slope_k_per_year": 0.004335892498518912,
+    "median_slope_k_per_year": 0.0027006369426751634,
+    "mean_last_minus_first_pre_year_k": -0.10207942631058357,
+    "limitations": "Descriptive only; matching uses these same pre-period data, so this is not an independent parallel-trends test."
+   },
+   "pooled_by_dose": [
+    {
+     "dose_bin": "10-14",
+     "n_sites": 126,
+     "mean_effect_k": 0.2804,
+     "se_k": 0.0712,
+     "mean_effect_5yr_plus_k": 0.1457,
+     "se_5yr_plus_k": 0.0746
+    },
+    {
+     "dose_bin": "15-19",
+     "n_sites": 157,
+     "mean_effect_k": 0.2298,
+     "se_k": 0.0497,
+     "mean_effect_5yr_plus_k": 0.2157,
+     "se_5yr_plus_k": 0.0552
+    },
+    {
+     "dose_bin": "20-29",
+     "n_sites": 314,
+     "mean_effect_k": 0.2591,
+     "se_k": 0.0336,
+     "mean_effect_5yr_plus_k": 0.2778,
+     "se_5yr_plus_k": 0.036
+    },
+    {
+     "dose_bin": "30-49",
+     "n_sites": 318,
+     "mean_effect_k": 0.1527,
+     "se_k": 0.027,
+     "mean_effect_5yr_plus_k": 0.216,
+     "se_5yr_plus_k": 0.03
+    },
+    {
+     "dose_bin": "50+",
+     "n_sites": 96,
+     "mean_effect_k": -0.0094,
+     "se_k": 0.0533,
+     "mean_effect_5yr_plus_k": 0.0343,
+     "se_5yr_plus_k": 0.0606
+    },
+    {
+     "dose_bin": "all",
+     "n_sites": 1011,
+     "mean_effect_k": 0.1982,
+     "se_k": 0.0187,
+     "mean_effect_5yr_plus_k": 0.2091,
+     "se_5yr_plus_k": 0.0202
+    }
+   ],
+   "pooled_iid_se_warning": "Across-site SEs assume independence; use source-block sensitivity and its limitations.",
+   "pre_period_mean_warning": "Pre-period centering makes the pooled pre mean approximately zero by construction; this is not a parallel-trends test.",
+   "pooled_block_sensitivity": {
+    "method": "joint_source_block_delete_one_jackknife",
+    "limitations": "Conditional on fixed matches and observed scenes. Deletes treated and control trajectories jointly; preserves reused-control dependence within each deletion. Spatial blocks at 2 km and 5 km with two origins are sensitivity choices, not validated independence boundaries. Intervals are normal approximations, not causal confidence intervals.",
+    "control_reuse": {
+     "unique_matched_controls": 194,
+     "total_control_assignments": 10110,
+     "controls_reused_by_multiple_sites": 174,
+     "max_treated_sites_per_control": 346
+    },
+    "grids": [
+     {
+      "block_size_m": 2000,
+      "origin_offset_fraction": 0.0,
+      "overall": {
+       "mean_effect_k": 0.19820862989737142,
+       "n_sites": 1010,
+       "n_blocks": 58,
+       "min_retained_fraction": 0.9603960396039604,
+       "status": "sensitivity_only",
+       "se_k": 0.07277535208774626,
+       "normal_interval_low_k": 0.05556893980538877,
+       "normal_interval_high_k": 0.34084831998935405
+      },
+      "five_year_plus": {
+       "mean_effect_k": 0.2091497438503895,
+       "n_sites": 1010,
+       "n_blocks": 58,
+       "min_retained_fraction": 0.9603960396039604,
+       "status": "sensitivity_only",
+       "se_k": 0.08776496543383851,
+       "normal_interval_low_k": 0.03713041160006603,
+       "normal_interval_high_k": 0.381169076100713
+      }
+     },
+     {
+      "block_size_m": 2000,
+      "origin_offset_fraction": 0.5,
+      "overall": {
+       "mean_effect_k": 0.19820862989737142,
+       "n_sites": 1010,
+       "n_blocks": 59,
+       "min_retained_fraction": 0.9623762376237623,
+       "status": "sensitivity_only",
+       "se_k": 0.10775210054013167,
+       "normal_interval_low_k": -0.01298548716128664,
+       "normal_interval_high_k": 0.4094027469560295
+      },
+      "five_year_plus": {
+       "mean_effect_k": 0.2091497438503895,
+       "n_sites": 1010,
+       "n_blocks": 59,
+       "min_retained_fraction": 0.9623762376237623,
+       "status": "sensitivity_only",
+       "se_k": 0.12526173370631147,
+       "normal_interval_low_k": -0.036363254213980956,
+       "normal_interval_high_k": 0.45466274191475997
+      }
+     },
+     {
+      "block_size_m": 5000,
+      "origin_offset_fraction": 0.0,
+      "overall": {
+       "mean_effect_k": 0.19820862989737142,
+       "n_sites": 1010,
+       "n_blocks": 14,
+       "min_retained_fraction": 0.8188118811881188,
+       "status": "sensitivity_only",
+       "se_k": 0.1400539317237714,
+       "normal_interval_low_k": -0.07629707628122051,
+       "normal_interval_high_k": 0.47271433607596336
+      },
+      "five_year_plus": {
+       "mean_effect_k": 0.2091497438503895,
+       "n_sites": 1010,
+       "n_blocks": 14,
+       "min_retained_fraction": 0.8188118811881188,
+       "status": "sensitivity_only",
+       "se_k": 0.1732890201361113,
+       "normal_interval_low_k": -0.13049673561638866,
+       "normal_interval_high_k": 0.5487962233171677
+      }
+     },
+     {
+      "block_size_m": 5000,
+      "origin_offset_fraction": 0.5,
+      "overall": {
+       "mean_effect_k": 0.19820862989737142,
+       "n_sites": 1010,
+       "n_blocks": 14,
+       "min_retained_fraction": 0.8267326732673267,
+       "status": "sensitivity_only",
+       "se_k": 0.0679419363630028,
+       "normal_interval_low_k": 0.06504243462588594,
+       "normal_interval_high_k": 0.3313748251688569
+      },
+      "five_year_plus": {
+       "mean_effect_k": 0.2091497438503895,
+       "n_sites": 1010,
+       "n_blocks": 14,
+       "min_retained_fraction": 0.8267326732673267,
+       "status": "sensitivity_only",
+       "se_k": 0.08883936736936358,
+       "normal_interval_low_k": 0.03502458380643689,
+       "normal_interval_high_k": 0.38327490389434216
+      }
+     }
+    ],
+    "n_sites_with_minimum_support": 1010,
+    "status": "sensitivity_only"
+   },
+   "variant": "all"
+  },
+  "excl_batch_dated": {
+   "n_detected": 59,
+   "n_detected_cooling": 13,
+   "n_detected_warming": 46,
+   "expected_detected_under_null": 50.550000000000004,
+   "n_scenes": 71,
+   "scenes_per_year": {
+    "2008": 5,
+    "2009": 5,
+    "2010": 5,
+    "2011": 5,
+    "2012": 1,
+    "2014": 3,
+    "2015": 4,
+    "2016": 3,
+    "2017": 2,
+    "2018": 1,
+    "2019": 2,
+    "2020": 3,
+    "2021": 3,
+    "2022": 7,
+    "2023": 4,
+    "2024": 5,
+    "2025": 6,
+    "2026": 7
+   },
+   "n_cells_in_panel": 1548,
+   "n_treated": 1011,
+   "n_matched": 1011,
+   "n_controls_eligible": 237,
+   "control_reuse": {
+    "unique_matched_controls": 194,
+    "total_control_assignments": 10110,
+    "controls_reused_by_multiple_sites": 174,
+    "max_treated_sites_per_control": 346
+   },
+   "labels": {
+    "inconclusive": 952,
+    "detected": 59
+   },
+   "median_mde_k": 1.45448854487335,
+   "median_effect_k_detected": 1.2146104976472125,
+   "pre_period_mean_effect_k": -0.021535838150289015,
+   "max_abs_smd": 0.8455314082122327,
+   "balance": [
+    {
+     "variable": "canopy_frac_baseline",
+     "mean_treated": 0.2212,
+     "mean_controls": 0.1836,
+     "smd": 0.2328
+    },
+    {
+     "variable": "impervious_frac",
+     "mean_treated": 0.5252,
+     "mean_controls": 0.5019,
+     "smd": 0.1228
+    },
+    {
+     "variable": "elevation_m",
+     "mean_treated": 53.418,
+     "mean_controls": 28.8207,
+     "smd": 0.8455
+    }
+   ],
+   "placebo_mean_k": -0.012426639707000805,
+   "n_valid_placebo_estimates": 237,
+   "placebo_sd_k": 0.4968792771679198,
+   "placebo_q95_abs_k": 1.0371099520522975,
+   "event_study": [
+    {
+     "years_since": -11,
+     "mean_effect_k": 0.0791,
+     "n_sites": 100
+    },
+    {
+     "years_since": -10,
+     "mean_effect_k": 0.039,
+     "n_sites": 257
+    },
+    {
+     "years_since": -9,
+     "mean_effect_k": 0.0611,
+     "n_sites": 560
+    },
+    {
+     "years_since": -8,
+     "mean_effect_k": 0.0276,
+     "n_sites": 980
+    },
+    {
+     "years_since": -7,
+     "mean_effect_k": -0.1092,
+     "n_sites": 1011
+    },
+    {
+     "years_since": -6,
+     "mean_effect_k": -0.0655,
+     "n_sites": 910
+    },
+    {
+     "years_since": -5,
+     "mean_effect_k": -0.14,
+     "n_sites": 853
+    },
+    {
+     "years_since": -4,
+     "mean_effect_k": -0.1277,
+     "n_sites": 708
+    },
+    {
+     "years_since": -3,
+     "mean_effect_k": -0.0065,
+     "n_sites": 590
+    },
+    {
+     "years_since": -2,
+     "mean_effect_k": 0.0584,
+     "n_sites": 979
+    },
+    {
+     "years_since": -1,
+     "mean_effect_k": 0.0752,
+     "n_sites": 1010
+    },
+    {
+     "years_since": 0,
+     "mean_effect_k": -0.1822,
+     "n_sites": 1010
+    },
+    {
+     "years_since": 1,
+     "mean_effect_k": -0.1373,
+     "n_sites": 1010
+    },
+    {
+     "years_since": 2,
+     "mean_effect_k": -0.0042,
+     "n_sites": 1010
+    },
+    {
+     "years_since": 3,
+     "mean_effect_k": 0.1543,
+     "n_sites": 1010
+    },
+    {
+     "years_since": 4,
+     "mean_effect_k": 0.3469,
+     "n_sites": 1009
+    },
+    {
+     "years_since": 5,
+     "mean_effect_k": 0.4892,
+     "n_sites": 1008
+    },
+    {
+     "years_since": 6,
+     "mean_effect_k": 0.3584,
+     "n_sites": 1010
+    },
+    {
+     "years_since": 7,
+     "mean_effect_k": 0.1478,
+     "n_sites": 1010
+    },
+    {
+     "years_since": 8,
+     "mean_effect_k": 0.0504,
+     "n_sites": 910
+    },
+    {
+     "years_since": 9,
+     "mean_effect_k": 0.0007,
+     "n_sites": 753
+    },
+    {
+     "years_since": 10,
+     "mean_effect_k": 0.0631,
+     "n_sites": 451
+    },
+    {
+     "years_since": 11,
+     "mean_effect_k": 0.1435,
+     "n_sites": 31
+    }
+   ],
+   "pre_trend_diagnostics": {
+    "n_sites_with_three_pre_years": 1011,
+    "mean_slope_k_per_year": 0.004335892498518912,
+    "median_slope_k_per_year": 0.0027006369426751634,
+    "mean_last_minus_first_pre_year_k": -0.10207942631058357,
+    "limitations": "Descriptive only; matching uses these same pre-period data, so this is not an independent parallel-trends test."
+   },
+   "pooled_by_dose": [
+    {
+     "dose_bin": "10-14",
+     "n_sites": 126,
+     "mean_effect_k": 0.2804,
+     "se_k": 0.0712,
+     "mean_effect_5yr_plus_k": 0.1457,
+     "se_5yr_plus_k": 0.0746
+    },
+    {
+     "dose_bin": "15-19",
+     "n_sites": 157,
+     "mean_effect_k": 0.2298,
+     "se_k": 0.0497,
+     "mean_effect_5yr_plus_k": 0.2157,
+     "se_5yr_plus_k": 0.0552
+    },
+    {
+     "dose_bin": "20-29",
+     "n_sites": 314,
+     "mean_effect_k": 0.2591,
+     "se_k": 0.0336,
+     "mean_effect_5yr_plus_k": 0.2778,
+     "se_5yr_plus_k": 0.036
+    },
+    {
+     "dose_bin": "30-49",
+     "n_sites": 318,
+     "mean_effect_k": 0.1527,
+     "se_k": 0.027,
+     "mean_effect_5yr_plus_k": 0.216,
+     "se_5yr_plus_k": 0.03
+    },
+    {
+     "dose_bin": "50+",
+     "n_sites": 96,
+     "mean_effect_k": -0.0094,
+     "se_k": 0.0533,
+     "mean_effect_5yr_plus_k": 0.0343,
+     "se_5yr_plus_k": 0.0606
+    },
+    {
+     "dose_bin": "all",
+     "n_sites": 1011,
+     "mean_effect_k": 0.1982,
+     "se_k": 0.0187,
+     "mean_effect_5yr_plus_k": 0.2091,
+     "se_5yr_plus_k": 0.0202
+    }
+   ],
+   "pooled_iid_se_warning": "Across-site SEs assume independence; use source-block sensitivity and its limitations.",
+   "pre_period_mean_warning": "Pre-period centering makes the pooled pre mean approximately zero by construction; this is not a parallel-trends test.",
+   "pooled_block_sensitivity": {
+    "method": "joint_source_block_delete_one_jackknife",
+    "limitations": "Conditional on fixed matches and observed scenes. Deletes treated and control trajectories jointly; preserves reused-control dependence within each deletion. Spatial blocks at 2 km and 5 km with two origins are sensitivity choices, not validated independence boundaries. Intervals are normal approximations, not causal confidence intervals.",
+    "control_reuse": {
+     "unique_matched_controls": 194,
+     "total_control_assignments": 10110,
+     "controls_reused_by_multiple_sites": 174,
+     "max_treated_sites_per_control": 346
+    },
+    "grids": [
+     {
+      "block_size_m": 2000,
+      "origin_offset_fraction": 0.0,
+      "overall": {
+       "mean_effect_k": 0.19820862989737142,
+       "n_sites": 1010,
+       "n_blocks": 58,
+       "min_retained_fraction": 0.9603960396039604,
+       "status": "sensitivity_only",
+       "se_k": 0.07277535208774626,
+       "normal_interval_low_k": 0.05556893980538877,
+       "normal_interval_high_k": 0.34084831998935405
+      },
+      "five_year_plus": {
+       "mean_effect_k": 0.2091497438503895,
+       "n_sites": 1010,
+       "n_blocks": 58,
+       "min_retained_fraction": 0.9603960396039604,
+       "status": "sensitivity_only",
+       "se_k": 0.08776496543383851,
+       "normal_interval_low_k": 0.03713041160006603,
+       "normal_interval_high_k": 0.381169076100713
+      }
+     },
+     {
+      "block_size_m": 2000,
+      "origin_offset_fraction": 0.5,
+      "overall": {
+       "mean_effect_k": 0.19820862989737142,
+       "n_sites": 1010,
+       "n_blocks": 59,
+       "min_retained_fraction": 0.9623762376237623,
+       "status": "sensitivity_only",
+       "se_k": 0.10775210054013167,
+       "normal_interval_low_k": -0.01298548716128664,
+       "normal_interval_high_k": 0.4094027469560295
+      },
+      "five_year_plus": {
+       "mean_effect_k": 0.2091497438503895,
+       "n_sites": 1010,
+       "n_blocks": 59,
+       "min_retained_fraction": 0.9623762376237623,
+       "status": "sensitivity_only",
+       "se_k": 0.12526173370631147,
+       "normal_interval_low_k": -0.036363254213980956,
+       "normal_interval_high_k": 0.45466274191475997
+      }
+     },
+     {
+      "block_size_m": 5000,
+      "origin_offset_fraction": 0.0,
+      "overall": {
+       "mean_effect_k": 0.19820862989737142,
+       "n_sites": 1010,
+       "n_blocks": 14,
+       "min_retained_fraction": 0.8188118811881188,
+       "status": "sensitivity_only",
+       "se_k": 0.1400539317237714,
+       "normal_interval_low_k": -0.07629707628122051,
+       "normal_interval_high_k": 0.47271433607596336
+      },
+      "five_year_plus": {
+       "mean_effect_k": 0.2091497438503895,
+       "n_sites": 1010,
+       "n_blocks": 14,
+       "min_retained_fraction": 0.8188118811881188,
+       "status": "sensitivity_only",
+       "se_k": 0.1732890201361113,
+       "normal_interval_low_k": -0.13049673561638866,
+       "normal_interval_high_k": 0.5487962233171677
+      }
+     },
+     {
+      "block_size_m": 5000,
+      "origin_offset_fraction": 0.5,
+      "overall": {
+       "mean_effect_k": 0.19820862989737142,
+       "n_sites": 1010,
+       "n_blocks": 14,
+       "min_retained_fraction": 0.8267326732673267,
+       "status": "sensitivity_only",
+       "se_k": 0.0679419363630028,
+       "normal_interval_low_k": 0.06504243462588594,
+       "normal_interval_high_k": 0.3313748251688569
+      },
+      "five_year_plus": {
+       "mean_effect_k": 0.2091497438503895,
+       "n_sites": 1010,
+       "n_blocks": 14,
+       "min_retained_fraction": 0.8267326732673267,
+       "status": "sensitivity_only",
+       "se_k": 0.08883936736936358,
+       "normal_interval_low_k": 0.03502458380643689,
+       "normal_interval_high_k": 0.38327490389434216
+      }
+     }
+    ],
+    "n_sites_with_minimum_support": 1010,
+    "status": "sensitivity_only"
+   },
+   "variant": "excl_batch_dated"
+  }
+ }
+}

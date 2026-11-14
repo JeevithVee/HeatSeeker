@@ -61,7 +61,8 @@ def treatment_table(
     elif variant != "all":
         raise ValueError(f"unknown variant {variant!r}")
 
-    planted_any = per_cell.index[per_cell["dose_trees"] > cfg.control_max_trees]
+    ever_planted = iv.groupby("site_id")["trees_planted"].sum()
+    planted_any = ever_planted.index[ever_planted > cfg.control_max_trees]
     control_ids = all_site_ids.difference(planted_any)
 
     cols = ["site_id", "treatment_year", "dose_trees", "batch_frac", "intervention_type"]
