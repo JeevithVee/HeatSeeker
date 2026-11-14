@@ -22,15 +22,18 @@
   from bronze with the real build code and found them identical to the live
   tables (run 1107437999708243). It writes nothing.
 
+- Bronze for DC, Seattle and San Francisco is in Databricks too (raw files
+  uploaded by Agent 2, tables created by Agent 1): `bronze.dc_urban_forestry_street_trees`
+  (224,097 rows), `bronze.sea_sdot_trees` (276,760), `bronze.sf_street_tree_list`
+  (144,606); the two census bronze tables now hold all four cities.
+- The verify job passed for every city: both silver tables rebuilt from bronze
+  are identical to the live ones (runs 1107437999708243 nyc, 128201262853483 dc,
+  614162988893915 sea, 352161324993762 sf).
+
 ## Left
-- Bronze for DC, Seattle and San Francisco. The raw files are on Agent 2's
-  machine (they built those cities). Once they are in
-  `/Volumes/heatseeker/bronze/landing/us/<city>/` in the NYC layout, create the
-  bronze tables and run the verify job with `city_id` set. The two census
-  bronze tables currently hold NYC only; append the other cities, do not
-  replace.
-- Delete the interim CSVs in `ingest/us/samples/` once Agents 3 and 4 read the
-  Delta tables. The loader job reads them too, so it must change first.
+- Delete the interim CSVs in `ingest/us/samples/` once nothing reads them:
+  Agent 4's app snapshot and `pipelines/load_silver.py` still do. With bronze
+  in place the loader could rebuild from bronze instead.
 - `median_household_income` is null everywhere: needs a Census API key.
 - `CLAUDE.md` city notes are stale for DC (no 1970-01-01 rows in the live
   layer; one layer covers every year). Needs the human's approval to edit.
