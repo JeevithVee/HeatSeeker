@@ -290,9 +290,10 @@ def view_track(t):
                 "logged_by": logged_by,
                 "logged_at_utc": datetime.now(timezone.utc).isoformat(),
             })
-            st.success(f"Logged {n} × {kind} at {site} → {dest}. It will be "
-                       "evaluated against matched controls once enough "
-                       "post-planting scenes arrive.")
+            st.success(f"Logged {n} × {kind} at {site} → {dest}. Recorded as "
+                       "staging: it becomes eligible for evaluation after it "
+                       "is confirmed into the city's planting records and "
+                       "enough post-planting scenes arrive.")
 
     new = data.load_new_plantings()
     if not new.empty:
