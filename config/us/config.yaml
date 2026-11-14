@@ -1,0 +1,59 @@
+# US configuration. Core code never imports this file; callers load it and pass
+# values in. The app reads it directly for units and labels.
+
+country_code: US
+
+display:
+  temperature_unit: fahrenheit   # storage is always Celsius/Kelvin (shared rule 10)
+  area_unit: acres
+  currency: USD
+
+cities:
+  - city_id: nyc
+    name: New York
+    lead: true
+    center: {lat: 40.7128, lon: -74.0060}
+  - city_id: dc
+    name: Washington DC
+    center: {lat: 38.9072, lon: -77.0369}
+  - city_id: sf
+    name: San Francisco
+    center: {lat: 37.7749, lon: -122.4194}
+  - city_id: sea
+    name: Seattle
+    center: {lat: 47.6062, lon: -122.3321}
+
+# Editable cost assumptions per intervention, USD per H3 res-9 cell treated.
+# Placeholder planning numbers for the prototype; a city can edit these.
+costs_usd:
+  street_trees: 18000      # ~30 trees/cell at ~$600 planted
+  park_trees: 12000
+  cool_roof: 25000
+  cool_pavement: 40000
+
+# Weights for vulnerability_index, computed per cell over the raw shares that
+# Agent 1 stores in silver.features (each min-max scaled within the city).
+# Agent 1's build_features takes this formula as an argument (board, msg 3);
+# equal weights match their placeholder. vulnerable_residents =
+# population * vulnerability_index.
+vulnerability_formula:
+  weights:
+    share_age_65_plus: 0.5
+    share_low_income: 0.5
+
+# Horizons (years since planting) the recommendations show. The effect model
+# predicts at these ages directly; frozen column names carry them
+# (predicted_cooling_k_5y / _15y).
+horizons_years: [5, 15]
+
+candidate_rules:
+  max_canopy_frac: 0.20
+  max_impervious_frac: 0.85
+  # Matches Agent 1's real vocabulary (Annual NLCD 2024, snake_case), read
+  # from nyc_silver_features.csv on agent-1-data.
+  allowed_land_cover_class:
+    [developed_open_space, developed_low_intensity, developed_medium_intensity,
+     grassland_herbaceous, pasture_hay, barren]
+
+ranking:
+  holdout_every_n: 5   # leave every Nth ranked site unplanted as a future control

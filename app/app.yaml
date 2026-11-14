@@ -1,0 +1,11 @@
+# Databricks App config. Deploy with: databricks apps deploy heatseeker --source-code-path app/
+# HEATSEEKER_DATA_DIR can point at a UC Volume holding the gold/silver snapshots;
+# app/data.py is the single place to swap parquet reads for SQL against Unity Catalog.
+command: ["streamlit", "run", "app.py"]
+env:
+  - name: STREAMLIT_SERVER_HEADLESS
+    value: "true"
+  - name: HEATSEEKER_DATA_DIR
+    value: "data"   # snapshot bundled in the app source by app/deploy.py
+  - name: DATABRICKS_WAREHOUSE_HTTP_PATH
+    value: "/sql/1.0/warehouses/b646c232444bafe7"   # enables live UC reads; snapshot remains the fallback
