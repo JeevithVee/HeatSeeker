@@ -49,10 +49,11 @@ horizons_years: [5, 15]
 candidate_rules:
   max_canopy_frac: 0.20
   max_impervious_frac: 0.85
-  # Must match Agent 1's land_cover_class vocabulary character for character
-  # (Annual NLCD 2024). Placeholder until Agent 1 posts the distinct values.
+  # Matches Agent 1's real vocabulary (Annual NLCD 2024, snake_case), read
+  # from nyc_silver_features.csv on agent-1-data.
   allowed_land_cover_class:
-    [developed_open, developed_low, developed_medium, grass, barren]
+    [developed_open_space, developed_low_intensity, developed_medium_intensity,
+     grassland_herbaceous, pasture_hay, barren]
 
 ranking:
   holdout_every_n: 5   # leave every Nth ranked site unplanted as a future control

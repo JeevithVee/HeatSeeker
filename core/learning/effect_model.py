@@ -27,6 +27,16 @@ FEATURE_COLUMNS = [
     "years_since_treatment",
 ]
 
+# Shrinkage similarity is over site characteristics only: years_since_treatment
+# is part of the QUERY (we deliberately predict at ages outside the observed
+# range), so including it would find zero neighbors for any 15-year horizon
+# and collapse every prediction to the training mean.
+SIMILARITY_COLUMNS = [
+    "canopy_frac_baseline",
+    "impervious_frac",
+    "dose_trees",
+]
+
 HEADLINE_VARIANT = "all"
 
 # Shrinkage: weight on the model prediction is n_similar / (n_similar + K).
@@ -45,14 +55,15 @@ class EffectModel:
         self._scale_sd: np.ndarray | None = None
 
     def _standardize(self, X: pd.DataFrame) -> np.ndarray:
-        return (X[FEATURE_COLUMNS].to_numpy() - self._scale_mu) / self._scale_sd
+        return (X[SIMILARITY_COLUMNS].to_numpy() - self._scale_mu) / self._scale_sd
 
     def fit(self, train: pd.DataFrame) -> "EffectModel":
         """train: one row per evaluated site with FEATURE_COLUMNS + effect_k."""
         X = train[FEATURE_COLUMNS].to_numpy()
         y = train["effect_k"].to_numpy()
-        self._scale_mu = X.mean(axis=0)
-        self._scale_sd = np.where(X.std(axis=0) == 0, 1.0, X.std(axis=0))
+        S = train[SIMILARITY_COLUMNS].to_numpy()
+        self._scale_mu = S.mean(axis=0)
+        self._scale_sd = np.where(S.std(axis=0) == 0, 1.0, S.std(axis=0))
         self.model.fit(X, y)
         self._train_mean = float(y.mean())
         self._nn = NearestNeighbors().fit(self._standardize(train))

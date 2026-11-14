@@ -237,7 +237,7 @@ def view_results(t):
     m[3].metric("Scenes pre / post", f"{r['n_pre_scenes']} / {r['n_post_scenes']}")
     m[4].metric("Matched controls", int(r["n_controls"]))
 
-    p = panel[panel["site_id"] == site]
+    p = panel[panel["site_id"] == site] if not panel.empty else panel
     if not p.empty:
         long = p.melt(
             id_vars=["scene_date", "post"],

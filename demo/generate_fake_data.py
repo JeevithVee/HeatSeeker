@@ -30,10 +30,11 @@ RNG = np.random.default_rng(42)
 N_CELLS = 2500
 AS_OF_YEAR = 2026
 NYC = {"lat": 40.7128, "lon": -74.0060}
-# Placeholder vocabulary; swap for Agent 1's NLCD strings when posted.
+# Agent 1's real vocabulary (Annual NLCD 2024, snake_case).
 LAND_COVER_CLASSES = [
-    "developed_open", "developed_low", "developed_medium", "developed_high",
-    "grass", "barren", "water", "forest",
+    "developed_open_space", "developed_low_intensity",
+    "developed_medium_intensity", "developed_high_intensity",
+    "grassland_herbaceous", "barren", "open_water", "deciduous_forest",
 ]
 RAMP_YEARS = 5
 
