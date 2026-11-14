@@ -46,9 +46,13 @@
   this job yet.
 - `gold.app_planting_log` goes into `schema/tables.yaml` as v1.1.0 once
   Agents 2 and 3 agree (Agent 4 has).
-- `median_household_income` is null everywhere: needs a Census API key.
 - `CLAUDE.md` city notes are stale for DC (no 1970-01-01 rows in the live
   layer; one layer covers every year). Needs the human's approval to edit.
+
+## Decided, not outstanding
+- `median_household_income` stays null in every city (human's decision,
+  2026-11-14). Nothing reads it; the vulnerability index uses the 65+ and
+  low-income shares. The column stays in the schema.
 
 ## Known limits of the data (carry into any result text)
 - Seattle: about 8,300 trees dated 1 January 2015-2019 were dropped as
