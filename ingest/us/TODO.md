@@ -11,7 +11,7 @@
   `gold.site_effects` was computed from.
 
 ## Left
-- Cross-review Agent 3's statistics once, as the brief requires.
+- (done) Cross-review of Agent 3's statistics: `pipelines/reviews/agent3_statistics_review.md`.
 - Bronze for Agent 1's sources (tree inventories, census, NLCD rasters) is not
   in Databricks; the raw files exist only on the machines that built them.
 - The silver tables are published from files. Rebuilding them from source
