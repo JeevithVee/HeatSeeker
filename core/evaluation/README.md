@@ -12,10 +12,14 @@ silver tables and writes `gold.site_effects`.
 2. **Relative temperature.** Each cell's LST minus the scene's city-wide median, in Kelvin.
    The city-wide scene effect (weather, time of year, calibration) cancels; what is left is how
    hot the cell runs relative to its city on that day.
-3. **Treatment** (`treatment.py`). A cell is planted in the first year it received ≥ `min_dose`
-   trees (default 10). Cells with ≤ 2 trees ever are the control pool. Lightly planted cells
-   are excluded from both sides. Variant `excl_batch_dated` drops planted cells where more than
-   half the trees were batch-dated entries.
+3. **Treatment** (`treatment.py`). A cell is planted in the first year its cumulative count
+   (from 2015) reaches `min_dose` trees (default 10); NYC plants a median of 5 trees per cell
+   per year, so a single-year bar would miss steady planters. Only cells reaching the dose
+   inside `treatment_window` (2015–2019) are evaluated; `dose_trees` is the window total. Cells
+   with ≤ 2 trees over the whole record (all years to date) are the control pool, so cells
+   planted after 2019 are excluded from it. Water- and wetland-dominated cells are excluded from
+   both sides. Variant `excl_batch_dated` drops planted cells where more than half the trees
+   were batch-dated entries (for NYC 2015–2019 nothing is flagged, so both variants agree).
 4. **Matching** (`matching.py`). For each planted cell, the 10 nearest controls by standardized
    distance over canopy, impervious fraction, elevation, and the cell's pre-period relative
    temperature level and trend, with an exact match on land-cover class when enough candidates
@@ -55,6 +59,25 @@ not call null sites detected, and handles both variants.
 ```
 python -m pytest core/tests -q
 ```
+
+## Dry run on the real NYC grid
+
+`synthetic.make_panel_for(features, interventions)` lays a synthetic panel (1 K noise, 6 scenes
+per summer, 2013–2025, 1.5 K long-run effect per 40 trees) over Agent 1's real NYC features and
+interventions. With `min_dose=10`: 1,111 treated cells, 3,872 controls, bias −0.01 K,
+correlation 0.75, 1.7 s for both variants. Detection rate by dose, for a true effect of about
+−0.3 K at 10 trees to −1.8 K at 50+:
+
+| trees in cell | cells | detected |
+|---|---|---|
+| 10–15 | 581 | 15% |
+| 15–20 | 227 | 28% |
+| 20–30 | 189 | 55% |
+| 30–50 | 87 | 95% |
+| 50+ | 27 | 100% |
+
+So per-site "detected" calls will concentrate in the ~300 cells with 20+ trees; the rest are
+honestly `not_detectable` at the single-site level and feed the pooled model.
 
 ## Config
 

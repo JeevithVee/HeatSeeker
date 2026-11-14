@@ -12,7 +12,7 @@ from core.evaluation.inference import bootstrap_effect, placebo_distribution, pl
 from core.evaluation.labels import quality_label
 from core.evaluation.matching import match_controls
 from core.evaluation.panel import filter_scenes, relative_temperature, to_wide, yearly_means
-from core.evaluation.treatment import treatment_table
+from core.evaluation.treatment import eligible_cells, treatment_table
 
 GOLD_COLUMNS = [
     "country_code", "city_id", "site_id", "variant", "treatment_year", "intervention_type", "dose_trees",
@@ -42,7 +42,8 @@ def evaluate_city(
     W = wide.to_numpy(dtype=float)
     row = {sid: i for i, sid in enumerate(wide.index)}
 
-    treated, control_ids = treatment_table(interventions, wide.index, cfg, variant)
+    eligible = wide.index.intersection(eligible_cells(features, cfg))
+    treated, control_ids = treatment_table(interventions, eligible, cfg, variant)
     matches = match_controls(treated, control_ids, features, yearly, cfg)
 
     placebo = placebo_distribution(

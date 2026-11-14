@@ -34,6 +34,101 @@ class SyntheticSpec:
     seed: int = 42
 
 
+def _make_scenes(spec: SyntheticSpec, rng: np.random.Generator) -> pd.DataFrame:
+    scenes = []
+    y0, y1 = spec.years
+    for year in range(y0, y1 + 1):
+        for s in range(spec.scenes_per_summer):
+            day = int(rng.integers(0, 92))
+            date = pd.Timestamp(f"{year}-06-01", tz="UTC") + pd.Timedelta(days=day, hours=15, minutes=int(rng.integers(0, 50)))
+            cloud = float(rng.beta(1, 8))
+            scenes.append((date, "LANDSAT_9" if year >= 2022 and s % 2 else "LANDSAT_8", cloud, False))
+        # one winter scene and one cloudy summer scene per year, plus a stray non-Landsat row set
+        scenes.append((pd.Timestamp(f"{year}-01-20T15:30", tz="UTC"), "LANDSAT_8", 0.05, False))
+        scenes.append((pd.Timestamp(f"{year}-07-10T15:30", tz="UTC"), "LANDSAT_8", 0.7, True))
+        scenes.append((pd.Timestamp(f"{year}-07-20T20:00", tz="UTC"), "ECOSTRESS", 0.05, False))
+    scene_df = pd.DataFrame(scenes, columns=["acquired_at_utc", "sensor", "scene_cloud_cover_frac", "garbage"])
+    scene_df["scene_id"] = [f"{r.sensor}_{r.acquired_at_utc.strftime('%Y%m%dT%H%M')}" for r in scene_df.itertuples()]
+    scene_df["scene_year"] = scene_df["acquired_at_utc"].dt.year
+    return scene_df
+
+
+def make_panel_for(
+    features: pd.DataFrame,
+    interventions: pd.DataFrame,
+    spec: SyntheticSpec = SyntheticSpec(),
+    min_dose: int = 10,
+    window: tuple = (2015, 2019),
+) -> dict[str, pd.DataFrame]:
+    """Synthetic silver.panel laid over REAL features and interventions.
+
+    Cells planted with >= min_dose trees in one year inside `window` get a true cooling effect
+    scaled by their total dose over the window, ramping in over spec.ramp_years. Everything
+    else about the panel (scene effects, cell fixed effects from real impervious/canopy, noise,
+    rows to filter) is as in make_city. Returns {"panel", "truth"}.
+    """
+    rng = np.random.default_rng(spec.seed)
+    f = features.reset_index(drop=True)
+    n = len(f)
+    site_id = f["site_id"].to_numpy()
+    pos = {s: i for i, s in enumerate(site_id)}
+    imperv = f["impervious_frac"].fillna(f["impervious_frac"].median()).to_numpy()
+    canopy = f["canopy_frac_baseline"].fillna(f["canopy_frac_baseline"].median()).to_numpy()
+    cell_fe = 8 * imperv - 6 * canopy + rng.normal(0, 1.0, n)
+
+    iv = interventions[interventions["plant_year"].between(*window)]
+    yearly = iv.groupby(["site_id", "plant_year"])["trees_planted"].sum().unstack(fill_value=0)
+    yearly = yearly.reindex(columns=range(window[0], window[1] + 1), fill_value=0)
+    reached = yearly.cumsum(axis=1).ge(min_dose)
+    first = reached.idxmax(axis=1).where(reached.any(axis=1)).dropna().astype(int)
+    dose = iv.groupby("site_id")["trees_planted"].sum()
+    treated = first.index.intersection(pos.keys())
+    ty = first.loc[treated].to_numpy()
+    dose_t = dose.loc[treated].to_numpy()
+    true_long_run = -spec.beta_k * dose_t / spec.dose_ref
+
+    y0, y1 = spec.years
+    scene_df = _make_scenes(spec, rng)
+    years = np.arange(y0, y1 + 1)
+    # effect matrix: treated cells x years
+    ys = years[None, :] - ty[:, None]
+    ramp = np.where(ys >= 1, np.minimum(ys / spec.ramp_years, 1.0), 0.0)
+    eff_matrix = true_long_run[:, None] * ramp
+    t_rows = np.array([pos[s] for s in treated], dtype=int)
+
+    frames = []
+    for sc in scene_df.itertuples():
+        base = 300 + 12 * rng.random()
+        lst = base + cell_fe + rng.normal(0, spec.noise_k, n)
+        eff = np.zeros(n)
+        eff[t_rows] = eff_matrix[:, int(sc.scene_year) - y0]
+        lst = lst + eff
+        valid = np.clip(rng.beta(12, 1, n), 0, 1)
+        lowq = rng.random(n) < 0.08
+        valid[lowq] = rng.uniform(0.2, 0.69, lowq.sum())
+        lst[lowq] += rng.normal(-4, 3, lowq.sum())
+        if sc.garbage:
+            lst += rng.normal(-8, 5, n)
+        frames.append(pd.DataFrame({
+            "country_code": f["country_code"], "city_id": f["city_id"], "site_id": site_id, "scene_id": sc.scene_id,
+            "acquired_at_utc": sc.acquired_at_utc, "acquired_date": sc.acquired_at_utc.date(),
+            "year": int(sc.scene_year), "sensor": sc.sensor,
+            "lst_mean_k": lst + rng.normal(0, 0.1, n), "lst_median_k": lst, "lst_std_k": rng.uniform(0.5, 2, n),
+            "valid_pixel_count": np.round(valid * 117).astype(int), "valid_pixel_frac": valid,
+            "is_clear": valid >= 0.8, "scene_cloud_cover_frac": sc.scene_cloud_cover_frac,
+            "city_clear_frac": float((valid >= 0.8).mean()), "sun_elevation_deg": 60.0 + rng.normal(0, 3),
+            "wrs_path": 13 if sc.scene_year % 2 else 14, "wrs_row": 32,
+            "tmax_c": float(base - 273.15 + rng.normal(0, 2)), "tmin_c": float(base - 283.15 + rng.normal(0, 2)),
+            "wind_speed_ms": float(rng.gamma(2, 1.5)), "precip_mm": 0.0, "source": "synthetic", "license": "none",
+        }))
+    panel = pd.concat(frames, ignore_index=True).sample(frac=0.95, random_state=spec.seed).reset_index(drop=True)
+    post_mask = years[None, :] > ty[:, None]
+    true_post_avg = np.where(post_mask.sum(1) > 0, (eff_matrix * post_mask).sum(1) / np.maximum(post_mask.sum(1), 1), 0.0)
+    truth = pd.DataFrame({"site_id": treated, "treatment_year": ty, "dose_trees": dose_t,
+                          "true_effect_k": true_long_run, "true_post_avg_k": true_post_avg, "group": "real"})
+    return {"panel": panel, "truth": truth}
+
+
 def make_city(spec: SyntheticSpec = SyntheticSpec()) -> dict[str, pd.DataFrame]:
     rng = np.random.default_rng(spec.seed)
     n = spec.n_cells
@@ -94,24 +189,9 @@ def make_city(spec: SyntheticSpec = SyntheticSpec()) -> dict[str, pd.DataFrame]:
         iv_rows.append(iv_row(c, rng.integers(2015, 2020), rng.integers(1, 3), 0))
     interventions = pd.DataFrame(iv_rows)
 
-    # --- scenes ---
-    scenes = []
+    # --- scenes and panel ---
     y0, y1 = spec.years
-    for year in range(y0, y1 + 1):
-        for s in range(spec.scenes_per_summer):
-            day = int(rng.integers(0, 92))
-            date = pd.Timestamp(f"{year}-06-01", tz="UTC") + pd.Timedelta(days=day, hours=15, minutes=int(rng.integers(0, 50)))
-            cloud = float(rng.beta(1, 8))
-            scenes.append((date, "LANDSAT_9" if year >= 2022 and s % 2 else "LANDSAT_8", cloud, False))
-        # one winter scene and one cloudy summer scene per year, plus a stray non-Landsat row set
-        scenes.append((pd.Timestamp(f"{year}-01-20T15:30", tz="UTC"), "LANDSAT_8", 0.05, False))
-        scenes.append((pd.Timestamp(f"{year}-07-10T15:30", tz="UTC"), "LANDSAT_8", 0.7, True))
-        scenes.append((pd.Timestamp(f"{year}-07-20T20:00", tz="UTC"), "ECOSTRESS", 0.05, False))
-    scene_df = pd.DataFrame(scenes, columns=["acquired_at_utc", "sensor", "scene_cloud_cover_frac", "garbage"])
-    scene_df["scene_id"] = [f"{r.sensor}_{r.acquired_at_utc.strftime('%Y%m%dT%H%M')}" for r in scene_df.itertuples()]
-    scene_df["scene_year"] = scene_df["acquired_at_utc"].dt.year
-
-    # --- panel ---
+    scene_df = _make_scenes(spec, rng)
     effect_by_cell_year = {}
     for j, c in enumerate(planted):
         for year in range(y0, y1 + 1):

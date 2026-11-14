@@ -43,7 +43,8 @@ def match_controls(
     `yearly` is the cells x years matrix of rel_k from panel.yearly_means.
     """
     feats = features.set_index("site_id") if "site_id" in features.columns else features
-    match_vars = [v for v in cfg.match_vars if v in feats.columns]
+    # skip variables that are entirely null (e.g. elevation before the static table lands)
+    match_vars = [v for v in cfg.match_vars if v in feats.columns and feats[v].notna().any()]
     scale = feats[match_vars].std(ddof=0).replace(0, 1.0)
     Z_static = (feats[match_vars] - feats[match_vars].mean()) / scale
 

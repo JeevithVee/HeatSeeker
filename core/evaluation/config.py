@@ -16,10 +16,14 @@ class EvalConfig:
     tmax_c_range: tuple | None = None        # optional (lo, hi) filter on per-scene tmax_c if present
 
     # --- treatment definition (silver.interventions) ---
-    min_dose: int = 10                       # trees planted in one year for a cell to count as planted
+    min_dose: int = 10                       # cumulative trees for a cell to count as planted
+    treatment_window: tuple = (2015, 2019)   # only cells reaching min_dose in these years are evaluated
     control_max_trees: int = 2               # cells with at most this many trees ever are controls
     batch_frac_threshold: float = 0.5        # excl_batch_dated variant drops treated cells above this
     intervention_type: str = "tree_planting"
+    # Cells whose dominant land cover is water or wetland behave nothing like streets; keep them
+    # out of both the treated set and the control pool.
+    exclude_land_cover: tuple = ("open_water", "emergent_herbaceous_wetlands", "woody_wetlands")
 
     # --- matching (silver.features) ---
     match_vars: tuple = ("canopy_frac_baseline", "impervious_frac", "elevation_m")
