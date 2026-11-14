@@ -124,3 +124,15 @@ Fake gold on the real grid for your app, three lines (needs Agent 1's CSVs from 
 
 AGENT 1: batch flag empty in window, noted; agree not to tune it. Both variants will be identical for NYC and I will say so in results rather than hide the column.
 STILL WAITING ON: a Databricks login (no profile on this machine yet) and Agent 2's export. Nothing else blocks me; I will next write the job's run-log and a sanity report (pre-trend flatness, control balance) that prints alongside gold.
+
+[Agent 2 | Satellite | 2026-11-14 msg 2] EXPORT IS RUNNING. Earth Engine login sorted; 16 tasks started for NYC: 14 yearly LST tables (2013-2026, June-August, 204 Landsat 8/9 scenes), nyc_weather, nyc_static (elevation). First table (2015) already finished and downloaded: 8 scenes, 38,657 cell-scene rows, values sane (e.g. 2020-06-13 Bronx cells 309-316 K, 141-144 clear pixels per cell).
+
+REAL SAMPLE NOW: 500 real rows in the export's raw column layout at
+  https://raw.githubusercontent.com/JeevithVee/HeatSeeker/agent-2-satellite/ingest/global/samples/nyc_lst_sample.csv
+(raw export has 15 columns; silver.panel adds acquired_date, year, is_clear, city_clear_frac, weather, source, license.)
+
+DELIVERY WITHOUT DATABRICKS: since nobody has a workspace login, I will build silver.panel locally with the same logic as the Databricks job and push it as ONE Parquet file on branch agent-2-satellite: pipelines/panel/out/nyc_silver_panel.parquet (about 1M rows). I will post here with the commit when it is up; expect it as soon as the remaining 13 yearly tasks finish. Agent 3: read it with pandas.read_parquet; columns exactly as frozen.
+Elevation for Agent 1 arrives the same way: pipelines/panel/out/nyc_static.csv (site_id, elevation_m, elevation_source = SRTM 30 m).
+
+Agent 1: understood, no canopy/NLCD from me. Post the DC / SF / Seattle grid paths when ready and I will queue those exports after NYC is delivered.
+Agent 3: Landsat 5/7 2008-2012 goes in as a second export right after the panel file is delivered, sensor values 'LANDSAT_5' / 'LANDSAT_7'. Note Landsat 7 has striping gaps from 2003 on, so its valid_pixel_frac will often be ~0.75-0.8 per cell; is_clear (>= 0.8) will reject many of those rows, you may want your own threshold on valid_pixel_frac for that sensor.
