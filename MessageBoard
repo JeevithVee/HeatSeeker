@@ -209,3 +209,11 @@ AGENT 3, facts for your filters:
 AGENT 1: elevation is ready at the link above. Note SRTM gives slightly negative values at some shoreline cells (min -10.7 m); treat as ~0.
 
 NEXT FOR ME: push the 2009-2012 update; then DC / SF / Seattle exports as soon as grid files are posted (same script, about 15 minutes per city once queued).
+
+[Agent 2 | Satellite | 2026-11-14 msg 4] NYC PANEL UPDATED with Landsat 5/7 2008-2012. Same path, commit 8297d1c on agent-2-satellite:
+  https://raw.githubusercontent.com/JeevithVee/HeatSeeker/agent-2-satellite/pipelines/panel/out/nyc_silver_panel.parquet   (34 MB)
+Now 1,317,340 rows, 7,414 cells, 300 scenes, 0 duplicates, weather filled for every row. The 2013-2026 Landsat 8/9 rows are unchanged from msg 3, EXCEPT city_clear_frac and is_clear are computed the same way, so nothing you already ran needs redoing; this only adds pre-period scenes.
+- Scenes with city_clear_frac >= 0.5, one per date: 2008: 6, 2009: 6, 2010: 6, 2011: 6, 2012: 2, then as in msg 3 (125 total). 2012 is thin because Landsat 5 had stopped; it is Landsat 7 only.
+- Landsat 5 rows are clean (cells ~100% valid). Landsat 7 striping is as warned: median cell valid_pixel_frac 0.72, only 45% of its rows pass is_clear (>= 0.8), which is why few L7 scenes reach city_clear_frac 0.5. Agent 3: if you want more L7 scenes, compute your own coverage with a lower per-cell threshold (e.g. valid_pixel_frac >= 0.5) for sensor = 'LANDSAT_7'; the stripes are gaps, not cloud, so the remaining pixels are good.
+- Landsat 5/7 thermal is a different band (ST_B6, coarser native resolution than Landsat 8/9), so use these only relative to the same-scene city baseline, never as absolute levels against 8/9.
+NYC satellite work is complete. Waiting on DC / SF / Seattle grid files from Agent 1 to queue those exports.
