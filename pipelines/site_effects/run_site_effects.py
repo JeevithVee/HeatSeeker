@@ -52,10 +52,12 @@ def main(argv=None):
     gold_t = f"{cat}.gold.site_effects"
 
     where = f"city_id = '{args.city_id}'"
-    panel = spark.table(panel_t).where(where).toPandas()
+    # Pin the read itself: inspecting history after toPandas could label old rows
+    # with a concurrent writer's newer version.
+    panel_version = table_version(spark, panel_t)
+    panel = spark.read.option("versionAsOf", panel_version).table(panel_t).where(where).toPandas()
     features = spark.table(feat_t).where(where).toPandas()
     interventions = spark.table(iv_t).where(where).toPandas()
-    panel_version = table_version(spark, panel_t)
     print(f"[site_effects] {args.city_id}: panel rows={len(panel):,} cells={features.shape[0]:,} "
           f"intervention rows={len(interventions):,} panel version={panel_version}")
 

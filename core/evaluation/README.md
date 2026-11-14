@@ -7,10 +7,10 @@ silver tables and writes `gold.site_effects`.
 ## Method
 
 1. **Scene filter** (`panel.py`). Keep clear-sky summer Landsat rows: June–August, sensor
-   `LANDSAT_8`/`LANDSAT_9`, cell valid-pixel fraction ≥ 70%, scene covering ≥ 30% of the city's
+   `LANDSAT_8`/`LANDSAT_9`, cell valid-pixel fraction ≥ 70%, scene covering ≥ 50% of the city's
    cells clearly (`city_clear_frac`), at least 200 cells. Whole-scene cloud cover is only a
    coarse guard (≤ 60%); the per-cell clear fraction does the real work. NYC sits on two Landsat
-   paths, so edge scenes cover part of the city; they are kept, and per site a scene counts only
+   paths, so the north-clipping footprint is excluded, and per site a scene counts only
    if at least half of its matched controls are present in it. ECOSTRESS is never mixed in; if
    it is loaded later it is evaluated as its own panel.
 2. **Relative temperature.** Each cell's LST minus the scene's city-wide median, in Kelvin.
@@ -53,8 +53,11 @@ Per site: 28 detected (20 cooling, 8 warming) vs ~56 expected by chance, so indi
 are below Landsat's detection limit at 10–100 trees per 0.1 km². Pooled: −0.054 ± 0.015 K
 overall, −0.082 ± 0.017 K at 5+ years, with no dose gradient (15–19 trees −0.14 K, 30–49
 trees +0.05 K). Adding Landsat 5/7 (125 scenes, pre-period back to 2008) gives the same
-picture: −0.058 ± 0.016 K, −0.086 ± 0.018 K at 5+ years. Street-tree planting at NYC density
-cools surface temperature by about a tenth of a kelvin after five years, visible only pooled.
+picture: −0.058 ± 0.016 K, −0.086 ± 0.018 K at 5+ years. These pooled differences are
+descriptive: the reported SEs assume independent cells, while matched controls are reused
+and nearby cells can covary. They do not establish a causal cooling effect or a spatially
+adjusted confidence interval. Surface temperature is not felt temperature. Observations
+currently cover NYC only; all four planned cities are temperate, limiting generalization.
 
 ## Sanity report
 
@@ -72,9 +75,10 @@ Read it before believing the effects.
   trees. For the effect at a given age, use `event_study_json` (`{"years_since": effect_k}`).
 - Negative = cooling. Units are Kelvin differences in **surface** temperature, not air or felt
   temperature (shared rule 14).
-- With ~1 K per-cell scene noise and 10 controls, per-site MDEs are ~0.8–1.1 K. Sub-degree
-  effects are real but cannot be confirmed site by site at 30 m; they show up pooled (Agent 4's
-  effect model). Cells with many trees planted five or more years ago are the ones to look at.
+- Real NYC's median per-site MDE is 1.62 K after applying the placebo floor. Sub-degree
+  differences cannot be confirmed site by site at 30 m. The pooled model should carry this
+  uncertainty and the shared-control/spatial caveat rather than presenting small differences
+  as proven cooling.
 
 ## Permanent test
 

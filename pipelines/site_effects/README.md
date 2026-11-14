@@ -29,8 +29,34 @@ records the panel's Delta version (time travel), and overwrites that city's rows
 runs it from the Git folder:
 
 ```
-databricks jobs create --json @pipelines/site_effects/job.json
-databricks jobs run-now <job_id> --json '{"job_parameters": {"city_id": "nyc"}}'
+databricks jobs create -p heatseeker --json @pipelines/site_effects/job.json
+databricks jobs run-now <job_id> -p heatseeker --json '{"job_parameters": {"city_id": "nyc"}}'
 ```
 
-Status: written against the frozen schema names; not yet run on a workspace (no login yet).
+The job reads from `agent-3-eval`; change that source after the evaluation code is merged.
+It pins `silver.panel` to the Delta version recorded before the read. Defaults are 500
+bootstrap and 800 placebo draws. Status: authentication works; the evaluation job has not
+run in the workspace because the three upstream silver tables are not loaded yet.
+
+## Load existing results into Databricks
+
+The real NYC file results are already available in `heatseeker.gold.site_effects`:
+2,222 rows, 1,111 cells in each variant. Their `panel_version` is the file provenance label
+`agent2-8297d1c`, not a Delta version. The app can read this table while silver is being loaded.
+
+```
+bash pipelines/site_effects/load_gold.sh \
+    pipelines/site_effects/out/nyc_gold_site_effects.csv nyc heatseeker heatseeker
+```
+
+The wrapper uses `load_gold.py` (Python standard library only). It finds the Databricks CLI
+on PATH or in `~/.local/bin`, requests JSON output explicitly, and uses a serverless warehouse
+(or `DATABRICKS_WAREHOUSE_ID`). It validates the CSV and uploaded event-study JSON, then
+replaces the city's rows atomically with `INSERT ... REPLACE WHERE`. After loading it checks
+row counts, unique site/variant keys, and exact equality with the typed CSV in both directions.
+The NYC load and repeat-load verification both passed on 2026-11-14.
+
+The saved report's pooled SEs assume independent sites. Shared controls and spatial
+correlation are not accounted for, so the pooled values are descriptive estimates, not
+spatially adjusted causal confidence intervals. Surface temperature is not felt temperature;
+current observations are NYC only and the planned cities are all temperate.

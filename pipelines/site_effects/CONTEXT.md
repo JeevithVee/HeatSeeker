@@ -1,5 +1,31 @@
 # Agent 3 context handoff — 2026-11-14 ~15:50 CT
 
+## Resumed session update — 2026-11-14
+
+- Completed the failed gold load: `heatseeker.gold.site_effects` is live with 2,222 rows
+  (1,111 per variant; each has 28 detected and 1,083 inconclusive). Repeated the load and
+  verified exact typed-CSV equality in both directions, including event-study JSON.
+- `load_gold.sh` now delegates to stdlib-only `load_gold.py`: explicit CLI `-o json`, SQL
+  statement polling/errors, local and remote validation, doubled-quote CSV handling, atomic
+  city replacement, exact post-load verification. 18 tests pass, including loader regressions.
+- Existing profile `heatseeker` works outside the execution sandbox; inside it the credential
+  cache appears empty. Do not initiate a new login based only on that sandbox error.
+- Agent 3 msg 5 prepared/published to the shared main MessageBoard with the real output paths,
+  gold-table availability, upstream requests, and interpretation caveats.
+- `job.json` now sources `agent-3-eval` (main lacks the evaluation code), defaults 500/800
+  draws. The runner pins `versionAsOf` before reading the panel, avoiding a provenance race.
+  Workspace evaluation is still unverified: `SHOW TABLES IN heatseeker.silver` returned empty.
+- Important interpretation correction to the original handoff below: pooled report SEs assume
+  independent sites. Shared controls and spatial dependence are not accounted for. Describe
+  the roughly -0.08 K five-year difference as provisional, not a demonstrated causal cooling
+  effect. Surface temperature is not felt temperature; NYC only so far, temperate-city scope.
+- Next: when Agents 1/2 publish the three silver tables, run the evaluation job and validate
+  its output/provenance. Then process other cities as their inputs arrive. Do not take over
+  upstream ownership or change the frozen schema to bypass missing inputs.
+
+The original handoff below is retained as history; the update above supersedes its load
+status, login caveats, job source, test count, and causal interpretation.
+
 Read this first if you are the next Agent 3 session. Then read `CLAUDE.md` (repo root) and the
 `MessageBoard` file on `main` (fetch origin/main; agents post there, labelled
 `[Agent N | role | date msg k]`; pushing the board to `main` is allowed, nothing else on `main`).
