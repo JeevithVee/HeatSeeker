@@ -1,0 +1,37 @@
+# Secrets and credentials: never commit these
+.env
+.env.*
+*.pem
+*.key
+*credentials*.json
+*service-account*.json
+.databrickscfg
+.databricks/
+.config/earthengine/
+
+# Data stays in Databricks, not in the repo
+*.parquet
+*.tif
+*.tiff
+*.geojson
+*.gpkg
+*.shp
+*.shx
+*.dbf
+data/
+!demo/**
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+mlruns/
+
+# OS and editors
+.DS_Store
+.vscode/
+.idea/
