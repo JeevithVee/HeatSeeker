@@ -5,3 +5,5 @@ command: ["streamlit", "run", "app.py"]
 env:
   - name: STREAMLIT_SERVER_HEADLESS
     value: "true"
+  - name: HEATSEEKER_DATA_DIR
+    value: "data"   # snapshot bundled in the app source by app/deploy.py
