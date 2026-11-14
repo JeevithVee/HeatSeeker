@@ -77,11 +77,35 @@ CSS = f"""
 .block-container {{padding-top: 2.2rem; max-width: 1200px;}}
 h1 {{font-size: 1.9rem; letter-spacing: -0.02em; margin-bottom: 0;
     color: {BRAND_DEEP};}}
+h1::after {{content: ""; display: block; width: 64px; height: 4px;
+    border-radius: 2px; margin-top: 6px;
+    background: linear-gradient(90deg, {BRAND} 0 42px, {ACCENT} 42px);}}
 h3 {{color: {BRAND_DEEP};}}
 a {{color: {BRAND_HOVER};}}
+/* sidebar wears the brand wash */
+[data-testid="stSidebar"] {{
+  background: {WASH}; border-right: 1px solid {HAIRLINE};
+}}
+[data-testid="stSidebar"] [data-testid="stAlert"] {{
+  background: #fdead0; border-left: 3px solid {ACCENT};
+  border-radius: 0 8px 8px 0; color: {INK};
+}}
+[data-testid="stSidebar"] [data-testid="stAlert"] * {{color: {INK_2};}}
+/* interactive chrome is green (works with or without the theme file) */
+button[kind="primary"], [data-testid="stFormSubmitButton"] button {{
+  background: {BRAND}; color: #fff; border: 0;
+}}
+button[kind="primary"]:hover, [data-testid="stFormSubmitButton"] button:hover {{
+  background: {BRAND_HOVER}; color: #fff;
+}}
+[data-testid="stSlider"] [role="slider"] {{background: {BRAND};}}
+[data-baseweb="tag"] {{background: #e0f3e2; color: {BRAND_DEEP};}}
+[data-baseweb="tag"] span {{color: {BRAND_DEEP};}}
+input[type="checkbox"], [data-testid="stCheckbox"] span {{accent-color: {BRAND};}}
+hr {{border-color: {HAIRLINE};}}
 [data-testid="stMetric"] {{
   background: {SURFACE}; border: 1px solid rgba(11,11,11,0.10);
-  border-radius: 12px; padding: 0.8rem 1rem;
+  border-top: 3px solid {BRAND}; border-radius: 12px; padding: 0.8rem 1rem;
 }}
 [data-testid="stMetricValue"] {{
   font-variant-numeric: tabular-nums; font-size: 1.45rem;
