@@ -4,18 +4,19 @@ Surface temperature is not felt or air temperature. Negative Kelvin differences 
 These observational comparisons are provisional. Site labels are not adjusted for multiple testing.
 All four cities are temperate. Method 0.2.0 results and earlier synthetic expectations are superseded.
 
-## Completed cloud runs
+## Completed full-silver cloud runs
 
-- Final headline run: `5222250658819`, SUCCESS; 27 tests and four city tasks passed.
-- Final all-sensor run: `149976888548281`, SUCCESS; 27 tests and four city tasks passed.
-- Gold: `heatseeker.gold.site_effects`, 5,882 rows, Delta version 10, method 0.3.0.
+- Headline plus standing review diagnostics: `606115661672539`, SUCCESS; 34 tests and all four city tasks passed.
+- Cross-sensor sensitivity: `598786481893891`, SUCCESS; 34 tests and all four city tasks passed.
+- Gold: `heatseeker.gold.site_effects`, 5,882 rows, Delta version 18, method 0.3.0.
+- Every city reads pinned Delta snapshots: panel 0, features 1, interventions 1. The job now defaults to silver-only inputs.
 - Typed CSV matches gold exactly in both directions; companion CSV/Parquet values match exactly.
-- Robustness outputs were checked independently and did not change headline gold version 10.
-- Both final runs read `heatseeker.silver.panel VERSION AS OF 0`; gold `panel_version` is the string `0`.
-- Features/interventions came from checksum-verified owner files: NYC commit `72b5b1a`, other cities `ea5fcf0`.
-- Source snapshot: `a5405c5ae6f07b7954476c72720fb771ed133e3142a078323259eb120e6b0648`.
-- Earlier file-input cloud runs `1044546343814209` / `1100247180142541` also passed. Their scientific values match the final runs; the final runs improve panel provenance.
-- Full silver-only mode remains available when feature/intervention tables are published. It has unit coverage for pinning all three versions; it has not been exercised against those absent tables.
+- Every scientific gold value exactly reproduces the prior mixed-input delivery; evaluation timestamps changed.
+- Cross-sensor output contains 5,884 rows in its separate run directory and preserved headline gold version 18.
+- Analysis source hash: `3ed3f2c83aa1a97583685f2eba6adf71d9be4162d1fe66546c41f51556fd0fb2`.
+- Diagnostic version 1.0.0 adds review checks without changing the frozen gold columns or headline estimator.
+- The first silver-only parity run `383042876269446` also succeeded and reproduced the old results exactly.
+- Earlier mixed-input runs remain historical audit records; current outputs no longer depend on staged feature/intervention files.
 
 ## Headline: Landsat 8/9, June–August
 
@@ -49,7 +50,51 @@ combined confidence interval. Controls and treated trajectories are removed toge
 - SF: all site results are inconclusive, matching is poor, and 5 km grids lack enough block/support retention to return an interval. Its envelope above uses 2 km grids only.
 - All intervals remain conditional on fixed matches and observed scenes; rematching uncertainty, across-block dependence and confounding are not resolved.
 
-## All-sensor robustness
+## Standing statistics-review checks
+
+The independent review at `462e2b4` reproduced the original estimator exactly and identified important weaknesses. These are now standing backend diagnostics; the headline estimator stays unchanged.
+
+### No matching on pre-period outcomes
+
+Both points in each row use the same cohort supported under both matching specifications. Units are Kelvin surface-temperature differences.
+
+| City | Common sites | Headline overall K | Static-feature matching only K |
+|---|---:|---:|---:|
+| NYC | 1109 | -0.074 | -0.012 |
+| DC | 971 | +0.172 | +0.167 |
+| SEA | 666 | -0.185 | -0.177 |
+| SF | 147 | +0.139 | +0.199 |
+
+NYC is near zero under the alternative specification. Matching on noisy pre-outcomes can induce regression to the mean; the alternative is a sensitivity estimate, not automatically the true causal answer.
+
+### Same-sensor pre-cohort fake date
+
+NYC: pretend the recorded 2015–2019 cohort was planted in 2010; use Landsat 5 only in 2008–2011, excluding 2010 from the contrast. The diagnostic reproduces **-0.239 K over 726 supported cells before the recorded cohort**, and its supported source-block intervals exclude zero. This challenges causal attribution. It does not measure the bias of the modern headline: the window is thin, has one post year, and contains other historical trees and changes.
+
+DC, Seattle and SF lack the required same-sensor pre/post scene support. The diagnostic explicitly reports insufficient data rather than substituting another sensor family.
+
+### Calendar-year and combined spatial/year sensitivity
+
+Calendar-year deletions rematch controls. To compare the spatial and year components on the same estimand, the interval cohort must be supported in every deletion and retain at least 80% of baseline support.
+
+| City | Common year-deletion sites | Retained | Year SE K | Combined overall sensitivity envelope K |
+|---|---:|---:|---:|---:|
+| NYC | 1057 | 95.3% | 0.048 | [-0.274, +0.146] |
+| DC | 492 | 50.7% | withheld | withheld |
+| SEA | 649 | 97.4% | 0.077 | [-0.470, +0.103] |
+| SF | 104 | 70.7% | withheld | withheld |
+
+The combined range adds spatial and calendar-year SEs on that common cohort (`SE_sum = SE_space + SE_year`), then spans the supported block/origin choices. It is a sensitivity construction allowing positive covariance in an additive-component interpretation. It is **not a calibrated multiway confidence interval**; components can overlap and dependence is not fully modelled. The NYC centre is -0.064 K (1,057 sites), Seattle -0.183 K (649 sites), rather than the larger headline cohort means. Both combined ranges cross zero.
+
+DC and SF retain only 50.7% and 70.7% of baseline support across all year deletions. Their common-cohort intervals are withheld; the support rule was not relaxed to produce a number. Full all-supported deletion means remain in the JSON as descriptive diagnostics. This differs deliberately from the review’s changing-cohort jackknife.
+
+### Later planting and interpretation
+
+Post-window planting occurs in 1,076 NYC treated cells (26,526 additional recorded trees), 1,007 DC cells (36,817), 544 Seattle cells (5,098), and 142 SF cells (2,117). Long-horizon contrasts therefore mix later cohorts while `dose_trees` stops in 2019. NYC has unobserved pre-2015 planting history too.
+
+No city has an established causal cooling effect under this design. Seattle retains a negative association under alternative matching, but identification, year uncertainty and source limitations remain. Model predictions inherit these limits.
+
+## Cross-sensor sensitivity
 
 Older Landsat 5/7 add pre-period observations. They retain the same city baseline and strict June–August filter.
 
@@ -60,15 +105,15 @@ Older Landsat 5/7 add pre-period observations. They retain the same city baselin
 | SEA | 144 | 667 | 18 | -0.263 | -0.246 |
 | SF | 56 | 153 | 0 | +0.129 | +0.124 |
 
-The extra DC cell has sufficient observed data only when older sensors are included. Robustness is not a replacement for headline gold.
+The extra DC cell has sufficient observed data only when older sensors are included. This is cross-sensor sensitivity, not independent confirmation of the headline. Legacy sensor observations occur only in the pre-period, so sensor-specific spatial contrasts can align with the pre/post split.
 NYC all-sensor source-block envelopes also cross zero at their widest choices. Full grid results are in the JSON reports.
 
 ## Delivery and downstream use
 
 - `out/<city>_gold_site_effects.parquet` and `.csv`: headline rows for NYC/DC/SEA/SF.
 - `out/<city>_site_effects_report.json`: diagnostics, source-block sensitivities, runtime, configuration and complete input/code provenance.
-- `out/<city>_site_effects_report_all_sensors.json`: robustness diagnostics.
+- `out/<city>_site_effects_report_all_sensors.json`: cross-sensor diagnostics.
 - `out/input_manifest.json`, `evaluation_runs.json`, verification receipts and `artifact_checksums.json`: audit trail.
-- All-sensor site rows remain in their distinct cloud run directory; they are intentionally not published over headline gold.
+- Cross-sensor site rows remain in their distinct cloud run directory; they are intentionally not published over headline gold.
 - Agent 4 should rebuild outputs previously based on method 0.2.0. Inspect matching balance before learning from these differences; DC/Seattle/SF are exploratory and must not be presented as validated causal training targets.
 - DC and SF can select surviving trees because historical removals are incomplete. Seattle has excluded unknown January-1 dates. No dated record does not prove a cell was never planted.

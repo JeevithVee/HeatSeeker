@@ -1,11 +1,11 @@
 {
-  "run_id": 5222250658819,
+  "run_id": 606115661672539,
   "mode": "headline",
   "cloud_rows": 5882,
   "unique_keys": 5882,
   "method_version": "0.3.0",
   "gold_table": "heatseeker.gold.site_effects",
-  "gold_delta_version": 10,
+  "gold_delta_version": 18,
   "exact_gold_csv_parity": true,
   "headline_version_preserved": false,
   "labels": [

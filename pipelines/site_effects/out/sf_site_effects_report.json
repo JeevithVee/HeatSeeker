@@ -2,47 +2,48 @@
  "city_id": "sf",
  "panel_version": "0",
  "provenance": {
-  "mode": "delta_panel_with_owner_feature_intervention_files",
+  "mode": "delta_snapshots",
   "inputs": {
    "panel": {
     "table": "heatseeker.silver.panel",
-    "delta_version": "0",
-    "owner_file_reference": {
-     "file": "sf_silver_panel.parquet",
-     "git_commit": "3fd6870fefb613445462a5741b949870203c4c4d",
-     "source_path": "pipelines/panel/out/sf_silver_panel.parquet",
-     "sha256": "470f89bd6a855f4f1167cd618ebf3c02539a289bfed36f187ba474093f86260e",
-     "bytes": 3697855
-    }
+    "delta_version": "0"
    },
    "features": {
-    "file": "sf_silver_features.csv",
-    "git_commit": "ea5fcf0b9dcbbcd0f6c28919bf66d270405d4206",
-    "source_path": "ingest/us/samples/sf_silver_features.csv",
-    "sha256": "425797fd4b54d2b11452339907ef4c34e2e203afb762c4fa0ff799b3fdea0372",
-    "bytes": 258594
+    "table": "heatseeker.silver.features",
+    "delta_version": "1"
    },
    "interventions": {
-    "file": "sf_silver_interventions.csv",
-    "git_commit": "ea5fcf0b9dcbbcd0f6c28919bf66d270405d4206",
-    "source_path": "ingest/us/samples/sf_silver_interventions.csv",
-    "sha256": "0113d6c1f228046197e06ecae8bef004493575ab8b7bee951c1242459eceee0d",
-    "bytes": 903493
+    "table": "heatseeker.silver.interventions",
+    "delta_version": "1"
    }
   },
-  "source_caveats": [
-   "Standing-tree inventory misses removed plantings; survivorship bias possible.",
-   "Dated trees have mildly uneven geographic coverage; 4,880 dated records lacked coordinates.",
-   "Strict June-August filtering excludes September scenes; fog limits observations."
-  ],
   "code_snapshot": {
-   "source_sha256": "a5405c5ae6f07b7954476c72720fb771ed133e3142a078323259eb120e6b0648"
+   "source_sha256": "3ed3f2c83aa1a97583685f2eba6adf71d9be4162d1fe66546c41f51556fd0fb2"
+  },
+  "review_context": {
+   "independent_review_commit": "462e2b4",
+   "reviewed_snapshot": {
+    "panel": "0",
+    "features": "1",
+    "interventions": "1"
+   },
+   "caveats": [
+    "Surface temperature is not felt or air temperature.",
+    "All four cities are temperate.",
+    "No dated planting record is not proof of no planting.",
+    "Post-window plantings in treated cells can contribute to later contrasts.",
+    "Cross-sensor sensitivity is not independent confirmation.",
+    "Some static matching features may postdate planting; source-year columns must be considered before causal interpretation.",
+    "Standing-tree records omit historical removals; survivorship bias is possible.",
+    "Some dated records lack coordinates; fog limits summer observations."
+   ]
   },
   "runtime": {
    "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
    "numpy": "2.1.3",
    "pandas": "2.2.3"
-  }
+  },
+  "analysis_purpose": "headline_observational_comparison"
  },
  "config": {
   "lst_col": "lst_median_k",
@@ -424,7 +425,341 @@
     "n_sites_with_minimum_support": 147,
     "status": "sensitivity_only"
    },
-   "variant": "all"
+   "variant": "all",
+   "review_diagnostics": {
+    "diagnostics_version": "1.0.0",
+    "variant": "all",
+    "specification_comparison": {
+     "headline": {
+      "overall": {
+       "n_sites": 147,
+       "mean_effect_k": 0.13861413475619372
+      },
+      "five_year_plus": {
+       "n_sites": 147,
+       "mean_effect_k": 0.16944152146775973
+      }
+     },
+     "no_pre_outcome_matching": {
+      "overall": {
+       "n_sites": 147,
+       "mean_effect_k": 0.19897705813397915
+      },
+      "five_year_plus": {
+       "n_sites": 147,
+       "mean_effect_k": 0.17518886287735638
+      }
+     },
+     "interpretation": "Specification sensitivity, not a correction or a separately identified causal estimate.",
+     "common_cohort": {
+      "overall": {
+       "n_sites": 147,
+       "headline_mean_k": 0.13861413475619372,
+       "static_only_mean_k": 0.19897705813397915
+      },
+      "five_year_plus": {
+       "n_sites": 147,
+       "headline_mean_k": 0.16944152146775973,
+       "static_only_mean_k": 0.17518886287735638
+      }
+     }
+    },
+    "year_block_sensitivity": {
+     "method": "delete_one_calendar_year_with_rematching",
+     "rematched": true,
+     "limitations": "Common-cohort normal-approximation sensitivity; few years and unmodelled dependence remain.",
+     "overall": {
+      "status": "insufficient_common_support",
+      "n_baseline_sites": 147,
+      "n_common_sites": 104,
+      "common_retained_fraction": 0.7074829931972789,
+      "n_years": 14,
+      "mean_effect_k": 0.13403208432810604,
+      "se_k": null,
+      "normal_interval_low_k": null,
+      "normal_interval_high_k": null,
+      "delete_one_year": [
+       {
+        "year": 2013,
+        "n_supported_sites": 144,
+        "mean_common_cohort_k": 0.0884237128213197,
+        "mean_all_supported_k": 0.09923234043296042
+       },
+       {
+        "year": 2014,
+        "n_supported_sites": 145,
+        "mean_common_cohort_k": 0.2581253754627892,
+        "mean_all_supported_k": 0.22933270347287618
+       },
+       {
+        "year": 2015,
+        "n_supported_sites": 104,
+        "mean_common_cohort_k": 0.06769093448351665,
+        "mean_all_supported_k": 0.06769093448351665
+       },
+       {
+        "year": 2016,
+        "n_supported_sites": 147,
+        "mean_common_cohort_k": 0.16675802385254743,
+        "mean_all_supported_k": 0.16862784970677724
+       },
+       {
+        "year": 2017,
+        "n_supported_sites": 145,
+        "mean_common_cohort_k": 0.1935738433730521,
+        "mean_all_supported_k": 0.19688307348459713
+       },
+       {
+        "year": 2018,
+        "n_supported_sites": 147,
+        "mean_common_cohort_k": 0.20998906443952225,
+        "mean_all_supported_k": 0.18654415879902675
+       },
+       {
+        "year": 2019,
+        "n_supported_sites": 147,
+        "mean_common_cohort_k": 0.18786725070494922,
+        "mean_all_supported_k": 0.17817211667518493
+       },
+       {
+        "year": 2020,
+        "n_supported_sites": 147,
+        "mean_common_cohort_k": 0.2109654939648224,
+        "mean_all_supported_k": 0.20222460885266522
+       },
+       {
+        "year": 2021,
+        "n_supported_sites": 147,
+        "mean_common_cohort_k": 0.09004384495157956,
+        "mean_all_supported_k": 0.10513568827545346
+       },
+       {
+        "year": 2022,
+        "n_supported_sites": 147,
+        "mean_common_cohort_k": 0.16510955461107632,
+        "mean_all_supported_k": 0.16742708355409522
+       },
+       {
+        "year": 2023,
+        "n_supported_sites": 147,
+        "mean_common_cohort_k": 0.12796244183015262,
+        "mean_all_supported_k": 0.13572116826781527
+       },
+       {
+        "year": 2024,
+        "n_supported_sites": 147,
+        "mean_common_cohort_k": -0.06773720441130232,
+        "mean_all_supported_k": -0.032760557715790305
+       },
+       {
+        "year": 2025,
+        "n_supported_sites": 147,
+        "mean_common_cohort_k": 0.20462286776802258,
+        "mean_all_supported_k": 0.21337222800941594
+       },
+       {
+        "year": 2026,
+        "n_supported_sites": 147,
+        "mean_common_cohort_k": 0.1386019283622519,
+        "mean_all_supported_k": 0.13627546764018944
+       }
+      ]
+     },
+     "five_year_plus": {
+      "status": "insufficient_common_support",
+      "n_baseline_sites": 147,
+      "n_common_sites": 104,
+      "common_retained_fraction": 0.7074829931972789,
+      "n_years": 14,
+      "mean_effect_k": 0.20271145394197693,
+      "se_k": null,
+      "normal_interval_low_k": null,
+      "normal_interval_high_k": null,
+      "delete_one_year": [
+       {
+        "year": 2013,
+        "n_supported_sites": 144,
+        "mean_common_cohort_k": 0.13692579606343327,
+        "mean_all_supported_k": 0.12154189569344319
+       },
+       {
+        "year": 2014,
+        "n_supported_sites": 145,
+        "mean_common_cohort_k": 0.330609080530622,
+        "mean_all_supported_k": 0.2574095108550001
+       },
+       {
+        "year": 2015,
+        "n_supported_sites": 104,
+        "mean_common_cohort_k": 0.14556089803394331,
+        "mean_all_supported_k": 0.14556089803394331
+       },
+       {
+        "year": 2016,
+        "n_supported_sites": 147,
+        "mean_common_cohort_k": 0.24095664732081432,
+        "mean_all_supported_k": 0.21041562382005385
+       },
+       {
+        "year": 2017,
+        "n_supported_sites": 145,
+        "mean_common_cohort_k": 0.26474546442717717,
+        "mean_all_supported_k": 0.24006340125460596
+       },
+       {
+        "year": 2018,
+        "n_supported_sites": 147,
+        "mean_common_cohort_k": 0.2886748905810682,
+        "mean_all_supported_k": 0.2282759879988519
+       },
+       {
+        "year": 2019,
+        "n_supported_sites": 147,
+        "mean_common_cohort_k": 0.20271145394197693,
+        "mean_all_supported_k": 0.16944152146775973
+       },
+       {
+        "year": 2020,
+        "n_supported_sites": 147,
+        "mean_common_cohort_k": 0.20271145394197693,
+        "mean_all_supported_k": 0.16944152146775973
+       },
+       {
+        "year": 2021,
+        "n_supported_sites": 147,
+        "mean_common_cohort_k": 0.20271145394197693,
+        "mean_all_supported_k": 0.16423547058092075
+       },
+       {
+        "year": 2022,
+        "n_supported_sites": 147,
+        "mean_common_cohort_k": 0.19931195323986325,
+        "mean_all_supported_k": 0.16843981160986848
+       },
+       {
+        "year": 2023,
+        "n_supported_sites": 147,
+        "mean_common_cohort_k": 0.2248814740227557,
+        "mean_all_supported_k": 0.18135300466400595
+       },
+       {
+        "year": 2024,
+        "n_supported_sites": 147,
+        "mean_common_cohort_k": -0.05045477959732444,
+        "mean_all_supported_k": -0.0423579627914124
+       },
+       {
+        "year": 2025,
+        "n_supported_sites": 147,
+        "mean_common_cohort_k": 0.40410747211349335,
+        "mean_all_supported_k": 0.3648610490385586
+       },
+       {
+        "year": 2026,
+        "n_supported_sites": 147,
+        "mean_common_cohort_k": 0.2357111499310968,
+        "mean_all_supported_k": 0.18011775570461705
+       }
+      ]
+     }
+    },
+    "combined_space_year_sensitivity": {
+     "method": "sum_of_spatial_and_year_SE_sensitivity",
+     "metrics": {
+      "overall": {
+       "status": "insufficient_common_support",
+       "grids": []
+      },
+      "five_year_plus": {
+       "status": "insufficient_common_support",
+       "grids": []
+      }
+     },
+     "limitations": "Adds SEs rather than selecting the wider component. This permits positive covariance in an additive-component interpretation, but is not a calibrated multiway variance estimator. Components can overlap; source-block dependence and observational bias remain."
+    },
+    "pre_cohort_fake_date": {
+     "method": "same_sensor_pre_cohort_fake_date",
+     "sensor": "LANDSAT_5",
+     "years": [
+      2008,
+      2009,
+      2010,
+      2011
+     ],
+     "fake_treatment_year": 2010,
+     "n_pre_scenes": 5,
+     "n_post_scenes": 2,
+     "limitations": "Thin older-sensor window, one post year. Tests a period before the recorded cohort, not a treeless city. A nonzero contrast challenges causal attribution but does not measure headline bias.",
+     "status": "insufficient_same_sensor_scenes"
+    },
+    "sensor_family_support": {
+     "sensor_transition_sensitive": false,
+     "cohorts": [
+      {
+       "treatment_year": 2015,
+       "pre_scenes_by_family": {
+        "modern_8_9": 3
+       },
+       "post_scenes_by_family": {
+        "modern_8_9": 38
+       },
+       "families_present_only_pre": [],
+       "families_present_only_post": []
+      },
+      {
+       "treatment_year": 2016,
+       "pre_scenes_by_family": {
+        "modern_8_9": 7
+       },
+       "post_scenes_by_family": {
+        "modern_8_9": 36
+       },
+       "families_present_only_pre": [],
+       "families_present_only_post": []
+      },
+      {
+       "treatment_year": 2017,
+       "pre_scenes_by_family": {
+        "modern_8_9": 9
+       },
+       "post_scenes_by_family": {
+        "modern_8_9": 33
+       },
+       "families_present_only_pre": [],
+       "families_present_only_post": []
+      },
+      {
+       "treatment_year": 2018,
+       "pre_scenes_by_family": {
+        "modern_8_9": 12
+       },
+       "post_scenes_by_family": {
+        "modern_8_9": 31
+       },
+       "families_present_only_pre": [],
+       "families_present_only_post": []
+      },
+      {
+       "treatment_year": 2019,
+       "pre_scenes_by_family": {
+        "modern_8_9": 14
+       },
+       "post_scenes_by_family": {
+        "modern_8_9": 27
+       },
+       "families_present_only_pre": [],
+       "families_present_only_post": []
+      }
+     ],
+     "interpretation": "Cross-sensor sensitivity is not independent confirmation; scene differencing does not remove family-specific spatial contrast changes."
+    },
+    "later_planting_context": {
+     "treated_cells_with_post_window_plantings": 142,
+     "trees_after_window_in_treated_cells": 2117,
+     "interpretation": "Post-period differences can include later plantings; dose_trees only counts the treatment window."
+    },
+    "inference_status": "observational_association_not_established_causal_cooling"
+   }
   },
   "excl_batch_dated": {
    "n_detected": 0,
@@ -742,7 +1077,341 @@
     "n_sites_with_minimum_support": 147,
     "status": "sensitivity_only"
    },
-   "variant": "excl_batch_dated"
+   "variant": "excl_batch_dated",
+   "review_diagnostics": {
+    "diagnostics_version": "1.0.0",
+    "variant": "excl_batch_dated",
+    "specification_comparison": {
+     "headline": {
+      "overall": {
+       "n_sites": 147,
+       "mean_effect_k": 0.13861413475619372
+      },
+      "five_year_plus": {
+       "n_sites": 147,
+       "mean_effect_k": 0.16944152146775973
+      }
+     },
+     "no_pre_outcome_matching": {
+      "overall": {
+       "n_sites": 147,
+       "mean_effect_k": 0.19897705813397915
+      },
+      "five_year_plus": {
+       "n_sites": 147,
+       "mean_effect_k": 0.17518886287735638
+      }
+     },
+     "interpretation": "Specification sensitivity, not a correction or a separately identified causal estimate.",
+     "common_cohort": {
+      "overall": {
+       "n_sites": 147,
+       "headline_mean_k": 0.13861413475619372,
+       "static_only_mean_k": 0.19897705813397915
+      },
+      "five_year_plus": {
+       "n_sites": 147,
+       "headline_mean_k": 0.16944152146775973,
+       "static_only_mean_k": 0.17518886287735638
+      }
+     }
+    },
+    "year_block_sensitivity": {
+     "method": "delete_one_calendar_year_with_rematching",
+     "rematched": true,
+     "limitations": "Common-cohort normal-approximation sensitivity; few years and unmodelled dependence remain.",
+     "overall": {
+      "status": "insufficient_common_support",
+      "n_baseline_sites": 147,
+      "n_common_sites": 104,
+      "common_retained_fraction": 0.7074829931972789,
+      "n_years": 14,
+      "mean_effect_k": 0.13403208432810604,
+      "se_k": null,
+      "normal_interval_low_k": null,
+      "normal_interval_high_k": null,
+      "delete_one_year": [
+       {
+        "year": 2013,
+        "n_supported_sites": 144,
+        "mean_common_cohort_k": 0.0884237128213197,
+        "mean_all_supported_k": 0.09923234043296042
+       },
+       {
+        "year": 2014,
+        "n_supported_sites": 145,
+        "mean_common_cohort_k": 0.2581253754627892,
+        "mean_all_supported_k": 0.22933270347287618
+       },
+       {
+        "year": 2015,
+        "n_supported_sites": 104,
+        "mean_common_cohort_k": 0.06769093448351665,
+        "mean_all_supported_k": 0.06769093448351665
+       },
+       {
+        "year": 2016,
+        "n_supported_sites": 147,
+        "mean_common_cohort_k": 0.16675802385254743,
+        "mean_all_supported_k": 0.16862784970677724
+       },
+       {
+        "year": 2017,
+        "n_supported_sites": 145,
+        "mean_common_cohort_k": 0.1935738433730521,
+        "mean_all_supported_k": 0.19688307348459713
+       },
+       {
+        "year": 2018,
+        "n_supported_sites": 147,
+        "mean_common_cohort_k": 0.20998906443952225,
+        "mean_all_supported_k": 0.18654415879902675
+       },
+       {
+        "year": 2019,
+        "n_supported_sites": 147,
+        "mean_common_cohort_k": 0.18786725070494922,
+        "mean_all_supported_k": 0.17817211667518493
+       },
+       {
+        "year": 2020,
+        "n_supported_sites": 147,
+        "mean_common_cohort_k": 0.2109654939648224,
+        "mean_all_supported_k": 0.20222460885266522
+       },
+       {
+        "year": 2021,
+        "n_supported_sites": 147,
+        "mean_common_cohort_k": 0.09004384495157956,
+        "mean_all_supported_k": 0.10513568827545346
+       },
+       {
+        "year": 2022,
+        "n_supported_sites": 147,
+        "mean_common_cohort_k": 0.16510955461107632,
+        "mean_all_supported_k": 0.16742708355409522
+       },
+       {
+        "year": 2023,
+        "n_supported_sites": 147,
+        "mean_common_cohort_k": 0.12796244183015262,
+        "mean_all_supported_k": 0.13572116826781527
+       },
+       {
+        "year": 2024,
+        "n_supported_sites": 147,
+        "mean_common_cohort_k": -0.06773720441130232,
+        "mean_all_supported_k": -0.032760557715790305
+       },
+       {
+        "year": 2025,
+        "n_supported_sites": 147,
+        "mean_common_cohort_k": 0.20462286776802258,
+        "mean_all_supported_k": 0.21337222800941594
+       },
+       {
+        "year": 2026,
+        "n_supported_sites": 147,
+        "mean_common_cohort_k": 0.1386019283622519,
+        "mean_all_supported_k": 0.13627546764018944
+       }
+      ]
+     },
+     "five_year_plus": {
+      "status": "insufficient_common_support",
+      "n_baseline_sites": 147,
+      "n_common_sites": 104,
+      "common_retained_fraction": 0.7074829931972789,
+      "n_years": 14,
+      "mean_effect_k": 0.20271145394197693,
+      "se_k": null,
+      "normal_interval_low_k": null,
+      "normal_interval_high_k": null,
+      "delete_one_year": [
+       {
+        "year": 2013,
+        "n_supported_sites": 144,
+        "mean_common_cohort_k": 0.13692579606343327,
+        "mean_all_supported_k": 0.12154189569344319
+       },
+       {
+        "year": 2014,
+        "n_supported_sites": 145,
+        "mean_common_cohort_k": 0.330609080530622,
+        "mean_all_supported_k": 0.2574095108550001
+       },
+       {
+        "year": 2015,
+        "n_supported_sites": 104,
+        "mean_common_cohort_k": 0.14556089803394331,
+        "mean_all_supported_k": 0.14556089803394331
+       },
+       {
+        "year": 2016,
+        "n_supported_sites": 147,
+        "mean_common_cohort_k": 0.24095664732081432,
+        "mean_all_supported_k": 0.21041562382005385
+       },
+       {
+        "year": 2017,
+        "n_supported_sites": 145,
+        "mean_common_cohort_k": 0.26474546442717717,
+        "mean_all_supported_k": 0.24006340125460596
+       },
+       {
+        "year": 2018,
+        "n_supported_sites": 147,
+        "mean_common_cohort_k": 0.2886748905810682,
+        "mean_all_supported_k": 0.2282759879988519
+       },
+       {
+        "year": 2019,
+        "n_supported_sites": 147,
+        "mean_common_cohort_k": 0.20271145394197693,
+        "mean_all_supported_k": 0.16944152146775973
+       },
+       {
+        "year": 2020,
+        "n_supported_sites": 147,
+        "mean_common_cohort_k": 0.20271145394197693,
+        "mean_all_supported_k": 0.16944152146775973
+       },
+       {
+        "year": 2021,
+        "n_supported_sites": 147,
+        "mean_common_cohort_k": 0.20271145394197693,
+        "mean_all_supported_k": 0.16423547058092075
+       },
+       {
+        "year": 2022,
+        "n_supported_sites": 147,
+        "mean_common_cohort_k": 0.19931195323986325,
+        "mean_all_supported_k": 0.16843981160986848
+       },
+       {
+        "year": 2023,
+        "n_supported_sites": 147,
+        "mean_common_cohort_k": 0.2248814740227557,
+        "mean_all_supported_k": 0.18135300466400595
+       },
+       {
+        "year": 2024,
+        "n_supported_sites": 147,
+        "mean_common_cohort_k": -0.05045477959732444,
+        "mean_all_supported_k": -0.0423579627914124
+       },
+       {
+        "year": 2025,
+        "n_supported_sites": 147,
+        "mean_common_cohort_k": 0.40410747211349335,
+        "mean_all_supported_k": 0.3648610490385586
+       },
+       {
+        "year": 2026,
+        "n_supported_sites": 147,
+        "mean_common_cohort_k": 0.2357111499310968,
+        "mean_all_supported_k": 0.18011775570461705
+       }
+      ]
+     }
+    },
+    "combined_space_year_sensitivity": {
+     "method": "sum_of_spatial_and_year_SE_sensitivity",
+     "metrics": {
+      "overall": {
+       "status": "insufficient_common_support",
+       "grids": []
+      },
+      "five_year_plus": {
+       "status": "insufficient_common_support",
+       "grids": []
+      }
+     },
+     "limitations": "Adds SEs rather than selecting the wider component. This permits positive covariance in an additive-component interpretation, but is not a calibrated multiway variance estimator. Components can overlap; source-block dependence and observational bias remain."
+    },
+    "pre_cohort_fake_date": {
+     "method": "same_sensor_pre_cohort_fake_date",
+     "sensor": "LANDSAT_5",
+     "years": [
+      2008,
+      2009,
+      2010,
+      2011
+     ],
+     "fake_treatment_year": 2010,
+     "n_pre_scenes": 5,
+     "n_post_scenes": 2,
+     "limitations": "Thin older-sensor window, one post year. Tests a period before the recorded cohort, not a treeless city. A nonzero contrast challenges causal attribution but does not measure headline bias.",
+     "status": "insufficient_same_sensor_scenes"
+    },
+    "sensor_family_support": {
+     "sensor_transition_sensitive": false,
+     "cohorts": [
+      {
+       "treatment_year": 2015,
+       "pre_scenes_by_family": {
+        "modern_8_9": 3
+       },
+       "post_scenes_by_family": {
+        "modern_8_9": 38
+       },
+       "families_present_only_pre": [],
+       "families_present_only_post": []
+      },
+      {
+       "treatment_year": 2016,
+       "pre_scenes_by_family": {
+        "modern_8_9": 7
+       },
+       "post_scenes_by_family": {
+        "modern_8_9": 36
+       },
+       "families_present_only_pre": [],
+       "families_present_only_post": []
+      },
+      {
+       "treatment_year": 2017,
+       "pre_scenes_by_family": {
+        "modern_8_9": 9
+       },
+       "post_scenes_by_family": {
+        "modern_8_9": 33
+       },
+       "families_present_only_pre": [],
+       "families_present_only_post": []
+      },
+      {
+       "treatment_year": 2018,
+       "pre_scenes_by_family": {
+        "modern_8_9": 12
+       },
+       "post_scenes_by_family": {
+        "modern_8_9": 31
+       },
+       "families_present_only_pre": [],
+       "families_present_only_post": []
+      },
+      {
+       "treatment_year": 2019,
+       "pre_scenes_by_family": {
+        "modern_8_9": 14
+       },
+       "post_scenes_by_family": {
+        "modern_8_9": 27
+       },
+       "families_present_only_pre": [],
+       "families_present_only_post": []
+      }
+     ],
+     "interpretation": "Cross-sensor sensitivity is not independent confirmation; scene differencing does not remove family-specific spatial contrast changes."
+    },
+    "later_planting_context": {
+     "treated_cells_with_post_window_plantings": 142,
+     "trees_after_window_in_treated_cells": 2117,
+     "interpretation": "Post-period differences can include later plantings; dose_trees only counts the treatment window."
+    },
+    "inference_status": "observational_association_not_established_causal_cooling"
+   }
   }
  }
 }

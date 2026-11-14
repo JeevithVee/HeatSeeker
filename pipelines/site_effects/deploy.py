@@ -23,7 +23,7 @@ def source_files():
     return sorted([ROOT / "core/__init__.py", *ROOT.glob("core/evaluation/*.py"),
                    *ROOT.glob("core/tests/*.py"),
                    *[ROOT / "pipelines/site_effects" / name for name in
-                     ("run_site_effects.py", "run_tests.py", "load_gold.py")]])
+                     ("run_site_effects.py", "run_tests.py", "load_gold.py", "source_caveats.json")]])
 
 
 def deploy(profile, catalog, input_dir, receipt_path, panel_source="files"):

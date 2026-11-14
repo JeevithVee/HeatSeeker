@@ -8,7 +8,7 @@ standard tables and publish the frozen `gold.site_effects` columns.
 
 1. Keep June–August Landsat 8/9 observations with cell valid-pixel fraction >= 0.7,
    whole-scene cloud fraction <= 0.6, city clear fraction >= 0.5 and at least 200 observed
-   cells. Landsat 5/7 are a separate robustness run; Landsat 7's per-cell threshold is 0.5
+   cells. Landsat 5/7 are a separate cross-sensor sensitivity run; Landsat 7's per-cell threshold is 0.5
    because of striping gaps. ECOSTRESS is never mixed into this estimate.
 2. Subtract the city median within each scene. Trim cold outliers below six scene MADs;
    retain hot roofs. Per-site contrasts use only scenes with at least half the matched
@@ -71,6 +71,51 @@ positive count for the combined bootstrap/placebo gate.
 References for the variance construction and spatial block-size limitations:
 - [Efron and Stein, The Jackknife Estimate of Variance](https://statistics.stanford.edu/technical-reports/jackknife-estimate-variance)
 - [Nordman and Lahiri, On optimal spatial subsample size for variance estimation](https://arxiv.org/abs/math/0503671)
+
+## Standing independent-review diagnostics
+
+`diagnostics.review_diagnostics` implements the follow-up to Agent 1's review at commit
+`462e2b4`. The Databricks pipeline runs it by default and stores its output under each
+variant's `review_diagnostics`. It does not change headline site estimates or labels.
+Diagnostics have their own version, currently 1.0.0.
+
+- **Specification:** recompute matches with pre-period temperature weight zero. Report
+  both specifications and their common-cohort comparison. The gap is specification
+  sensitivity; the alternative is not automatically a corrected causal estimate.
+- **Pre-cohort fake date:** take the actual treatment-window cohort and pretend it was
+  planted in 2010. Use Landsat 5 only, 2008–2011, excluding fake year 2010. Keep the full
+  real planting record when selecting controls. Require the ordinary scene/site support
+  criteria, and explicitly skip cities without adequate same-sensor data. This tests a
+  period before the recorded cohort, not a treeless city. Thin coverage and one post year
+  prevent using its magnitude as an estimate of headline bias.
+- **Calendar-year jackknife:** drop each year and rematch controls. Intervals use the
+  intersection of sites supported in the baseline and every deletion. At least four years,
+  two sites and 80% of baseline support must remain; otherwise no interval is supplied.
+  Reports retain all-supported deletion means as diagnostics, but do not silently mix
+  changing cohorts into the common-cohort interval.
+- **Combined sensitivity:** recompute source-block variability on exactly that common
+  cohort and centre both components on the same point. Combine via
+  `SE_sum = spatial_SE + year_SE`, rather than selecting the larger component. The normal
+  range around this sum is an explicit sensitivity construction permitting positive
+  covariance in an additive-component interpretation. It is not a calibrated multiway
+  variance estimate: components can overlap, correlation is unknown, and spatial rematching
+  is not performed. It must not be shown as an established causal confidence interval.
+- **Sensor support:** report pre/post scene availability by sensor family and cohort.
+  Legacy-only pre-period observations make cross-sensor comparisons susceptible to a
+  sensor transition. Same-scene centring removes shared offsets, not every change in
+  spatial contrasts or effective thermal resolution. Stop calling this independent
+  robustness confirmation.
+- **Later planting:** report how many treated cells receive additional trees after the
+  dose window. Long-horizon contrasts can include those later cohorts.
+
+The headline fake-date/placebo p-values and labels remain observational statistical
+outputs. A failed pre-cohort diagnostic is a substantive reason to reject causal attribution,
+including when a conditional spatial interval excludes zero.
+
+Background: [Daw and Hatfield on matching and regression to the mean](https://pmc.ncbi.nlm.nih.gov/articles/PMC6232412/).
+A calibrated multiway variance procedure requires more than adding two reported variances;
+see [Cameron, Gelbach and Miller](https://cameron.econ.ucdavis.edu/research/CGM_twoway_ALL_13may2008.pdf).
+Our SE-sum output is labelled a sensitivity range and does not claim that estimator's theory.
 
 ## Reading results
 

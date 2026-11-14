@@ -56,6 +56,10 @@
     {
       "name": "panel_source",
       "default": "files"
+    },
+    {
+      "name": "review_diagnostics",
+      "default": "true"
     }
   ],
   "max_concurrent_runs": 1,
@@ -98,7 +102,9 @@
           "--publish-gold",
           "{{job.parameters.publish_gold}}",
           "--panel-source",
-          "{{job.parameters.panel_source}}"
+          "{{job.parameters.panel_source}}",
+          "--review-diagnostics",
+          "{{job.parameters.review_diagnostics}}"
         ]
       },
       "timeout_seconds": 3600
@@ -132,7 +138,9 @@
           "--publish-gold",
           "{{job.parameters.publish_gold}}",
           "--panel-source",
-          "{{job.parameters.panel_source}}"
+          "{{job.parameters.panel_source}}",
+          "--review-diagnostics",
+          "{{job.parameters.review_diagnostics}}"
         ]
       },
       "timeout_seconds": 3600
@@ -166,7 +174,9 @@
           "--publish-gold",
           "{{job.parameters.publish_gold}}",
           "--panel-source",
-          "{{job.parameters.panel_source}}"
+          "{{job.parameters.panel_source}}",
+          "--review-diagnostics",
+          "{{job.parameters.review_diagnostics}}"
         ]
       },
       "timeout_seconds": 3600
@@ -200,7 +210,9 @@
           "--publish-gold",
           "{{job.parameters.publish_gold}}",
           "--panel-source",
-          "{{job.parameters.panel_source}}"
+          "{{job.parameters.panel_source}}",
+          "--review-diagnostics",
+          "{{job.parameters.review_diagnostics}}"
         ]
       },
       "timeout_seconds": 3600

@@ -6,9 +6,7 @@ Agent 3's wrappers evaluate the standard silver inputs and publish the frozen
 ## Deploy and run on Databricks
 
 ```
-python pipelines/site_effects/deploy.py --profile heatseeker \
-  --input-dir /Volumes/heatseeker/gold/files/site_effects/inputs/<input-snapshot> \
-  --panel-source delta
+python pipelines/site_effects/deploy.py --profile heatseeker
 databricks jobs run-now <job-id> --no-wait -p heatseeker -o json
 ```
 
@@ -48,14 +46,15 @@ uses the existing CLI profile; credentials are never part of the source snapshot
 Reports also carry the immutable code hash, runtime versions, configuration and source-data
 caveats. The deployed snapshot is reproducible even if an agent branch changes later.
 
-Once all upstream silver tables are available, switch modes without changing the code:
+All three silver tables are now live. The deployed default is full silver-only mode; the
+explicit override below also selects it:
 
 ```
 databricks jobs run-now --no-wait -p heatseeker \
   --json '{"job_id":<job-id>,"job_parameters":{"input_dir":""}}'
 ```
 
-## Outputs and robustness
+## Outputs and cross-sensor sensitivity
 
 Each successful city task writes CSV, Parquet and a JSON report under
 `<output_dir>/<job-run-id>/<city>/`, then atomically replaces that city's rows in
@@ -71,7 +70,7 @@ Run the all-sensor check without overwriting headline gold:
 
 ```
 databricks jobs run-now --no-wait -p heatseeker \
-  --json '{"job_id":<job-id>,"job_parameters":{"sensors":"LANDSAT_5 LANDSAT_7 LANDSAT_8 LANDSAT_9","publish_gold":"false"}}'
+  --json '{"job_id":<job-id>,"job_parameters":{"sensors":"LANDSAT_5 LANDSAT_7 LANDSAT_8 LANDSAT_9","publish_gold":"false","review_diagnostics":"false"}}'
 ```
 
 Its output files live under its own run ID. Strict June–August filtering applies to SF too;
@@ -119,6 +118,20 @@ CSV with the gold table using `EXCEPT ALL` in both directions. CSV/Parquet value
 also checked locally. Use the CSV for SQL/Spark file ingestion: pandas' Parquet timestamp
 encoding can be nanoseconds, which this SQL warehouse does not support directly.
 
-For a robustness run, pass `--robustness --expected-gold-version <headline-version>` to
-verify that the headline table version was preserved. The robustness outputs are audited
-independently; they are intentionally not equal to the headline table.
+For a cross-sensor run, pass `--robustness --expected-gold-version <headline-version>` to
+verify that the headline table version was preserved. The sensitivity outputs are audited
+independently; they are intentionally not equal to the headline table. The historical
+`--robustness` audit flag describes that non-publication check, not scientific confirmation.
+
+## Statistics review diagnostics
+
+The default `review_diagnostics=true` adds specification comparisons, the same-sensor
+pre-cohort fake-date diagnostic, calendar-year rematching, and combined spatial/year
+sensitivity. Identical variant cohorts share the expensive diagnostic calculation, while
+reports retain their own variant labels. All values are stored in the per-city JSON reports;
+the frozen site-effects table is unchanged. Source caveats accompany full Delta reads too.
+
+Use `review_diagnostics=false` for the separate cross-sensor run to avoid repeating the
+headline's standing checks. Older sensors are a sensitivity exercise, not independent
+robustness evidence. See the independent review and `RESULTS.md` for the failed NYC
+pre-cohort diagnostic and limits on causal interpretation.

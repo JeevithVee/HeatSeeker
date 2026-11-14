@@ -2,45 +2,49 @@
  "city_id": "nyc",
  "panel_version": "0",
  "provenance": {
-  "mode": "delta_panel_with_owner_feature_intervention_files",
+  "mode": "delta_snapshots",
   "inputs": {
    "panel": {
     "table": "heatseeker.silver.panel",
-    "delta_version": "0",
-    "owner_file_reference": {
-     "file": "nyc_silver_panel.parquet",
-     "git_commit": "3fd6870fefb613445462a5741b949870203c4c4d",
-     "source_path": "pipelines/panel/out/nyc_silver_panel.parquet",
-     "sha256": "a839f36e227d9e9794d62f82b639ca34b81e1ed07ef8f7920cc455828625c149",
-     "bytes": 34476055
-    }
+    "delta_version": "0"
    },
    "features": {
-    "file": "nyc_silver_features.csv",
-    "git_commit": "72b5b1a794d1e89abb8ff8e441fa5fb533655c57",
-    "source_path": "ingest/us/samples/nyc_silver_features.csv",
-    "sha256": "24ea1d08dd9c92ee19a77fa6066068822ac19ed5b1e5e271f4f2d8efb8c7ad5a",
-    "bytes": 1233401
+    "table": "heatseeker.silver.features",
+    "delta_version": "1"
    },
    "interventions": {
-    "file": "nyc_silver_interventions.csv",
-    "git_commit": "72b5b1a794d1e89abb8ff8e441fa5fb533655c57",
-    "source_path": "ingest/us/samples/nyc_silver_interventions.csv",
-    "sha256": "c4a80759c09aae1c8713c7cbd81cbfb3e91c7b8738b107408e40acd8edbf680b",
-    "bytes": 2645631
+    "table": "heatseeker.silver.interventions",
+    "delta_version": "1"
    }
   },
-  "source_caveats": [
-   "Incomplete dated planting history: absence of a dated record is not proof of no planting."
-  ],
   "code_snapshot": {
-   "source_sha256": "a5405c5ae6f07b7954476c72720fb771ed133e3142a078323259eb120e6b0648"
+   "source_sha256": "3ed3f2c83aa1a97583685f2eba6adf71d9be4162d1fe66546c41f51556fd0fb2"
+  },
+  "review_context": {
+   "independent_review_commit": "462e2b4",
+   "reviewed_snapshot": {
+    "panel": "0",
+    "features": "1",
+    "interventions": "1"
+   },
+   "caveats": [
+    "Surface temperature is not felt or air temperature.",
+    "All four cities are temperate.",
+    "No dated planting record is not proof of no planting.",
+    "Post-window plantings in treated cells can contribute to later contrasts.",
+    "Cross-sensor sensitivity is not independent confirmation.",
+    "Some static matching features may postdate planting; source-year columns must be considered before causal interpretation.",
+    "Dated inventory begins in 2015; earlier cohorts can mature unseen in both groups.",
+    "The 2008-2011 same-sensor pre-cohort fake-date check found a nonzero contrast.",
+    "Matching on noisy pre-outcomes can select regression to the mean."
+   ]
   },
   "runtime": {
    "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
    "numpy": "2.1.3",
    "pandas": "2.2.3"
-  }
+  },
+  "analysis_purpose": "cross_sensor_sensitivity_not_independent_confirmation"
  },
  "config": {
   "lst_col": "lst_median_k",

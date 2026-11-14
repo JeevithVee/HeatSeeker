@@ -12,6 +12,7 @@ Parameters (job parameters or CLI flags):
 """
 
 import argparse
+import copy
 import hashlib
 import json
 import sys
@@ -42,6 +43,8 @@ def parse_args(argv=None):
     ap.add_argument("--output-dir", default="", help="Volume output root; each city gets its own subdirectory")
     ap.add_argument("--publish-gold", choices=("true", "false"), default="true",
                     help="false writes robustness files/reports without replacing headline gold")
+    ap.add_argument("--review-diagnostics", choices=("true", "false"), default="true",
+                    help="run specification, fake-date and calendar-year sensitivity diagnostics")
     ap.add_argument("--report-path", default=None,
                     help="optional Volume path for the JSON sanity report, e.g. /Volumes/heatseeker/gold/reports/nyc_site_effects.json")
     return ap.parse_args(argv)
@@ -115,6 +118,14 @@ def main(argv=None):
     snapshot = REPO_ROOT / "source_snapshot.json"
     if snapshot.is_file():
         provenance["code_snapshot"] = json.loads(snapshot.read_text())
+    caveats = REPO_ROOT / "pipelines/site_effects/source_caveats.json"
+    if caveats.is_file():
+        context = json.loads(caveats.read_text())
+        provenance["review_context"] = {
+            "independent_review_commit": context["independent_review_commit"],
+            "reviewed_snapshot": context["reviewed_snapshot"],
+            "caveats": context["all_cities"] + context["city_notes"].get(args.city_id, []),
+        }
     import numpy as np
     import pandas as pd
     provenance["runtime"] = {"python": sys.version, "numpy": np.__version__, "pandas": pd.__version__}
@@ -123,7 +134,21 @@ def main(argv=None):
 
     extra = {"sensors": tuple(s for value in args.sensors for s in value.split())} if args.sensors else {}
     cfg = EvalConfig(n_bootstrap=args.n_bootstrap, n_placebo=args.n_placebo, min_dose=args.min_dose, **extra)
+    provenance["analysis_purpose"] = ("cross_sensor_sensitivity_not_independent_confirmation"
+                                      if {"LANDSAT_5", "LANDSAT_7"}.intersection(cfg.sensors)
+                                      else "headline_observational_comparison")
     gold, reports = evaluate_city_all_variants_with_reports(panel, features, interventions, cfg, panel_version=panel_version)
+    if args.review_diagnostics == "true":
+        from core.evaluation.diagnostics import review_diagnostics
+        cache = {}
+        for variant, report in reports.items():
+            cohort = gold.loc[gold.variant == variant, ["site_id", "treatment_year", "dose_trees"]]
+            key = tuple(cohort.sort_values("site_id").itertuples(index=False, name=None))
+            if key not in cache:
+                print(f"[site_effects] review diagnostics, {args.city_id}/{variant}", flush=True)
+                cache[key] = review_diagnostics(panel, features, interventions, cfg, variant)
+            report["review_diagnostics"] = copy.deepcopy(cache[key])
+            report["review_diagnostics"]["variant"] = variant
     print(f"[site_effects] rows={len(gold)}")
     for variant, rep in reports.items():
         print(f"[site_effects] --- sanity report, variant={variant} ---")
