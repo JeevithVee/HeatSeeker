@@ -1,0 +1,59 @@
+{
+  "version": 2,
+  "config": {
+    "sample_questions": [
+      {"question": ["Why was site 892a1000a2bffff recommended?"]},
+      {"question": ["How many planted cells in Seattle have a detected cooling effect, and what is their median effect?"]},
+      {"question": ["Which NYC recommendations have the most vulnerable residents per dollar?"]},
+      {"question": ["For each city, how many evaluated sites are detected, inconclusive and not detectable?"]}
+    ]
+  },
+  "data_sources": {
+    "tables": [
+      {"identifier": "heatseeker.gold.prediction_log"},
+      {"identifier": "heatseeker.gold.recommendations"},
+      {"identifier": "heatseeker.gold.site_effects"},
+      {"identifier": "heatseeker.gold.site_reports"},
+      {"identifier": "heatseeker.silver.features"},
+      {"identifier": "heatseeker.silver.interventions"}
+    ]
+  },
+  "instructions": {
+    "text_instructions": [
+      {
+        "content": [
+          "* HeatSeeker measures whether tree planting cooled an H3 cell (site_id) using satellite SURFACE temperature. Surface temperature is not air or felt temperature; say so when reporting an effect.\n",
+          "* Temperatures are Kelvin DIFFERENCES. Negative effect_k = cooler. To show Fahrenheit differences multiply by 1.8.\n",
+          "* gold.site_effects has two rows per site (variant 'all' and 'excl_batch_dated'). Use variant = 'all' unless asked otherwise.\n",
+          "* quality_label is a statistical label, not causal proof: 'detected' means the effect beat the placebo test; 'inconclusive' means the cell was too noisy to see an effect smaller than mde_k; 'not_detectable' means it had the precision and found none.\n",
+          "* Reliable cooling is NOT established in any city; when summarising effects, add that caveat.\n",
+          "* gold.recommendations ranks unplanted candidate cells by score = predicted cooling x vulnerable_residents / est_cost_usd; rank 1 is best. holdout_control = true means the cell is deliberately left unplanted as a future control.\n",
+          "* 'Why was a site recommended' = its rank, score, predicted_cooling_k_15y (and _low/_high), vulnerable_residents, est_cost_usd, suggested_intervention from gold.recommendations, plus canopy_frac_baseline, impervious_frac, land_cover_class, population from silver.features.\n",
+          "* silver.interventions has one row per site_id x plant_year; trees_planted counts dated plantings. dose_trees in gold.site_effects sums 2015-2019.\n",
+          "* city_id values: nyc = New York, dc = Washington DC, sea = Seattle, sf = San Francisco."
+        ]
+      }
+    ],
+    "example_question_sqls": [
+      {
+        "question": ["Why was site 892a1000a2bffff recommended?"],
+        "sql": [
+          "SELECT r.city_id, r.site_id, r.rank, r.score, r.predicted_cooling_k_15y, r.predicted_cooling_k_15y_low,\n",
+          "       r.predicted_cooling_k_15y_high, r.vulnerable_residents, r.est_cost_usd, r.suggested_intervention, r.holdout_control,\n",
+          "       f.canopy_frac_baseline, f.impervious_frac, f.land_cover_class, f.population\n",
+          "FROM heatseeker.gold.recommendations r\n",
+          "JOIN heatseeker.silver.features f USING (country_code, city_id, site_id)\n",
+          "WHERE r.site_id = '892a1000a2bffff'"
+        ]
+      },
+      {
+        "question": ["For each city, how many evaluated sites are detected, inconclusive and not detectable?"],
+        "sql": [
+          "SELECT city_id, quality_label, COUNT(*) AS sites, ROUND(AVG(effect_k), 3) AS mean_effect_k\n",
+          "FROM heatseeker.gold.site_effects WHERE variant = 'all'\n",
+          "GROUP BY city_id, quality_label ORDER BY city_id, quality_label"
+        ]
+      }
+    ]
+  }
+}

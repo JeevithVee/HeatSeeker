@@ -36,6 +36,7 @@ TABLES = {
     "panel_sample": "panel_sample.parquet",
     "prediction_log": "prediction_log.parquet",
     "prediction_scores": "prediction_scores.parquet",
+    "site_reports": "gold_site_reports.parquet",
 }
 
 # Unity Catalog sources for live mode. panel_sample and prediction_scores
@@ -46,6 +47,7 @@ LIVE_TABLES = {
     "site_effects": "heatseeker.gold.site_effects",
     "recommendations": "heatseeker.gold.recommendations",
     "prediction_log": "heatseeker.gold.prediction_log",
+    "site_reports": "heatseeker.gold.site_reports",
 }
 
 PLANTING_TABLE = "heatseeker.gold.app_planting_log"

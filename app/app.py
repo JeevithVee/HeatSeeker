@@ -392,6 +392,17 @@ def view_results(t):
     m[3].metric("Scenes pre / post", f"{r['n_pre_scenes']} / {r['n_post_scenes']}")
     m[4].metric("Matched controls", int(r["n_controls"]))
 
+    reports = t.get("site_reports", pd.DataFrame())
+    if not reports.empty:
+        rep = reports[(reports["site_id"] == site) & (reports["variant"] == HEADLINE_VARIANT)]
+        if not rep.empty:
+            st.markdown(
+                f'<div class="hs-note"><b>Site report</b> — {rep.iloc[0]["report_text"]}'
+                f'<br><span style="color:{MUTED};font-size:0.78rem">Phrased by '
+                f'{rep.iloc[0]["model"]} from the numbers above only (gold.site_effects '
+                f'v{rep.iloc[0].get("site_effects_version", "?")}); the model adds no figures.'
+                '</span></div>', unsafe_allow_html=True)
+
     p = panel[panel["site_id"] == site] if not panel.empty else panel
     if not p.empty:
         long = p.melt(
