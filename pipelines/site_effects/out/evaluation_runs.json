@@ -5,7 +5,7 @@
   "input_dir": "",
   "panel_source": "delta",
   "job_name": "heatseeker-site-effects",
-  "headline_run_id": 606115661672539,
+  "headline_run_id": 1123694992477746,
   "cross_sensor_sensitivity_run_id": 598786481893891,
   "cloud_tests_passed": 34,
   "headline_job_success": true,
@@ -13,14 +13,16 @@
   "input_delta_versions": {
     "panel": "0",
     "features": "1",
-    "interventions": "1"
+    "interventions": "2"
   },
   "full_silver_verified": true,
   "diagnostics_version": "1.0.0",
-  "gold_delta_version": 18,
+  "gold_delta_version": 22,
   "prior_full_silver_parity_run": 383042876269446,
   "previous_mixed_input_runs": {
     "headline": 5222250658819,
     "cross_sensor": 149976888548281
-  }
+  },
+  "previous_headline_run_id": 606115661672539,
+  "loop_demo": "silver.interventions v2 = v1 + one app-logged planting promoted by build-silver run 700137402752977; 3 NYC effect values changed, 0 labels"
 }

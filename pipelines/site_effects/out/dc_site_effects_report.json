@@ -14,7 +14,7 @@
    },
    "interventions": {
     "table": "heatseeker.silver.interventions",
-    "delta_version": "1"
+    "delta_version": "2"
    }
   },
   "code_snapshot": {

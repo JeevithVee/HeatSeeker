@@ -6,10 +6,10 @@ All four cities are temperate. Method 0.2.0 results and earlier synthetic expect
 
 ## Completed full-silver cloud runs
 
-- Headline plus standing review diagnostics: `606115661672539`, SUCCESS; 34 tests and all four city tasks passed.
+- Headline plus standing review diagnostics: `1123694992477746`, SUCCESS (34 tests and all four city tasks). It reads silver.interventions version 2, which includes one app-logged planting promoted by the build job (the Plan→Plant→Prove loop run live); versus the previous run `606115661672539` on interventions v1, 3 NYC effect values changed and no labels.
 - Cross-sensor sensitivity: `598786481893891`, SUCCESS; 34 tests and all four city tasks passed.
-- Gold: `heatseeker.gold.site_effects`, 5,882 rows, Delta version 18, method 0.3.0.
-- Every city reads pinned Delta snapshots: panel 0, features 1, interventions 1. The job now defaults to silver-only inputs.
+- Gold: `heatseeker.gold.site_effects`, 5,882 rows, Delta version 22, method 0.3.0.
+- Every city reads pinned Delta snapshots: panel 0, features 1, interventions 2. The job now defaults to silver-only inputs.
 - Typed CSV matches gold exactly in both directions; companion CSV/Parquet values match exactly.
 - Every scientific gold value exactly reproduces the prior mixed-input delivery; evaluation timestamps changed.
 - Cross-sensor output contains 5,884 rows in its separate run directory and preserved headline gold version 18.

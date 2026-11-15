@@ -14,7 +14,7 @@
    },
    "interventions": {
     "table": "heatseeker.silver.interventions",
-    "delta_version": "1"
+    "delta_version": "2"
    }
   },
   "code_snapshot": {
@@ -135,45 +135,45 @@
    "n_cells_in_panel": 7413,
    "n_treated": 1111,
    "n_matched": 1111,
-   "n_controls_eligible": 1785,
+   "n_controls_eligible": 1784,
    "control_reuse": {
-    "unique_matched_controls": 1068,
+    "unique_matched_controls": 1067,
     "total_control_assignments": 11110,
-    "controls_reused_by_multiple_sites": 840,
+    "controls_reused_by_multiple_sites": 839,
     "max_treated_sites_per_control": 144
    },
    "labels": {
     "inconclusive": 1095,
     "detected": 16
    },
-   "median_mde_k": 1.8793975582390356,
+   "median_mde_k": 1.9564799575224971,
    "median_effect_k_detected": -1.456671001751848,
-   "pre_period_mean_effect_k": -0.005323816912335144,
-   "max_abs_smd": 0.13182946438342852,
+   "pre_period_mean_effect_k": -0.005323487199379365,
+   "max_abs_smd": 0.13187724237900916,
    "balance": [
     {
      "variable": "canopy_frac_baseline",
      "mean_treated": 0.0798,
      "mean_controls": 0.0873,
-     "smd": -0.0786
+     "smd": -0.0788
     },
     {
      "variable": "impervious_frac",
      "mean_treated": 0.7222,
      "mean_controls": 0.7106,
-     "smd": 0.0868
+     "smd": 0.0867
     },
     {
      "variable": "elevation_m",
      "mean_treated": 18.9774,
-     "mean_controls": 17.1391,
-     "smd": 0.1318
+     "mean_controls": 17.1384,
+     "smd": 0.1319
     }
    ],
-   "placebo_mean_k": -0.05361964224273561,
-   "n_valid_placebo_estimates": 799,
-   "placebo_sd_k": 0.696385307455586,
-   "placebo_q95_abs_k": 1.2944338999763434,
+   "placebo_mean_k": -0.01606702176659912,
+   "n_valid_placebo_estimates": 798,
+   "placebo_sd_k": 0.7150160794655627,
+   "placebo_q95_abs_k": 1.3558664507714244,
    "event_study": [
     {
      "years_since": -6,
@@ -192,7 +192,7 @@
     },
     {
      "years_since": -3,
-     "mean_effect_k": -0.0094,
+     "mean_effect_k": -0.0095,
      "n_sites": 1053
     },
     {
@@ -202,47 +202,47 @@
     },
     {
      "years_since": -1,
-     "mean_effect_k": -0.0072,
+     "mean_effect_k": -0.0071,
      "n_sites": 1111
     },
     {
      "years_since": 0,
-     "mean_effect_k": 0.0846,
+     "mean_effect_k": 0.0847,
      "n_sites": 1110
     },
     {
      "years_since": 1,
-     "mean_effect_k": -0.0016,
+     "mean_effect_k": -0.0015,
      "n_sites": 1110
     },
     {
      "years_since": 2,
-     "mean_effect_k": 0.0173,
+     "mean_effect_k": 0.0174,
      "n_sites": 1110
     },
     {
      "years_since": 3,
-     "mean_effect_k": -0.0928,
+     "mean_effect_k": -0.0931,
      "n_sites": 1110
     },
     {
      "years_since": 4,
-     "mean_effect_k": -0.008,
+     "mean_effect_k": -0.0081,
      "n_sites": 1111
     },
     {
      "years_since": 5,
-     "mean_effect_k": -0.1425,
+     "mean_effect_k": -0.1427,
      "n_sites": 1110
     },
     {
      "years_since": 6,
-     "mean_effect_k": -0.1102,
+     "mean_effect_k": -0.1104,
      "n_sites": 1111
     },
     {
      "years_since": 7,
-     "mean_effect_k": -0.1045,
+     "mean_effect_k": -0.1047,
      "n_sites": 1111
     },
     {
@@ -252,12 +252,12 @@
     },
     {
      "years_since": 9,
-     "mean_effect_k": -0.0344,
+     "mean_effect_k": -0.0343,
      "n_sites": 502
     },
     {
      "years_since": 10,
-     "mean_effect_k": -0.1435,
+     "mean_effect_k": -0.1444,
      "n_sites": 166
     },
     {
@@ -268,26 +268,26 @@
    ],
    "pre_trend_diagnostics": {
     "n_sites_with_three_pre_years": 1053,
-    "mean_slope_k_per_year": -0.02233722968389635,
-    "median_slope_k_per_year": -0.010889999999999997,
-    "mean_last_minus_first_pre_year_k": -0.12479667616334283,
+    "mean_slope_k_per_year": -0.02226111382444716,
+    "median_slope_k_per_year": -0.010770000000000007,
+    "mean_last_minus_first_pre_year_k": -0.12464444444444443,
     "limitations": "Descriptive only; matching uses these same pre-period data, so this is not an independent parallel-trends test."
    },
    "pooled_by_dose": [
     {
      "dose_bin": "10-14",
      "n_sites": 531,
-     "mean_effect_k": -0.0759,
+     "mean_effect_k": -0.0761,
      "se_k": 0.0236,
-     "mean_effect_5yr_plus_k": -0.1088,
+     "mean_effect_5yr_plus_k": -0.1091,
      "se_5yr_plus_k": 0.0281
     },
     {
      "dose_bin": "15-19",
      "n_sites": 253,
-     "mean_effect_k": -0.1131,
+     "mean_effect_k": -0.113,
      "se_k": 0.031,
-     "mean_effect_5yr_plus_k": -0.1638,
+     "mean_effect_5yr_plus_k": -0.1637,
      "se_5yr_plus_k": 0.0357
     },
     {
@@ -317,9 +317,9 @@
     {
      "dose_bin": "all",
      "n_sites": 1111,
-     "mean_effect_k": -0.0745,
+     "mean_effect_k": -0.0746,
      "se_k": 0.0154,
-     "mean_effect_5yr_plus_k": -0.1124,
+     "mean_effect_5yr_plus_k": -0.1125,
      "se_5yr_plus_k": 0.0182
     }
    ],
@@ -329,9 +329,9 @@
     "method": "joint_source_block_delete_one_jackknife",
     "limitations": "Conditional on fixed matches and observed scenes. Deletes treated and control trajectories jointly; preserves reused-control dependence within each deletion. Spatial blocks at 2 km and 5 km with two origins are sensitivity choices, not validated independence boundaries. Intervals are normal approximations, not causal confidence intervals.",
     "control_reuse": {
-     "unique_matched_controls": 1068,
+     "unique_matched_controls": 1067,
      "total_control_assignments": 11110,
-     "controls_reused_by_multiple_sites": 840,
+     "controls_reused_by_multiple_sites": 839,
      "max_treated_sites_per_control": 144
     },
     "grids": [
@@ -339,96 +339,96 @@
       "block_size_m": 2000,
       "origin_offset_fraction": 0.0,
       "overall": {
-       "mean_effect_k": -0.07406868933400773,
+       "mean_effect_k": -0.07416748715695509,
        "n_sites": 1109,
        "n_blocks": 249,
        "min_retained_fraction": 0.9774571686203787,
        "status": "sensitivity_only",
-       "se_k": 0.04405358865712788,
-       "normal_interval_low_k": -0.16041372310197838,
-       "normal_interval_high_k": 0.012276344433962902
+       "se_k": 0.044053076040061624,
+       "normal_interval_low_k": -0.16051151619547588,
+       "normal_interval_high_k": 0.012176541881565695
       },
       "five_year_plus": {
-       "mean_effect_k": -0.11254463614266737,
+       "mean_effect_k": -0.11265522333090769,
        "n_sites": 1109,
        "n_blocks": 249,
        "min_retained_fraction": 0.9774571686203787,
        "status": "sensitivity_only",
-       "se_k": 0.055070464389799366,
-       "normal_interval_low_k": -0.22048274634667414,
-       "normal_interval_high_k": -0.004606525938660608
+       "se_k": 0.0550669435611533,
+       "normal_interval_low_k": -0.22058643271076817,
+       "normal_interval_high_k": -0.004724013951047226
       }
      },
      {
       "block_size_m": 2000,
       "origin_offset_fraction": 0.5,
       "overall": {
-       "mean_effect_k": -0.07406868933400773,
+       "mean_effect_k": -0.07416748715695509,
        "n_sites": 1109,
        "n_blocks": 246,
        "min_retained_fraction": 0.9774571686203787,
        "status": "sensitivity_only",
-       "se_k": 0.045560246172453224,
-       "normal_interval_low_k": -0.16336677183201603,
-       "normal_interval_high_k": 0.015229393164000585
+       "se_k": 0.04555471647356563,
+       "normal_interval_low_k": -0.16345473144514372,
+       "normal_interval_high_k": 0.01511975713123355
       },
       "five_year_plus": {
-       "mean_effect_k": -0.11254463614266737,
+       "mean_effect_k": -0.11265522333090769,
        "n_sites": 1109,
        "n_blocks": 246,
        "min_retained_fraction": 0.9774571686203787,
        "status": "sensitivity_only",
-       "se_k": 0.05684844538795145,
-       "normal_interval_low_k": -0.2239675891030522,
-       "normal_interval_high_k": -0.0011216831822825207
+       "se_k": 0.05684398622272711,
+       "normal_interval_low_k": -0.2240694363274528,
+       "normal_interval_high_k": -0.0012410103343625661
       }
      },
      {
       "block_size_m": 5000,
       "origin_offset_fraction": 0.0,
       "overall": {
-       "mean_effect_k": -0.07406868933400773,
+       "mean_effect_k": -0.07416748715695509,
        "n_sites": 1109,
        "n_blocks": 53,
        "min_retained_fraction": 0.9350766456266907,
        "status": "sensitivity_only",
-       "se_k": 0.04736798911085135,
-       "normal_interval_low_k": -0.16690994799127637,
-       "normal_interval_high_k": 0.018772569323260907
+       "se_k": 0.0473314624156923,
+       "normal_interval_low_k": -0.166937153491712,
+       "normal_interval_high_k": 0.01860217917780181
       },
       "five_year_plus": {
-       "mean_effect_k": -0.11254463614266737,
+       "mean_effect_k": -0.11265522333090769,
        "n_sites": 1109,
        "n_blocks": 53,
        "min_retained_fraction": 0.9350766456266907,
        "status": "sensitivity_only",
-       "se_k": 0.061558104235024044,
-       "normal_interval_low_k": -0.2331985204433145,
-       "normal_interval_high_k": 0.008109248157979754
+       "se_k": 0.06150593436744518,
+       "normal_interval_low_k": -0.23320685469110025,
+       "normal_interval_high_k": 0.00789640802928486
       }
      },
      {
       "block_size_m": 5000,
       "origin_offset_fraction": 0.5,
       "overall": {
-       "mean_effect_k": -0.07406868933400773,
+       "mean_effect_k": -0.07416748715695509,
        "n_sites": 1109,
        "n_blocks": 54,
        "min_retained_fraction": 0.915238954012624,
        "status": "sensitivity_only",
-       "se_k": 0.05775321659643902,
-       "normal_interval_low_k": -0.1872649938630282,
-       "normal_interval_high_k": 0.03912761519501275
+       "se_k": 0.05772355618144323,
+       "normal_interval_low_k": -0.1873056572725838,
+       "normal_interval_high_k": 0.03897068295867363
       },
       "five_year_plus": {
-       "mean_effect_k": -0.11254463614266737,
+       "mean_effect_k": -0.11265522333090769,
        "n_sites": 1109,
        "n_blocks": 54,
        "min_retained_fraction": 0.915238954012624,
        "status": "sensitivity_only",
-       "se_k": 0.07338850614998442,
-       "normal_interval_low_k": -0.2563861081966368,
-       "normal_interval_high_k": 0.0312968359113021
+       "se_k": 0.07336220607574642,
+       "normal_interval_low_k": -0.2564451472393707,
+       "normal_interval_high_k": 0.031134700577555297
       }
      }
     ],
@@ -443,34 +443,34 @@
      "headline": {
       "overall": {
        "n_sites": 1109,
-       "mean_effect_k": -0.07406868933400772
+       "mean_effect_k": -0.07416748715695509
       },
       "five_year_plus": {
        "n_sites": 1109,
-       "mean_effect_k": -0.11254463614266738
+       "mean_effect_k": -0.1126552233309077
       }
      },
      "no_pre_outcome_matching": {
       "overall": {
        "n_sites": 1109,
-       "mean_effect_k": -0.011547396365508486
+       "mean_effect_k": -0.011668165424127352
       },
       "five_year_plus": {
        "n_sites": 1109,
-       "mean_effect_k": -0.041006913370944954
+       "mean_effect_k": -0.041181579630920416
       }
      },
      "interpretation": "Specification sensitivity, not a correction or a separately identified causal estimate.",
      "common_cohort": {
       "overall": {
        "n_sites": 1109,
-       "headline_mean_k": -0.07406868933400772,
-       "static_only_mean_k": -0.011547396365508486
+       "headline_mean_k": -0.07416748715695509,
+       "static_only_mean_k": -0.011668165424127352
       },
       "five_year_plus": {
        "n_sites": 1109,
-       "headline_mean_k": -0.11254463614266738,
-       "static_only_mean_k": -0.041006913370944954
+       "headline_mean_k": -0.1126552233309077,
+       "static_only_mean_k": -0.041181579630920416
       }
      }
     },
@@ -484,22 +484,22 @@
       "n_common_sites": 1057,
       "common_retained_fraction": 0.9531109107303878,
       "n_years": 14,
-      "mean_effect_k": -0.06421587169498723,
-      "se_k": 0.047753591284548605,
-      "normal_interval_low_k": -0.15781291061270247,
-      "normal_interval_high_k": 0.02938116722272803,
+      "mean_effect_k": -0.06428859789142169,
+      "se_k": 0.047753965987553985,
+      "normal_interval_low_k": -0.1578863712270275,
+      "normal_interval_high_k": 0.029309175444184127,
       "delete_one_year": [
        {
         "year": 2013,
         "n_supported_sites": 1105,
-        "mean_common_cohort_k": -0.05109769190276214,
-        "mean_all_supported_k": -0.0514956813128174
+        "mean_common_cohort_k": -0.05101696068906351,
+        "mean_all_supported_k": -0.0514348324208341
        },
        {
         "year": 2014,
         "n_supported_sites": 1057,
-        "mean_common_cohort_k": -0.08307955405156538,
-        "mean_all_supported_k": -0.08307955405156538
+        "mean_common_cohort_k": -0.08303188740126495,
+        "mean_all_supported_k": -0.08303188740126495
        },
        {
         "year": 2015,
@@ -510,68 +510,68 @@
        {
         "year": 2016,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.06281636004759637,
-        "mean_all_supported_k": -0.07416092145509749
+        "mean_common_cohort_k": -0.06288908624403083,
+        "mean_all_supported_k": -0.07425971927804484
        },
        {
         "year": 2017,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.08378889408261284,
-        "mean_all_supported_k": -0.09329752941267042
+        "mean_common_cohort_k": -0.0838700714614611,
+        "mean_all_supported_k": -0.09340960462576493
        },
        {
         "year": 2018,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.05914022548607257,
-        "mean_all_supported_k": -0.06854396407610726
+        "mean_common_cohort_k": -0.059214403068159935,
+        "mean_all_supported_k": -0.06864908220113043
        },
        {
         "year": 2019,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.08158443331298955,
-        "mean_all_supported_k": -0.09206192811249188
+        "mean_common_cohort_k": -0.08165407557843415,
+        "mean_all_supported_k": -0.09214437052372078
        },
        {
         "year": 2020,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.05738125899936642,
-        "mean_all_supported_k": -0.06738271723560338
+        "mean_common_cohort_k": -0.057450320867449195,
+        "mean_all_supported_k": -0.06747993096610369
        },
        {
         "year": 2021,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.08082283223701332,
-        "mean_all_supported_k": -0.09109333920962108
+        "mean_common_cohort_k": -0.08089566829112114,
+        "mean_all_supported_k": -0.09118680256843824
        },
        {
         "year": 2022,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.04880234950056655,
-        "mean_all_supported_k": -0.059296440866094716
+        "mean_common_cohort_k": -0.04884972664849039,
+        "mean_all_supported_k": -0.05938345723369626
        },
        {
         "year": 2023,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.06372313651092835,
-        "mean_all_supported_k": -0.0735818103841566
+        "mean_common_cohort_k": -0.06378754453312317,
+        "mean_all_supported_k": -0.07367066007558663
        },
        {
         "year": 2024,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.04335355276499916,
-        "mean_all_supported_k": -0.052467320655705973
+        "mean_common_cohort_k": -0.04343143953452411,
+        "mean_all_supported_k": -0.05257677204742178
        },
        {
         "year": 2025,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.07306376543753662,
-        "mean_all_supported_k": -0.08194882680631427
+        "mean_common_cohort_k": -0.07315073016840797,
+        "mean_all_supported_k": -0.08206555850424836
        },
        {
         "year": 2026,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.06335264113637569,
-        "mean_all_supported_k": -0.07170195302900699
+        "mean_common_cohort_k": -0.06343680785359945,
+        "mean_all_supported_k": -0.0717987974653624
        }
       ]
      },
@@ -581,22 +581,22 @@
       "n_common_sites": 1057,
       "common_retained_fraction": 0.9531109107303878,
       "n_years": 14,
-      "mean_effect_k": -0.10234911036437948,
-      "se_k": 0.05504634722882913,
-      "normal_interval_low_k": -0.21023995093288456,
-      "normal_interval_high_k": 0.005541730204125614,
+      "mean_effect_k": -0.10242730579636429,
+      "se_k": 0.05503830207363623,
+      "normal_interval_low_k": -0.2103023778606913,
+      "normal_interval_high_k": 0.005447766267962728,
       "delete_one_year": [
        {
         "year": 2013,
         "n_supported_sites": 1105,
-        "mean_common_cohort_k": -0.09318376742357398,
-        "mean_all_supported_k": -0.09367602147102962
+        "mean_common_cohort_k": -0.09311284987276418,
+        "mean_all_supported_k": -0.0936136035617334
        },
        {
         "year": 2014,
         "n_supported_sites": 1057,
-        "mean_common_cohort_k": -0.12077972208070334,
-        "mean_all_supported_k": -0.12077972208070334
+        "mean_common_cohort_k": -0.12074767202032016,
+        "mean_all_supported_k": -0.12074767202032016
        },
        {
         "year": 2015,
@@ -607,68 +607,68 @@
        {
         "year": 2016,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.0995460592879573,
-        "mean_all_supported_k": -0.10987301757839481
+        "mean_common_cohort_k": -0.09962425471994213,
+        "mean_all_supported_k": -0.10998360476663516
        },
        {
         "year": 2017,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.12485389294049039,
-        "mean_all_supported_k": -0.13399418995957377
+        "mean_common_cohort_k": -0.1249320883724752,
+        "mean_all_supported_k": -0.13410477714781407
        },
        {
         "year": 2018,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.09675307686674292,
-        "mean_all_supported_k": -0.10721099555925719
+        "mean_common_cohort_k": -0.09683127229872773,
+        "mean_all_supported_k": -0.10732158274749753
        },
        {
         "year": 2019,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.10234911036437948,
-        "mean_all_supported_k": -0.11254463614266738
+        "mean_common_cohort_k": -0.10242730579636429,
+        "mean_all_supported_k": -0.1126552233309077
        },
        {
         "year": 2020,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.10265355829546692,
-        "mean_all_supported_k": -0.11209099033775143
+        "mean_common_cohort_k": -0.10273175372745175,
+        "mean_all_supported_k": -0.11220157752599175
        },
        {
         "year": 2021,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.10621402061240953,
-        "mean_all_supported_k": -0.11996496607242417
+        "mean_common_cohort_k": -0.10629831949773923,
+        "mean_all_supported_k": -0.12006517502954328
        },
        {
         "year": 2022,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.09973128724063074,
-        "mean_all_supported_k": -0.11046582677057257
+        "mean_common_cohort_k": -0.09977581683341818,
+        "mean_all_supported_k": -0.11055750751392937
        },
        {
         "year": 2023,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.09471349837894817,
-        "mean_all_supported_k": -0.10516901086642386
+        "mean_common_cohort_k": -0.09478189515982788,
+        "mean_all_supported_k": -0.10526755586719645
        },
        {
         "year": 2024,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.0689100189018309,
-        "mean_all_supported_k": -0.07871779634715365
+        "mean_common_cohort_k": -0.06899812507898614,
+        "mean_all_supported_k": -0.07884897424481921
        },
        {
         "year": 2025,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.131625945797561,
-        "mean_all_supported_k": -0.1401719815795276
+        "mean_common_cohort_k": -0.13171907349712955,
+        "mean_all_supported_k": -0.14030780413047728
        },
        {
         "year": 2026,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.11299526122872094,
-        "mean_all_supported_k": -0.1216129518322951
+        "mean_common_cohort_k": -0.11308597468490933,
+        "mean_all_supported_k": -0.12171903981187339
        }
       ]
      }
@@ -684,48 +684,48 @@
          "origin_offset_fraction": 0.0,
          "status": "sensitivity_only",
          "n_sites": 1057,
-         "mean_effect_k": -0.06421587169498723,
-         "spatial_se_k": 0.04545332922983293,
-         "year_se_k": 0.047753591284548605,
-         "se_sum_k": 0.09320692051438154,
-         "sensitivity_low_k": -0.24690143590317504,
-         "sensitivity_high_k": 0.11846969251320057
+         "mean_effect_k": -0.06428859789142169,
+         "spatial_se_k": 0.045453254141466386,
+         "year_se_k": 0.047753965987553985,
+         "se_sum_k": 0.09320722012902037,
+         "sensitivity_low_k": -0.2469747493443016,
+         "sensitivity_high_k": 0.11839755356145823
         },
         {
          "block_size_m": 2000,
          "origin_offset_fraction": 0.5,
          "status": "sensitivity_only",
          "n_sites": 1057,
-         "mean_effect_k": -0.06421587169498723,
-         "spatial_se_k": 0.04721278180183319,
-         "year_se_k": 0.047753591284548605,
-         "se_sum_k": 0.0949663730863818,
-         "sensitivity_low_k": -0.25034996294429557,
-         "sensitivity_high_k": 0.1219182195543211
+         "mean_effect_k": -0.06428859789142169,
+         "spatial_se_k": 0.047210438131779005,
+         "year_se_k": 0.047753965987553985,
+         "se_sum_k": 0.09496440411933299,
+         "sensitivity_low_k": -0.25041882996531434,
+         "sensitivity_high_k": 0.12184163418247096
         },
         {
          "block_size_m": 5000,
          "origin_offset_fraction": 0.0,
          "status": "sensitivity_only",
          "n_sites": 1057,
-         "mean_effect_k": -0.06421587169498723,
-         "spatial_se_k": 0.048701484506378644,
-         "year_se_k": 0.047753591284548605,
-         "se_sum_k": 0.09645507579092724,
-         "sensitivity_low_k": -0.2532678202452046,
-         "sensitivity_high_k": 0.12483607685523017
+         "mean_effect_k": -0.06428859789142169,
+         "spatial_se_k": 0.04870262910038688,
+         "year_se_k": 0.047753965987553985,
+         "se_sum_k": 0.09645659508794086,
+         "sensitivity_low_k": -0.25334352426378576,
+         "sensitivity_high_k": 0.12476632848094238
         },
         {
          "block_size_m": 5000,
          "origin_offset_fraction": 0.5,
          "status": "sensitivity_only",
          "n_sites": 1057,
-         "mean_effect_k": -0.06421587169498723,
-         "spatial_se_k": 0.05935996264760359,
-         "year_se_k": 0.047753591284548605,
-         "se_sum_k": 0.10711355393215219,
-         "sensitivity_low_k": -0.2741584374020055,
-         "sensitivity_high_k": 0.14572669401203103
+         "mean_effect_k": -0.06428859789142169,
+         "spatial_se_k": 0.05934075946832624,
+         "year_se_k": 0.047753965987553985,
+         "se_sum_k": 0.10709472545588022,
+         "sensitivity_low_k": -0.27419425978494694,
+         "sensitivity_high_k": 0.14561706400210356
         }
        ]
       },
@@ -737,48 +737,48 @@
          "origin_offset_fraction": 0.0,
          "status": "sensitivity_only",
          "n_sites": 1057,
-         "mean_effect_k": -0.10234911036437948,
-         "spatial_se_k": 0.057179796464312725,
-         "year_se_k": 0.05504634722882913,
-         "se_sum_k": 0.11222614369314185,
-         "sensitivity_low_k": -0.3223123520029375,
-         "sensitivity_high_k": 0.11761413127417854
+         "mean_effect_k": -0.10242730579636429,
+         "spatial_se_k": 0.05717807778681668,
+         "year_se_k": 0.05503830207363623,
+         "se_sum_k": 0.11221637986045291,
+         "sensitivity_low_k": -0.322371410322852,
+         "sensitivity_high_k": 0.1175167987301234
         },
         {
          "block_size_m": 2000,
          "origin_offset_fraction": 0.5,
          "status": "sensitivity_only",
          "n_sites": 1057,
-         "mean_effect_k": -0.10234911036437948,
-         "spatial_se_k": 0.059113355868444045,
-         "year_se_k": 0.05504634722882913,
-         "se_sum_k": 0.11415970309727318,
-         "sensitivity_low_k": -0.3261021284350349,
-         "sensitivity_high_k": 0.12140390770627595
+         "mean_effect_k": -0.10242730579636429,
+         "spatial_se_k": 0.05911547349367246,
+         "year_se_k": 0.05503830207363623,
+         "se_sum_k": 0.11415377556730869,
+         "sensitivity_low_k": -0.32616870590828934,
+         "sensitivity_high_k": 0.12131409431556074
         },
         {
          "block_size_m": 5000,
          "origin_offset_fraction": 0.0,
          "status": "sensitivity_only",
          "n_sites": 1057,
-         "mean_effect_k": -0.10234911036437948,
-         "spatial_se_k": 0.06343426667858629,
-         "year_se_k": 0.05504634722882913,
-         "se_sum_k": 0.11848061390741542,
-         "sensitivity_low_k": -0.3345711136229137,
-         "sensitivity_high_k": 0.1298728928941547
+         "mean_effect_k": -0.10242730579636429,
+         "spatial_se_k": 0.06343250512299774,
+         "year_se_k": 0.05503830207363623,
+         "se_sum_k": 0.11847080719663397,
+         "sensitivity_low_k": -0.33463008790176685,
+         "sensitivity_high_k": 0.1297754763090383
         },
         {
          "block_size_m": 5000,
          "origin_offset_fraction": 0.5,
          "status": "sensitivity_only",
          "n_sites": 1057,
-         "mean_effect_k": -0.10234911036437948,
-         "spatial_se_k": 0.07568434684196657,
-         "year_se_k": 0.05504634722882913,
-         "se_sum_k": 0.13073069407079568,
-         "sensitivity_low_k": -0.358581270743139,
-         "sensitivity_high_k": 0.15388305001438002
+         "mean_effect_k": -0.10242730579636429,
+         "spatial_se_k": 0.07567855481610745,
+         "year_se_k": 0.05503830207363623,
+         "se_sum_k": 0.1307168568897437,
+         "sensitivity_low_k": -0.3586323453002619,
+         "sensitivity_high_k": 0.15377773370753334
         }
        ]
       }
@@ -812,7 +812,7 @@
       "method": "joint_source_block_delete_one_jackknife",
       "limitations": "Conditional on fixed matches and observed scenes. Deletes treated and control trajectories jointly; preserves reused-control dependence within each deletion. Spatial blocks at 2 km and 5 km with two origins are sensitivity choices, not validated independence boundaries. Intervals are normal approximations, not causal confidence intervals.",
       "control_reuse": {
-       "unique_matched_controls": 1040,
+       "unique_matched_controls": 1039,
        "total_control_assignments": 11110,
        "controls_reused_by_multiple_sites": 827,
        "max_treated_sites_per_control": 122
@@ -921,15 +921,15 @@
      "no_pre_outcome_matching": {
       "overall": {
        "n_sites": 732,
-       "mean_effect_k": -0.252086566379686
+       "mean_effect_k": -0.2522721175820292
       },
       "five_year_plus": {
        "n_sites": 0,
        "mean_effect_k": null
       }
      },
-     "n_control_placebos": 492,
-     "control_placebo_mean_k": -0.06691525559354093,
+     "n_control_placebos": 503,
+     "control_placebo_mean_k": 0.011596314649823023,
      "status": "nonzero_pre_cohort_contrast"
     },
     "sensor_family_support": {
@@ -1026,45 +1026,45 @@
    "n_cells_in_panel": 7413,
    "n_treated": 1111,
    "n_matched": 1111,
-   "n_controls_eligible": 1785,
+   "n_controls_eligible": 1784,
    "control_reuse": {
-    "unique_matched_controls": 1068,
+    "unique_matched_controls": 1067,
     "total_control_assignments": 11110,
-    "controls_reused_by_multiple_sites": 840,
+    "controls_reused_by_multiple_sites": 839,
     "max_treated_sites_per_control": 144
    },
    "labels": {
     "inconclusive": 1095,
     "detected": 16
    },
-   "median_mde_k": 1.8793975582390356,
+   "median_mde_k": 1.9564799575224971,
    "median_effect_k_detected": -1.456671001751848,
-   "pre_period_mean_effect_k": -0.005323816912335144,
-   "max_abs_smd": 0.13182946438342852,
+   "pre_period_mean_effect_k": -0.005323487199379365,
+   "max_abs_smd": 0.13187724237900916,
    "balance": [
     {
      "variable": "canopy_frac_baseline",
      "mean_treated": 0.0798,
      "mean_controls": 0.0873,
-     "smd": -0.0786
+     "smd": -0.0788
     },
     {
      "variable": "impervious_frac",
      "mean_treated": 0.7222,
      "mean_controls": 0.7106,
-     "smd": 0.0868
+     "smd": 0.0867
     },
     {
      "variable": "elevation_m",
      "mean_treated": 18.9774,
-     "mean_controls": 17.1391,
-     "smd": 0.1318
+     "mean_controls": 17.1384,
+     "smd": 0.1319
     }
    ],
-   "placebo_mean_k": -0.05361964224273561,
-   "n_valid_placebo_estimates": 799,
-   "placebo_sd_k": 0.696385307455586,
-   "placebo_q95_abs_k": 1.2944338999763434,
+   "placebo_mean_k": -0.01606702176659912,
+   "n_valid_placebo_estimates": 798,
+   "placebo_sd_k": 0.7150160794655627,
+   "placebo_q95_abs_k": 1.3558664507714244,
    "event_study": [
     {
      "years_since": -6,
@@ -1083,7 +1083,7 @@
     },
     {
      "years_since": -3,
-     "mean_effect_k": -0.0094,
+     "mean_effect_k": -0.0095,
      "n_sites": 1053
     },
     {
@@ -1093,47 +1093,47 @@
     },
     {
      "years_since": -1,
-     "mean_effect_k": -0.0072,
+     "mean_effect_k": -0.0071,
      "n_sites": 1111
     },
     {
      "years_since": 0,
-     "mean_effect_k": 0.0846,
+     "mean_effect_k": 0.0847,
      "n_sites": 1110
     },
     {
      "years_since": 1,
-     "mean_effect_k": -0.0016,
+     "mean_effect_k": -0.0015,
      "n_sites": 1110
     },
     {
      "years_since": 2,
-     "mean_effect_k": 0.0173,
+     "mean_effect_k": 0.0174,
      "n_sites": 1110
     },
     {
      "years_since": 3,
-     "mean_effect_k": -0.0928,
+     "mean_effect_k": -0.0931,
      "n_sites": 1110
     },
     {
      "years_since": 4,
-     "mean_effect_k": -0.008,
+     "mean_effect_k": -0.0081,
      "n_sites": 1111
     },
     {
      "years_since": 5,
-     "mean_effect_k": -0.1425,
+     "mean_effect_k": -0.1427,
      "n_sites": 1110
     },
     {
      "years_since": 6,
-     "mean_effect_k": -0.1102,
+     "mean_effect_k": -0.1104,
      "n_sites": 1111
     },
     {
      "years_since": 7,
-     "mean_effect_k": -0.1045,
+     "mean_effect_k": -0.1047,
      "n_sites": 1111
     },
     {
@@ -1143,12 +1143,12 @@
     },
     {
      "years_since": 9,
-     "mean_effect_k": -0.0344,
+     "mean_effect_k": -0.0343,
      "n_sites": 502
     },
     {
      "years_since": 10,
-     "mean_effect_k": -0.1435,
+     "mean_effect_k": -0.1444,
      "n_sites": 166
     },
     {
@@ -1159,26 +1159,26 @@
    ],
    "pre_trend_diagnostics": {
     "n_sites_with_three_pre_years": 1053,
-    "mean_slope_k_per_year": -0.02233722968389635,
-    "median_slope_k_per_year": -0.010889999999999997,
-    "mean_last_minus_first_pre_year_k": -0.12479667616334283,
+    "mean_slope_k_per_year": -0.02226111382444716,
+    "median_slope_k_per_year": -0.010770000000000007,
+    "mean_last_minus_first_pre_year_k": -0.12464444444444443,
     "limitations": "Descriptive only; matching uses these same pre-period data, so this is not an independent parallel-trends test."
    },
    "pooled_by_dose": [
     {
      "dose_bin": "10-14",
      "n_sites": 531,
-     "mean_effect_k": -0.0759,
+     "mean_effect_k": -0.0761,
      "se_k": 0.0236,
-     "mean_effect_5yr_plus_k": -0.1088,
+     "mean_effect_5yr_plus_k": -0.1091,
      "se_5yr_plus_k": 0.0281
     },
     {
      "dose_bin": "15-19",
      "n_sites": 253,
-     "mean_effect_k": -0.1131,
+     "mean_effect_k": -0.113,
      "se_k": 0.031,
-     "mean_effect_5yr_plus_k": -0.1638,
+     "mean_effect_5yr_plus_k": -0.1637,
      "se_5yr_plus_k": 0.0357
     },
     {
@@ -1208,9 +1208,9 @@
     {
      "dose_bin": "all",
      "n_sites": 1111,
-     "mean_effect_k": -0.0745,
+     "mean_effect_k": -0.0746,
      "se_k": 0.0154,
-     "mean_effect_5yr_plus_k": -0.1124,
+     "mean_effect_5yr_plus_k": -0.1125,
      "se_5yr_plus_k": 0.0182
     }
    ],
@@ -1220,9 +1220,9 @@
     "method": "joint_source_block_delete_one_jackknife",
     "limitations": "Conditional on fixed matches and observed scenes. Deletes treated and control trajectories jointly; preserves reused-control dependence within each deletion. Spatial blocks at 2 km and 5 km with two origins are sensitivity choices, not validated independence boundaries. Intervals are normal approximations, not causal confidence intervals.",
     "control_reuse": {
-     "unique_matched_controls": 1068,
+     "unique_matched_controls": 1067,
      "total_control_assignments": 11110,
-     "controls_reused_by_multiple_sites": 840,
+     "controls_reused_by_multiple_sites": 839,
      "max_treated_sites_per_control": 144
     },
     "grids": [
@@ -1230,96 +1230,96 @@
       "block_size_m": 2000,
       "origin_offset_fraction": 0.0,
       "overall": {
-       "mean_effect_k": -0.07406868933400773,
+       "mean_effect_k": -0.07416748715695509,
        "n_sites": 1109,
        "n_blocks": 249,
        "min_retained_fraction": 0.9774571686203787,
        "status": "sensitivity_only",
-       "se_k": 0.04405358865712788,
-       "normal_interval_low_k": -0.16041372310197838,
-       "normal_interval_high_k": 0.012276344433962902
+       "se_k": 0.044053076040061624,
+       "normal_interval_low_k": -0.16051151619547588,
+       "normal_interval_high_k": 0.012176541881565695
       },
       "five_year_plus": {
-       "mean_effect_k": -0.11254463614266737,
+       "mean_effect_k": -0.11265522333090769,
        "n_sites": 1109,
        "n_blocks": 249,
        "min_retained_fraction": 0.9774571686203787,
        "status": "sensitivity_only",
-       "se_k": 0.055070464389799366,
-       "normal_interval_low_k": -0.22048274634667414,
-       "normal_interval_high_k": -0.004606525938660608
+       "se_k": 0.0550669435611533,
+       "normal_interval_low_k": -0.22058643271076817,
+       "normal_interval_high_k": -0.004724013951047226
       }
      },
      {
       "block_size_m": 2000,
       "origin_offset_fraction": 0.5,
       "overall": {
-       "mean_effect_k": -0.07406868933400773,
+       "mean_effect_k": -0.07416748715695509,
        "n_sites": 1109,
        "n_blocks": 246,
        "min_retained_fraction": 0.9774571686203787,
        "status": "sensitivity_only",
-       "se_k": 0.045560246172453224,
-       "normal_interval_low_k": -0.16336677183201603,
-       "normal_interval_high_k": 0.015229393164000585
+       "se_k": 0.04555471647356563,
+       "normal_interval_low_k": -0.16345473144514372,
+       "normal_interval_high_k": 0.01511975713123355
       },
       "five_year_plus": {
-       "mean_effect_k": -0.11254463614266737,
+       "mean_effect_k": -0.11265522333090769,
        "n_sites": 1109,
        "n_blocks": 246,
        "min_retained_fraction": 0.9774571686203787,
        "status": "sensitivity_only",
-       "se_k": 0.05684844538795145,
-       "normal_interval_low_k": -0.2239675891030522,
-       "normal_interval_high_k": -0.0011216831822825207
+       "se_k": 0.05684398622272711,
+       "normal_interval_low_k": -0.2240694363274528,
+       "normal_interval_high_k": -0.0012410103343625661
       }
      },
      {
       "block_size_m": 5000,
       "origin_offset_fraction": 0.0,
       "overall": {
-       "mean_effect_k": -0.07406868933400773,
+       "mean_effect_k": -0.07416748715695509,
        "n_sites": 1109,
        "n_blocks": 53,
        "min_retained_fraction": 0.9350766456266907,
        "status": "sensitivity_only",
-       "se_k": 0.04736798911085135,
-       "normal_interval_low_k": -0.16690994799127637,
-       "normal_interval_high_k": 0.018772569323260907
+       "se_k": 0.0473314624156923,
+       "normal_interval_low_k": -0.166937153491712,
+       "normal_interval_high_k": 0.01860217917780181
       },
       "five_year_plus": {
-       "mean_effect_k": -0.11254463614266737,
+       "mean_effect_k": -0.11265522333090769,
        "n_sites": 1109,
        "n_blocks": 53,
        "min_retained_fraction": 0.9350766456266907,
        "status": "sensitivity_only",
-       "se_k": 0.061558104235024044,
-       "normal_interval_low_k": -0.2331985204433145,
-       "normal_interval_high_k": 0.008109248157979754
+       "se_k": 0.06150593436744518,
+       "normal_interval_low_k": -0.23320685469110025,
+       "normal_interval_high_k": 0.00789640802928486
       }
      },
      {
       "block_size_m": 5000,
       "origin_offset_fraction": 0.5,
       "overall": {
-       "mean_effect_k": -0.07406868933400773,
+       "mean_effect_k": -0.07416748715695509,
        "n_sites": 1109,
        "n_blocks": 54,
        "min_retained_fraction": 0.915238954012624,
        "status": "sensitivity_only",
-       "se_k": 0.05775321659643902,
-       "normal_interval_low_k": -0.1872649938630282,
-       "normal_interval_high_k": 0.03912761519501275
+       "se_k": 0.05772355618144323,
+       "normal_interval_low_k": -0.1873056572725838,
+       "normal_interval_high_k": 0.03897068295867363
       },
       "five_year_plus": {
-       "mean_effect_k": -0.11254463614266737,
+       "mean_effect_k": -0.11265522333090769,
        "n_sites": 1109,
        "n_blocks": 54,
        "min_retained_fraction": 0.915238954012624,
        "status": "sensitivity_only",
-       "se_k": 0.07338850614998442,
-       "normal_interval_low_k": -0.2563861081966368,
-       "normal_interval_high_k": 0.0312968359113021
+       "se_k": 0.07336220607574642,
+       "normal_interval_low_k": -0.2564451472393707,
+       "normal_interval_high_k": 0.031134700577555297
       }
      }
     ],
@@ -1334,34 +1334,34 @@
      "headline": {
       "overall": {
        "n_sites": 1109,
-       "mean_effect_k": -0.07406868933400772
+       "mean_effect_k": -0.07416748715695509
       },
       "five_year_plus": {
        "n_sites": 1109,
-       "mean_effect_k": -0.11254463614266738
+       "mean_effect_k": -0.1126552233309077
       }
      },
      "no_pre_outcome_matching": {
       "overall": {
        "n_sites": 1109,
-       "mean_effect_k": -0.011547396365508486
+       "mean_effect_k": -0.011668165424127352
       },
       "five_year_plus": {
        "n_sites": 1109,
-       "mean_effect_k": -0.041006913370944954
+       "mean_effect_k": -0.041181579630920416
       }
      },
      "interpretation": "Specification sensitivity, not a correction or a separately identified causal estimate.",
      "common_cohort": {
       "overall": {
        "n_sites": 1109,
-       "headline_mean_k": -0.07406868933400772,
-       "static_only_mean_k": -0.011547396365508486
+       "headline_mean_k": -0.07416748715695509,
+       "static_only_mean_k": -0.011668165424127352
       },
       "five_year_plus": {
        "n_sites": 1109,
-       "headline_mean_k": -0.11254463614266738,
-       "static_only_mean_k": -0.041006913370944954
+       "headline_mean_k": -0.1126552233309077,
+       "static_only_mean_k": -0.041181579630920416
       }
      }
     },
@@ -1375,22 +1375,22 @@
       "n_common_sites": 1057,
       "common_retained_fraction": 0.9531109107303878,
       "n_years": 14,
-      "mean_effect_k": -0.06421587169498723,
-      "se_k": 0.047753591284548605,
-      "normal_interval_low_k": -0.15781291061270247,
-      "normal_interval_high_k": 0.02938116722272803,
+      "mean_effect_k": -0.06428859789142169,
+      "se_k": 0.047753965987553985,
+      "normal_interval_low_k": -0.1578863712270275,
+      "normal_interval_high_k": 0.029309175444184127,
       "delete_one_year": [
        {
         "year": 2013,
         "n_supported_sites": 1105,
-        "mean_common_cohort_k": -0.05109769190276214,
-        "mean_all_supported_k": -0.0514956813128174
+        "mean_common_cohort_k": -0.05101696068906351,
+        "mean_all_supported_k": -0.0514348324208341
        },
        {
         "year": 2014,
         "n_supported_sites": 1057,
-        "mean_common_cohort_k": -0.08307955405156538,
-        "mean_all_supported_k": -0.08307955405156538
+        "mean_common_cohort_k": -0.08303188740126495,
+        "mean_all_supported_k": -0.08303188740126495
        },
        {
         "year": 2015,
@@ -1401,68 +1401,68 @@
        {
         "year": 2016,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.06281636004759637,
-        "mean_all_supported_k": -0.07416092145509749
+        "mean_common_cohort_k": -0.06288908624403083,
+        "mean_all_supported_k": -0.07425971927804484
        },
        {
         "year": 2017,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.08378889408261284,
-        "mean_all_supported_k": -0.09329752941267042
+        "mean_common_cohort_k": -0.0838700714614611,
+        "mean_all_supported_k": -0.09340960462576493
        },
        {
         "year": 2018,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.05914022548607257,
-        "mean_all_supported_k": -0.06854396407610726
+        "mean_common_cohort_k": -0.059214403068159935,
+        "mean_all_supported_k": -0.06864908220113043
        },
        {
         "year": 2019,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.08158443331298955,
-        "mean_all_supported_k": -0.09206192811249188
+        "mean_common_cohort_k": -0.08165407557843415,
+        "mean_all_supported_k": -0.09214437052372078
        },
        {
         "year": 2020,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.05738125899936642,
-        "mean_all_supported_k": -0.06738271723560338
+        "mean_common_cohort_k": -0.057450320867449195,
+        "mean_all_supported_k": -0.06747993096610369
        },
        {
         "year": 2021,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.08082283223701332,
-        "mean_all_supported_k": -0.09109333920962108
+        "mean_common_cohort_k": -0.08089566829112114,
+        "mean_all_supported_k": -0.09118680256843824
        },
        {
         "year": 2022,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.04880234950056655,
-        "mean_all_supported_k": -0.059296440866094716
+        "mean_common_cohort_k": -0.04884972664849039,
+        "mean_all_supported_k": -0.05938345723369626
        },
        {
         "year": 2023,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.06372313651092835,
-        "mean_all_supported_k": -0.0735818103841566
+        "mean_common_cohort_k": -0.06378754453312317,
+        "mean_all_supported_k": -0.07367066007558663
        },
        {
         "year": 2024,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.04335355276499916,
-        "mean_all_supported_k": -0.052467320655705973
+        "mean_common_cohort_k": -0.04343143953452411,
+        "mean_all_supported_k": -0.05257677204742178
        },
        {
         "year": 2025,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.07306376543753662,
-        "mean_all_supported_k": -0.08194882680631427
+        "mean_common_cohort_k": -0.07315073016840797,
+        "mean_all_supported_k": -0.08206555850424836
        },
        {
         "year": 2026,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.06335264113637569,
-        "mean_all_supported_k": -0.07170195302900699
+        "mean_common_cohort_k": -0.06343680785359945,
+        "mean_all_supported_k": -0.0717987974653624
        }
       ]
      },
@@ -1472,22 +1472,22 @@
       "n_common_sites": 1057,
       "common_retained_fraction": 0.9531109107303878,
       "n_years": 14,
-      "mean_effect_k": -0.10234911036437948,
-      "se_k": 0.05504634722882913,
-      "normal_interval_low_k": -0.21023995093288456,
-      "normal_interval_high_k": 0.005541730204125614,
+      "mean_effect_k": -0.10242730579636429,
+      "se_k": 0.05503830207363623,
+      "normal_interval_low_k": -0.2103023778606913,
+      "normal_interval_high_k": 0.005447766267962728,
       "delete_one_year": [
        {
         "year": 2013,
         "n_supported_sites": 1105,
-        "mean_common_cohort_k": -0.09318376742357398,
-        "mean_all_supported_k": -0.09367602147102962
+        "mean_common_cohort_k": -0.09311284987276418,
+        "mean_all_supported_k": -0.0936136035617334
        },
        {
         "year": 2014,
         "n_supported_sites": 1057,
-        "mean_common_cohort_k": -0.12077972208070334,
-        "mean_all_supported_k": -0.12077972208070334
+        "mean_common_cohort_k": -0.12074767202032016,
+        "mean_all_supported_k": -0.12074767202032016
        },
        {
         "year": 2015,
@@ -1498,68 +1498,68 @@
        {
         "year": 2016,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.0995460592879573,
-        "mean_all_supported_k": -0.10987301757839481
+        "mean_common_cohort_k": -0.09962425471994213,
+        "mean_all_supported_k": -0.10998360476663516
        },
        {
         "year": 2017,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.12485389294049039,
-        "mean_all_supported_k": -0.13399418995957377
+        "mean_common_cohort_k": -0.1249320883724752,
+        "mean_all_supported_k": -0.13410477714781407
        },
        {
         "year": 2018,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.09675307686674292,
-        "mean_all_supported_k": -0.10721099555925719
+        "mean_common_cohort_k": -0.09683127229872773,
+        "mean_all_supported_k": -0.10732158274749753
        },
        {
         "year": 2019,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.10234911036437948,
-        "mean_all_supported_k": -0.11254463614266738
+        "mean_common_cohort_k": -0.10242730579636429,
+        "mean_all_supported_k": -0.1126552233309077
        },
        {
         "year": 2020,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.10265355829546692,
-        "mean_all_supported_k": -0.11209099033775143
+        "mean_common_cohort_k": -0.10273175372745175,
+        "mean_all_supported_k": -0.11220157752599175
        },
        {
         "year": 2021,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.10621402061240953,
-        "mean_all_supported_k": -0.11996496607242417
+        "mean_common_cohort_k": -0.10629831949773923,
+        "mean_all_supported_k": -0.12006517502954328
        },
        {
         "year": 2022,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.09973128724063074,
-        "mean_all_supported_k": -0.11046582677057257
+        "mean_common_cohort_k": -0.09977581683341818,
+        "mean_all_supported_k": -0.11055750751392937
        },
        {
         "year": 2023,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.09471349837894817,
-        "mean_all_supported_k": -0.10516901086642386
+        "mean_common_cohort_k": -0.09478189515982788,
+        "mean_all_supported_k": -0.10526755586719645
        },
        {
         "year": 2024,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.0689100189018309,
-        "mean_all_supported_k": -0.07871779634715365
+        "mean_common_cohort_k": -0.06899812507898614,
+        "mean_all_supported_k": -0.07884897424481921
        },
        {
         "year": 2025,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.131625945797561,
-        "mean_all_supported_k": -0.1401719815795276
+        "mean_common_cohort_k": -0.13171907349712955,
+        "mean_all_supported_k": -0.14030780413047728
        },
        {
         "year": 2026,
         "n_supported_sites": 1109,
-        "mean_common_cohort_k": -0.11299526122872094,
-        "mean_all_supported_k": -0.1216129518322951
+        "mean_common_cohort_k": -0.11308597468490933,
+        "mean_all_supported_k": -0.12171903981187339
        }
       ]
      }
@@ -1575,48 +1575,48 @@
          "origin_offset_fraction": 0.0,
          "status": "sensitivity_only",
          "n_sites": 1057,
-         "mean_effect_k": -0.06421587169498723,
-         "spatial_se_k": 0.04545332922983293,
-         "year_se_k": 0.047753591284548605,
-         "se_sum_k": 0.09320692051438154,
-         "sensitivity_low_k": -0.24690143590317504,
-         "sensitivity_high_k": 0.11846969251320057
+         "mean_effect_k": -0.06428859789142169,
+         "spatial_se_k": 0.045453254141466386,
+         "year_se_k": 0.047753965987553985,
+         "se_sum_k": 0.09320722012902037,
+         "sensitivity_low_k": -0.2469747493443016,
+         "sensitivity_high_k": 0.11839755356145823
         },
         {
          "block_size_m": 2000,
          "origin_offset_fraction": 0.5,
          "status": "sensitivity_only",
          "n_sites": 1057,
-         "mean_effect_k": -0.06421587169498723,
-         "spatial_se_k": 0.04721278180183319,
-         "year_se_k": 0.047753591284548605,
-         "se_sum_k": 0.0949663730863818,
-         "sensitivity_low_k": -0.25034996294429557,
-         "sensitivity_high_k": 0.1219182195543211
+         "mean_effect_k": -0.06428859789142169,
+         "spatial_se_k": 0.047210438131779005,
+         "year_se_k": 0.047753965987553985,
+         "se_sum_k": 0.09496440411933299,
+         "sensitivity_low_k": -0.25041882996531434,
+         "sensitivity_high_k": 0.12184163418247096
         },
         {
          "block_size_m": 5000,
          "origin_offset_fraction": 0.0,
          "status": "sensitivity_only",
          "n_sites": 1057,
-         "mean_effect_k": -0.06421587169498723,
-         "spatial_se_k": 0.048701484506378644,
-         "year_se_k": 0.047753591284548605,
-         "se_sum_k": 0.09645507579092724,
-         "sensitivity_low_k": -0.2532678202452046,
-         "sensitivity_high_k": 0.12483607685523017
+         "mean_effect_k": -0.06428859789142169,
+         "spatial_se_k": 0.04870262910038688,
+         "year_se_k": 0.047753965987553985,
+         "se_sum_k": 0.09645659508794086,
+         "sensitivity_low_k": -0.25334352426378576,
+         "sensitivity_high_k": 0.12476632848094238
         },
         {
          "block_size_m": 5000,
          "origin_offset_fraction": 0.5,
          "status": "sensitivity_only",
          "n_sites": 1057,
-         "mean_effect_k": -0.06421587169498723,
-         "spatial_se_k": 0.05935996264760359,
-         "year_se_k": 0.047753591284548605,
-         "se_sum_k": 0.10711355393215219,
-         "sensitivity_low_k": -0.2741584374020055,
-         "sensitivity_high_k": 0.14572669401203103
+         "mean_effect_k": -0.06428859789142169,
+         "spatial_se_k": 0.05934075946832624,
+         "year_se_k": 0.047753965987553985,
+         "se_sum_k": 0.10709472545588022,
+         "sensitivity_low_k": -0.27419425978494694,
+         "sensitivity_high_k": 0.14561706400210356
         }
        ]
       },
@@ -1628,48 +1628,48 @@
          "origin_offset_fraction": 0.0,
          "status": "sensitivity_only",
          "n_sites": 1057,
-         "mean_effect_k": -0.10234911036437948,
-         "spatial_se_k": 0.057179796464312725,
-         "year_se_k": 0.05504634722882913,
-         "se_sum_k": 0.11222614369314185,
-         "sensitivity_low_k": -0.3223123520029375,
-         "sensitivity_high_k": 0.11761413127417854
+         "mean_effect_k": -0.10242730579636429,
+         "spatial_se_k": 0.05717807778681668,
+         "year_se_k": 0.05503830207363623,
+         "se_sum_k": 0.11221637986045291,
+         "sensitivity_low_k": -0.322371410322852,
+         "sensitivity_high_k": 0.1175167987301234
         },
         {
          "block_size_m": 2000,
          "origin_offset_fraction": 0.5,
          "status": "sensitivity_only",
          "n_sites": 1057,
-         "mean_effect_k": -0.10234911036437948,
-         "spatial_se_k": 0.059113355868444045,
-         "year_se_k": 0.05504634722882913,
-         "se_sum_k": 0.11415970309727318,
-         "sensitivity_low_k": -0.3261021284350349,
-         "sensitivity_high_k": 0.12140390770627595
+         "mean_effect_k": -0.10242730579636429,
+         "spatial_se_k": 0.05911547349367246,
+         "year_se_k": 0.05503830207363623,
+         "se_sum_k": 0.11415377556730869,
+         "sensitivity_low_k": -0.32616870590828934,
+         "sensitivity_high_k": 0.12131409431556074
         },
         {
          "block_size_m": 5000,
          "origin_offset_fraction": 0.0,
          "status": "sensitivity_only",
          "n_sites": 1057,
-         "mean_effect_k": -0.10234911036437948,
-         "spatial_se_k": 0.06343426667858629,
-         "year_se_k": 0.05504634722882913,
-         "se_sum_k": 0.11848061390741542,
-         "sensitivity_low_k": -0.3345711136229137,
-         "sensitivity_high_k": 0.1298728928941547
+         "mean_effect_k": -0.10242730579636429,
+         "spatial_se_k": 0.06343250512299774,
+         "year_se_k": 0.05503830207363623,
+         "se_sum_k": 0.11847080719663397,
+         "sensitivity_low_k": -0.33463008790176685,
+         "sensitivity_high_k": 0.1297754763090383
         },
         {
          "block_size_m": 5000,
          "origin_offset_fraction": 0.5,
          "status": "sensitivity_only",
          "n_sites": 1057,
-         "mean_effect_k": -0.10234911036437948,
-         "spatial_se_k": 0.07568434684196657,
-         "year_se_k": 0.05504634722882913,
-         "se_sum_k": 0.13073069407079568,
-         "sensitivity_low_k": -0.358581270743139,
-         "sensitivity_high_k": 0.15388305001438002
+         "mean_effect_k": -0.10242730579636429,
+         "spatial_se_k": 0.07567855481610745,
+         "year_se_k": 0.05503830207363623,
+         "se_sum_k": 0.1307168568897437,
+         "sensitivity_low_k": -0.3586323453002619,
+         "sensitivity_high_k": 0.15377773370753334
         }
        ]
       }
@@ -1703,7 +1703,7 @@
       "method": "joint_source_block_delete_one_jackknife",
       "limitations": "Conditional on fixed matches and observed scenes. Deletes treated and control trajectories jointly; preserves reused-control dependence within each deletion. Spatial blocks at 2 km and 5 km with two origins are sensitivity choices, not validated independence boundaries. Intervals are normal approximations, not causal confidence intervals.",
       "control_reuse": {
-       "unique_matched_controls": 1040,
+       "unique_matched_controls": 1039,
        "total_control_assignments": 11110,
        "controls_reused_by_multiple_sites": 827,
        "max_treated_sites_per_control": 122
@@ -1812,15 +1812,15 @@
      "no_pre_outcome_matching": {
       "overall": {
        "n_sites": 732,
-       "mean_effect_k": -0.252086566379686
+       "mean_effect_k": -0.2522721175820292
       },
       "five_year_plus": {
        "n_sites": 0,
        "mean_effect_k": null
       }
      },
-     "n_control_placebos": 492,
-     "control_placebo_mean_k": -0.06691525559354093,
+     "n_control_placebos": 503,
+     "control_placebo_mean_k": 0.011596314649823023,
      "status": "nonzero_pre_cohort_contrast"
     },
     "sensor_family_support": {
