@@ -35,3 +35,6 @@ mlruns/
 .DS_Store
 .vscode/
 .idea/
+
+# Website: plantings logged while running locally
+web/var/

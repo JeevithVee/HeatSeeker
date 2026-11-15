@@ -1,0 +1,94 @@
+/* HeatSeeker: shared tokens and controls for the landing page and the tool. */
+:root {
+  --bg: #0a0f12;
+  --surface: #111a1e;
+  --surface-2: #18242a;
+  --surface-glass: rgba(15, 23, 27, 0.86);
+  --line: rgba(255, 255, 255, 0.1);
+  --line-strong: rgba(255, 255, 255, 0.2);
+  --ink: #ecf2f0;
+  --ink-2: #aebbb7;
+  --ink-3: #8c9c98;
+  --heat: #ff7a45;
+  --heat-ink: #1a0d06;
+  --cool: #5bc8f5;
+  --leaf: #7be0a0;
+  --warn-bg: #2a1c10;
+  --warn-ink: #ffcfa8;
+  --radius-s: 8px;
+  --radius-m: 12px;
+  --radius-l: 18px;
+  --font-display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 { font-family: var(--font-display); font-weight: 600; letter-spacing: -0.02em; line-height: 1.08; margin: 0; }
+p { margin: 0; }
+a { color: var(--cool); }
+button, input, select, textarea { font: inherit; color: inherit; }
+
+.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; letter-spacing: -0.01em; }
+
+.skip-link {
+  position: absolute; left: 16px; top: -60px; z-index: 100;
+  background: var(--ink); color: var(--bg); padding: 12px 16px; border-radius: var(--radius-s);
+  font-weight: 600; text-decoration: none; transition: top 0.15s var(--ease);
+}
+.skip-link:focus { top: 16px; }
+
+:focus-visible { outline: 2px solid var(--cool); outline-offset: 2px; border-radius: 4px; }
+
+/* One button pair for the whole site. */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  min-height: 48px; padding: 0 22px; border-radius: 999px; border: 1px solid transparent;
+  font-weight: 600; font-size: 16px; text-decoration: none; cursor: pointer; white-space: nowrap;
+  transition: transform 0.18s var(--ease), background-color 0.18s var(--ease), border-color 0.18s var(--ease);
+}
+.btn svg { transition: transform 0.18s var(--ease); }
+.btn:hover { transform: translateY(-2px); }
+.btn:hover svg { transform: translateX(3px); }
+.btn:active { transform: translateY(0) scale(0.98); }
+.btn-primary { background: var(--heat); color: var(--heat-ink); }
+.btn-primary:hover { background: #ff8d5f; }
+.btn-ghost { background: transparent; color: var(--ink); border-color: var(--line-strong); }
+.btn-ghost:hover { border-color: var(--ink-2); background: rgba(255, 255, 255, 0.04); }
+.btn-small { min-height: 44px; padding: 0 16px; font-size: 14px; }
+
+.brand { display: inline-flex; align-items: center; gap: 10px; font-family: var(--font-display); font-weight: 600; font-size: 19px; letter-spacing: -0.02em; color: var(--ink); text-decoration: none; }
+.brand-mark { width: 22px; height: 22px; flex: none; }
+
+/* City switcher: the same control on both pages. */
+.city-switch { display: inline-flex; gap: 2px; padding: 4px; border-radius: 999px; background: var(--surface-glass); border: 1px solid var(--line); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+.city-switch button {
+  min-height: 40px; padding: 0 14px; border: 0; border-radius: 999px; background: transparent; color: var(--ink-2);
+  font-size: 14px; font-weight: 500; cursor: pointer; white-space: nowrap;
+  transition: background-color 0.18s var(--ease), color 0.18s var(--ease);
+}
+.city-switch button:hover { color: var(--ink); background: rgba(255, 255, 255, 0.06); }
+.city-switch button[aria-pressed="true"] { background: var(--ink); color: var(--bg); font-weight: 600; }
+
+.caveat {
+  background: var(--warn-bg); color: var(--warn-ink); border: 1px solid rgba(255, 170, 110, 0.28);
+  border-radius: var(--radius-m); padding: 10px 14px; font-size: 13px; line-height: 1.45;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+}
