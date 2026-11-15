@@ -22,7 +22,7 @@ classifier). The board on `main` stays append-only.
 | App | `heatseeker`, https://heatseeker-7474650715825059.aws.databricksapps.com, source `/Workspace/Shared/heatseeker/app`, **live mode confirmed** (app principal queries all live tables; 33 FINISHED queries in history). Shows LLM site reports under each Results site. |
 | Dashboard | "HeatSeeker Portfolio" `01f1e080008617ff8ba3af26fa258064` |
 | Genie | "HeatSeeker — ask the results" `01f1e087c5881f388af2ec32a1711ff3` (definition `app/genie_space.json`) |
-| Model Serving | `serving/register_effect_model.py` → UC model `heatseeker.gold.effect_model`, endpoint `heatseeker-effect-model` (scale-to-zero). Check `databricks serving-endpoints get heatseeker-effect-model -p heatseeker` for READY; the first container build was still running at handoff. |
+| Model Serving | `serving/register_effect_model.py` → UC model `heatseeker.gold.effect_model`, endpoint `heatseeker-effect-model` (scale-to-zero). READY with model version 3 (v1 failed: Python 3.15 has no orjson wheel; v2 failed: `core` package not shipped; v3 logged from `.venv-serving` (Python 3.12) with code_paths). Test query returned predictions with the caveat. |
 | Schema | `schema/tables.yaml` v1.2.0 (adds gold.app_planting_log, gold.site_reports) |
 | Loop demo | Plant→promote→prove ran live: app_planting_log → silver.interventions v2 → gold v22; 3 NYC effect values changed, 0 labels |
 
@@ -55,7 +55,7 @@ does not source ~/.zshrc (use `~/.local/bin/databricks` or `export PATH`). Alway
 ## Remaining / optional
 
 - Fast-forward `main` when the human says so; then the agent branches are frozen history.
-- Confirm the serving endpoint is READY and, if wanted, add a "what if I plant here" panel to the
+- If wanted, add a "what if I plant here" panel to the
   app's Recommend view that calls it (the pitch's beat 4 live-scoring moment; today the ranked
   predictions come from the same model offline).
 - Recommendations/prediction log were built on gold v18; gold v22 differs in 3 NYC values, so a
