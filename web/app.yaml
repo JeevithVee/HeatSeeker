@@ -1,0 +1,5 @@
+# Databricks App config for the rebuilt site. Deploy with:
+#   databricks apps deploy <app-name> --source-code-path web/
+# The app serves static pages and precomputed data; plantings logged in the
+# tool are written under HEATSEEKER_LOG_DIR (point it at a UC Volume to keep them).
+command: ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en" data-type="software">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HeatSeeker: plan, plant, prove urban cooling</title>
+<meta name="description" content="HeatSeeker ranks where US cities should plant trees next, then tests with satellite surface temperature whether past plantings cooled anything.">
+<meta name="page-type" content="software">
+<meta name="site-kind" content="software">
+<meta property="og:title" content="HeatSeeker: plan, plant, prove urban cooling">
+<meta property="og:description" content="Rank where to plant, log what was planted, and test with satellite data whether it cooled the block.">
+<meta name="theme-color" content="#0a0f12">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 1.5 21 6.75v10.5L12 22.5 3 17.25V6.75z' fill='%23ff7a45'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="vendor/lenis.css">
+<link rel="stylesheet" href="css/base.css">
+<link rel="stylesheet" href="css/landing.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-head">
+  <a class="brand" href="./" aria-label="HeatSeeker home">
+    <svg class="brand-mark" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 1.5 21 6.75v10.5L12 22.5 3 17.25V6.75z" fill="#ff7a45"/><path d="M12 7v10M8.5 10.5 12 7l3.5 3.5" fill="none" stroke="#1a0d06" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    HeatSeeker
+  </a>
+  <nav class="site-nav" aria-label="Page">
+    <a href="#loop">How it works</a>
+    <a href="#evidence">The evidence</a>
+  </nav>
+  <a class="btn btn-primary btn-small" href="dashboard">Open the dashboard
+    <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </a>
+</header>
+
+<main id="main">
+  <!-- Screen 1: the hero. The map behind it is real data, drawn cell by cell. -->
+  <section class="hero" aria-labelledby="hero-title">
+    <canvas id="heat-field" class="hero-field" aria-hidden="true"></canvas>
+    <div class="hero-shade" aria-hidden="true"></div>
+    <div class="wrap hero-inner">
+      <div class="hero-copy">
+        <p class="eyebrow" data-enter>Urban cooling tool for US city planners</p>
+        <h1 id="hero-title" data-enter>Plant where it counts.<br>Then prove it cooled.</h1>
+        <p class="lede" data-enter>HeatSeeker ranks the blocks where a city should plant next, logs what gets planted, and checks past plantings against satellite surface temperature to see whether they cooled anything.</p>
+        <div class="hero-actions" data-enter>
+          <a class="btn btn-primary" href="dashboard" id="hero-cta">Open the dashboard
+            <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a class="btn btn-ghost" href="#loop">See how it works</a>
+        </div>
+        <dl class="hero-facts" data-enter>
+          <div><dt>Cities</dt><dd class="num" data-count="cities">4</dd></div>
+          <div><dt>Map cells</dt><dd class="num" data-count="cells">&nbsp;</dd></div>
+          <div><dt>Satellite readings</dt><dd class="num" data-count="rows">&nbsp;</dd></div>
+        </dl>
+      </div>
+
+      <div class="hero-panel" data-enter>
+        <div class="city-switch" role="group" aria-label="City shown behind this page" id="hero-cities"></div>
+        <div class="readout" aria-live="polite">
+          <p class="readout-label" id="readout-label">Summer surface heat, cell by cell</p>
+          <p class="readout-value" id="readout-value">Move over the map</p>
+          <p class="readout-note" id="readout-note">&nbsp;</p>
+          <div class="ramp" aria-hidden="true"><span>Cooler</span><i></i><span>Hotter</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Screen 2: the loop, pinned while the four steps play. -->
+  <section class="loop" id="loop" aria-labelledby="loop-title">
+    <div class="wrap loop-inner">
+      <div class="loop-head">
+        <h2 id="loop-title">One loop, four steps</h2>
+        <p>Each planting season feeds the next recommendation.</p>
+      </div>
+      <ol class="loop-steps" id="loop-steps">
+        <li class="step is-active" data-step="0">
+          <button type="button" class="step-tab" aria-expanded="true"><span class="num">01</span> Plan</button>
+          <div class="step-body">
+            <p class="step-text">Candidate cells are ranked by predicted cooling, times vulnerable residents, divided by cost. Some are deliberately left unplanted so they can serve as controls later.</p>
+            <p class="step-fact"><span class="num" data-count="candidates">&nbsp;</span> candidate cells ranked across four cities</p>
+          </div>
+        </li>
+        <li class="step" data-step="1">
+          <button type="button" class="step-tab" aria-expanded="false"><span class="num">02</span> Plant</button>
+          <div class="step-body">
+            <p class="step-text">The city logs what it actually did: where, when, what kind and what it cost. Existing records come from each city's public tree inventory.</p>
+            <p class="step-fact"><span class="num" data-count="trees">&nbsp;</span> dated plantings on record</p>
+          </div>
+        </li>
+        <li class="step" data-step="2">
+          <button type="button" class="step-tab" aria-expanded="false"><span class="num">03</span> Prove</button>
+          <div class="step-body">
+            <p class="step-text">Each planted cell is compared with matched unplanted cells, before and after, across every clear summer Landsat scene. If an effect is too small to see, the tool says so.</p>
+            <p class="step-fact"><span class="num" data-count="evaluated">&nbsp;</span> planted cells measured against controls</p>
+          </div>
+        </li>
+        <li class="step" data-step="3">
+          <button type="button" class="step-tab" aria-expanded="false"><span class="num">04</span> Learn</button>
+          <div class="step-body">
+            <p class="step-text">Measured results retrain the prediction model. Every prediction is logged and scored once its outcome is measured, so the next ranking is checked against the last.</p>
+            <p class="step-fact"><span class="num" data-count="candidates">&nbsp;</span> predictions logged for scoring</p>
+          </div>
+        </li>
+      </ol>
+      <div class="loop-ring" aria-hidden="true">
+        <svg viewBox="0 0 320 320">
+          <circle cx="160" cy="160" r="128" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>
+          <circle id="ring-progress" cx="160" cy="160" r="128" fill="none" stroke="#ff7a45" stroke-width="4" stroke-linecap="round" stroke-dasharray="804.25" stroke-dashoffset="603.2" transform="rotate(-90 160 160)"/>
+          <g id="ring-dots">
+            <circle cx="160" cy="32" r="9" fill="#ff7a45"/>
+            <circle cx="288" cy="160" r="9" fill="#27353b"/>
+            <circle cx="160" cy="288" r="9" fill="#27353b"/>
+            <circle cx="32" cy="160" r="9" fill="#27353b"/>
+          </g>
+        </svg>
+        <p class="ring-word" id="ring-word">Plan</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Screen 3: what the evidence says, stated plainly. -->
+  <section class="evidence" id="evidence" aria-labelledby="evidence-title">
+    <div class="wrap evidence-inner">
+      <div class="evidence-copy">
+        <h2 id="evidence-title">The evidence so far, without the gloss</h2>
+        <p>Street-tree plantings at these densities have not yet shown reliable cooling in satellite data. Most single cells are inconclusive: the change is smaller than a 30 m sensor can pick out. The tool reports that rather than tuning until an effect appears.</p>
+        <ul class="evidence-notes">
+          <li>These are satellite surface temperatures taken late morning. They are not the air temperature people feel.</li>
+          <li>All four cities are temperate. Nothing here covers a hot, dry city.</li>
+          <li>"Detected" is a statistical label, not proof that planting caused the change. It includes warming.</li>
+        </ul>
+        <a class="btn btn-primary" href="dashboard">Explore the four cities
+          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+      </div>
+      <div class="tiles" id="tiles">
+        <div class="tile"><p class="tile-label">Planted cells measured</p><p class="tile-value num" data-count="evaluated">&nbsp;</p><p class="tile-note">against matched unplanted cells</p></div>
+        <div class="tile"><p class="tile-label">Inconclusive</p><p class="tile-value num" data-count="inconclusive">&nbsp;</p><p class="tile-note">change too small to separate from noise</p></div>
+        <div class="tile"><p class="tile-label">Flagged as a detectable change</p><p class="tile-value num" data-count="detected">&nbsp;</p><p class="tile-note"><span class="num" data-count="cooling">&nbsp;</span> cooling, <span class="num" data-count="warming">&nbsp;</span> warming</p></div>
+        <div class="tile"><p class="tile-label">Clear summer scenes used</p><p class="tile-value num" data-count="scenes">&nbsp;</p><p class="tile-note">Landsat 5, 7, 8 and 9, <span id="scene-years">&nbsp;</span></p></div>
+      </div>
+    </div>
+    <footer class="site-foot wrap">
+      <p>Built on Databricks. Data: USGS Landsat Collection 2, MRLC Annual NLCD, US Census, CDC SVI, and the public tree inventories of New York, Washington DC, Seattle and San Francisco.</p>
+    </footer>
+  </section>
+</main>
+
+<script src="vendor/gsap.min.js"></script>
+<script src="vendor/ScrollTrigger.min.js"></script>
+<script src="vendor/lenis.min.js"></script>
+<script src="js/common.js"></script>
+<script src="js/landing.js"></script>
+</body>
+</html>
