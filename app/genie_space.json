@@ -2,20 +2,52 @@
   "version": 2,
   "config": {
     "sample_questions": [
-      {"question": ["Why was site 892a1000a2bffff recommended?"]},
-      {"question": ["How many planted cells in Seattle have a detected cooling effect, and what is their median effect?"]},
-      {"question": ["Which NYC recommendations have the most vulnerable residents per dollar?"]},
-      {"question": ["For each city, how many evaluated sites are detected, inconclusive and not detectable?"]}
+      {
+        "question": [
+          "Why was site 892a1000a2bffff recommended?"
+        ],
+        "id": "bc2f22574c424950a1aa8f0b83289259"
+      },
+      {
+        "question": [
+          "How many planted cells in Seattle have a detected cooling effect, and what is their median effect?"
+        ],
+        "id": "7ccf9bd9f95f4eedb88ca28163b6ac47"
+      },
+      {
+        "question": [
+          "Which NYC recommendations have the most vulnerable residents per dollar?"
+        ],
+        "id": "e33bd5c7768d4bbfa70bcc3585a8642d"
+      },
+      {
+        "question": [
+          "For each city, how many evaluated sites are detected, inconclusive and not detectable?"
+        ],
+        "id": "18ecd90bf63641df95d98518d7827ded"
+      }
     ]
   },
   "data_sources": {
     "tables": [
-      {"identifier": "heatseeker.gold.prediction_log"},
-      {"identifier": "heatseeker.gold.recommendations"},
-      {"identifier": "heatseeker.gold.site_effects"},
-      {"identifier": "heatseeker.gold.site_reports"},
-      {"identifier": "heatseeker.silver.features"},
-      {"identifier": "heatseeker.silver.interventions"}
+      {
+        "identifier": "heatseeker.gold.prediction_log"
+      },
+      {
+        "identifier": "heatseeker.gold.recommendations"
+      },
+      {
+        "identifier": "heatseeker.gold.site_effects"
+      },
+      {
+        "identifier": "heatseeker.gold.site_reports"
+      },
+      {
+        "identifier": "heatseeker.silver.features"
+      },
+      {
+        "identifier": "heatseeker.silver.interventions"
+      }
     ]
   },
   "instructions": {
@@ -31,12 +63,15 @@
           "* 'Why was a site recommended' = its rank, score, predicted_cooling_k_15y (and _low/_high), vulnerable_residents, est_cost_usd, suggested_intervention from gold.recommendations, plus canopy_frac_baseline, impervious_frac, land_cover_class, population from silver.features.\n",
           "* silver.interventions has one row per site_id x plant_year; trees_planted counts dated plantings. dose_trees in gold.site_effects sums 2015-2019.\n",
           "* city_id values: nyc = New York, dc = Washington DC, sea = Seattle, sf = San Francisco."
-        ]
+        ],
+        "id": "b61c9ee9c2514513b0c96ba6a69f5a89"
       }
     ],
     "example_question_sqls": [
       {
-        "question": ["Why was site 892a1000a2bffff recommended?"],
+        "question": [
+          "Why was site 892a1000a2bffff recommended?"
+        ],
         "sql": [
           "SELECT r.city_id, r.site_id, r.rank, r.score, r.predicted_cooling_k_15y, r.predicted_cooling_k_15y_low,\n",
           "       r.predicted_cooling_k_15y_high, r.vulnerable_residents, r.est_cost_usd, r.suggested_intervention, r.holdout_control,\n",
@@ -44,15 +79,19 @@
           "FROM heatseeker.gold.recommendations r\n",
           "JOIN heatseeker.silver.features f USING (country_code, city_id, site_id)\n",
           "WHERE r.site_id = '892a1000a2bffff'"
-        ]
+        ],
+        "id": "4321599e62034637960b426e3437083e"
       },
       {
-        "question": ["For each city, how many evaluated sites are detected, inconclusive and not detectable?"],
+        "question": [
+          "For each city, how many evaluated sites are detected, inconclusive and not detectable?"
+        ],
         "sql": [
           "SELECT city_id, quality_label, COUNT(*) AS sites, ROUND(AVG(effect_k), 3) AS mean_effect_k\n",
           "FROM heatseeker.gold.site_effects WHERE variant = 'all'\n",
           "GROUP BY city_id, quality_label ORDER BY city_id, quality_label"
-        ]
+        ],
+        "id": "7077e961b8e646c0a544c88f7abec6ac"
       }
     ]
   }
