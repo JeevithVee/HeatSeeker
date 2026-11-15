@@ -19,6 +19,7 @@ measured results back into the next recommendation. Plan, plant, prove, repeat.
 | AI/BI dashboard "HeatSeeker Portfolio" | Workspace → Dashboards (id `01f1e080008617ff8ba3af26fa258064`) |
 | Genie space "HeatSeeker — ask the results" | Workspace → Genie (id `01f1e087c5881f388af2ec32a1711ff3`) |
 | Model Serving endpoint | `heatseeker-effect-model` (UC model `heatseeker.gold.effect_model`) |
+| Alternative front end | `web/` landing page + map tool (run locally with uvicorn; deployable as a second Databricks App) |
 | Tables | `heatseeker.bronze.*` → `silver.{panel,features,interventions}` → `gold.{site_effects,site_reports,recommendations,prediction_log,app_planting_log}` |
 
 ## Beat 1 — "Here's where this city planted" (Track view, NYC)

@@ -13,6 +13,7 @@ effect; see `pipelines/site_effects/RESULTS.md` before quoting any number.**
 | Surface | Location |
 |---|---|
 | App (Recommend / Track / Results) | https://heatseeker-7474650715825059.aws.databricksapps.com |
+| Alternative front end (not deployed) | `web/`: landing page + map-first tool (FastAPI + MapLibre), built by Agent 2 from the same snapshot; `uvicorn server:app --app-dir web --port 8600` |
 | Dashboard "HeatSeeker Portfolio" | Databricks → Dashboards, id `01f1e080008617ff8ba3af26fa258064` |
 | Genie "HeatSeeker — ask the results" | Databricks → Genie, id `01f1e087c5881f388af2ec32a1711ff3` |
 | Model Serving | endpoint `heatseeker-effect-model`, model `heatseeker.gold.effect_model` |
