@@ -89,6 +89,9 @@ def main(argv=None):
         info = mlflow.pyfunc.log_model(
             name="model", python_model=EffectModelPyfunc(model), signature=sig, input_example=example,
             registered_model_name=full_name,
+            # The pyfunc pickles EffectModel from the repo's core package; ship that code with the
+            # model or the serving container fails at load with a missing module.
+            code_paths=[str(REPO / "core")],
             pip_requirements=[f"scikit-learn=={__import__('sklearn').__version__}",
                               f"pandas=={pd.__version__}", f"numpy=={__import__('numpy').__version__}"],
         )

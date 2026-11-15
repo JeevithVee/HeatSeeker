@@ -38,3 +38,6 @@ mlruns/
 
 # Website: plantings logged while running locally
 web/var/
+
+# local MLflow client scratch
+mlflow.db
